@@ -13,6 +13,7 @@ enum Category: String, Codable {
     case culture
 }
 
+//질문 목록
 struct QuestionList: Codable, Identifiable, Hashable {
     //답변 완료 유무?
     let id: Int
@@ -34,6 +35,7 @@ struct QuestionList: Codable, Identifiable, Hashable {
     }
 }
 
+//질문 작성자
 struct QuestionUser: Codable, Hashable {
     let id: Int
     let name: String
@@ -45,5 +47,20 @@ struct QuestionUser: Codable, Hashable {
         case name = "user_name"
         case email = "user_email"
         case role = "user_role"
+    }
+}
+
+//질문 생성
+struct CreateQuestion: Codable {
+    let title: String
+    let content: String
+    let category: String
+    let imageUrl: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case title
+        case content
+        case category
+        case imageUrl = "image_url"
     }
 }
