@@ -39,4 +39,11 @@ struct QuestionUser: Codable, Hashable {
     let name: String
     let email: String
     let role: String
+    
+    enum CoingKeys: String, CodingKey {
+        case id
+        case name = "user_name"
+        case email = "user_email"
+        case role = "user_role"
+    }
 }
