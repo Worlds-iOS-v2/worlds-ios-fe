@@ -27,6 +27,7 @@ struct LoginView: View {
                     .padding(.bottom, 80)
                 
                 TextField("이메일을 입력하세요", text: $email)
+                    .keyboardType(.emailAddress)
                     .foregroundStyle(Color.gray)
                     .font(.system(size: 20))
                     .fontWeight(.semibold)
@@ -36,7 +37,7 @@ struct LoginView: View {
                     .cornerRadius(25)
                     .padding(.bottom, 24)
                 
-                TextField("비밀번호를 입력하세요", text: $password)
+                SecureField("비밀번호를 입력하세요", text: $password)
                     .foregroundStyle(Color.gray)
                     .font(.system(size: 20))
                     .fontWeight(.semibold)
