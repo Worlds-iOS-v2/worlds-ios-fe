@@ -50,17 +50,17 @@ struct QuestionUser: Codable, Hashable {
     }
 }
 
-//질문 생성
-struct CreateQuestion: Codable {
-    let title: String
-    let content: String
-    let category: String
-    let imageUrl: String?
-    
-    enum CodingKeys: String, CodingKey {
-        case title
-        case content
-        case category
-        case imageUrl = "image_url"
-    }
-}
+//질문 생성 (->이미지 포함해야해서 뺌)
+//struct CreateQuestion: Codable {
+//    let title: String
+//    let content: String
+//    let category: String
+//    let imageUrl: String?
+//    
+//    enum CodingKeys: String, CodingKey {
+//        case title
+//        case content
+//        case category
+//        case imageUrl = "image_url"
+//    }
+//}
