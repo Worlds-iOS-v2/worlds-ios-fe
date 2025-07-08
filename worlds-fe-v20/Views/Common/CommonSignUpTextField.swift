@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct CommonSignUpTextField: View {
-    @State var title: String = ""
-    @State var placeholder: String = ""
+    var title: String = ""
+    var placeholder: String = ""
+    var isSecure: Bool = false
+
     @Binding var content: String
     
     var body: some View {
@@ -19,14 +21,26 @@ struct CommonSignUpTextField: View {
                 .font(.system(size: 20))
                 .fontWeight(.semibold)
             
-            TextField("\(placeholder)", text: $content)
-                .foregroundStyle(Color.gray)
-                .font(.system(size: 20))
-                .fontWeight(.semibold)
-                .frame(height: 50)
-                .padding(.horizontal, 14)
-                .background(Color.white)
-                .cornerRadius(10)
+            if isSecure {
+                SecureField("\(placeholder)", text: $content)
+                    .foregroundStyle(Color.gray)
+                    .font(.system(size: 20))
+                    .fontWeight(.semibold)
+                    .frame(height: 50)
+                    .padding(.horizontal, 14)
+                    .background(Color.white)
+                    .cornerRadius(10)
+                
+            } else {
+                TextField("\(placeholder)", text: $content)
+                    .foregroundStyle(Color.gray)
+                    .font(.system(size: 20))
+                    .fontWeight(.semibold)
+                    .frame(height: 50)
+                    .padding(.horizontal, 14)
+                    .background(Color.white)
+                    .cornerRadius(10)
+            }
         }
     }
 }
