@@ -7,10 +7,10 @@
 import Foundation
 
 enum Category: String, Codable {
-    case all
-    case study
-    case life
-    case culture
+    case all = "전체보기"
+    case study = "학습질문"
+    case life = "학교생활"
+    case culture = "한국문화"
 }
 
 //질문 목록
