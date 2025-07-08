@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CommonSignUpButton: View {
     var text: String
-    @Binding var isFilled: Bool
+    var isFilled: Bool
     var action: () -> Void
     
     var body: some View {
