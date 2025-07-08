@@ -7,13 +7,14 @@
 
 import SwiftUI
 import UIKit
+import PhotosUI
 
 struct ImagePickerView: UIViewControllerRepresentable {
-    // **  1. 바인딩 변수 (선택한 이미지 전달)
-    @Binding var selectedImage: UIImage?
+    // **  1. 이미지 배열로 변경
+    @Binding var selectedImages: [UIImage]
     
     // **  2. 사진첩 or 카메라
-    var sourceType: UIImagePickerController.SourceType
+//    var sourceType: UIImagePickerController.SourceType
     
     // 3. 뷰 닫기용 환경변수
     @Environment(\.presentationMode) var presentationMode
@@ -24,33 +25,47 @@ struct ImagePickerView: UIViewControllerRepresentable {
     }
     
     // 5. **  UIKit 뷰컨트롤러 생성
-    func makeUIViewController(context: Context) -> UIImagePickerController {
-        let picker = UIImagePickerController()
-        picker.sourceType = sourceType
+    func makeUIViewController(context: Context) -> PHPickerViewController {
+        var config = PHPickerConfiguration()
+        config.selectionLimit = 3
+        config.filter = .images
+
+        let picker = PHPickerViewController(configuration: config)
         picker.delegate = context.coordinator
         return picker
     }
     
     // 6. 업데이트 필요 없음
-    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
     
     // **  7. 델리게이트 처리(SwiftUI로 사진 전송)
-    class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-        let parent: ImagePickerView
-        
-        init(_ parent: ImagePickerView) {
-            self.parent = parent
-        }
-        
-        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-            if let image = info[.originalImage] as? UIImage {
-                parent.selectedImage = image
+    class Coordinator: NSObject, PHPickerViewControllerDelegate {
+            var parent: ImagePickerView
+
+            init(_ parent: ImagePickerView) {
+                self.parent = parent
             }
-            parent.presentationMode.wrappedValue.dismiss()
-        }
-        
-        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            parent.presentationMode.wrappedValue.dismiss()
+
+            func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+                parent.selectedImages = []
+
+                let group = DispatchGroup()
+
+                for result in results {
+                    group.enter()
+                    result.itemProvider.loadObject(ofClass: UIImage.self) { (object, error) in
+                        defer { group.leave() }
+                        if let image = object as? UIImage {
+                            DispatchQueue.main.async {
+                                self.parent.selectedImages.append(image)
+                            }
+                        }
+                    }
+                }
+
+                group.notify(queue: .main) {
+                    picker.dismiss(animated: true)
+                }
+            }
         }
     }
-}
