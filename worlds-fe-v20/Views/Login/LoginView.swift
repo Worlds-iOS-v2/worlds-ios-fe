@@ -12,7 +12,12 @@ struct LoginView: View {
     
     @State var email: String = ""
     @State var password: String = ""
-    @State var isFilled: Bool = false
+    var isFilled: Bool {
+        !email.isEmpty && !password.isEmpty
+    }
+    
+    @State private var showAlert = false
+    @State private var alertMessage = ""
 
     var body: some View {
         ZStack {
@@ -48,8 +53,16 @@ struct LoginView: View {
                     .padding(.bottom, 32)
                 
                 Button {
-                    // 로그인 진행
-                    appState.flow = .main
+                    if email.isEmpty || password.isEmpty {
+                        alertMessage = "이메일과 비밀번호를 모두 입력해주세요."
+                        showAlert = true
+                    } else if !isValidEmail(email) {
+                        alertMessage = "이메일 형식이 올바르지 않습니다."
+                        showAlert = true
+                    } else {
+                        // 로그인 진행
+                        appState.flow = .main
+                    }
                 } label: {
                     ZStack {
                         RoundedRectangle(cornerRadius: 25)
@@ -61,6 +74,11 @@ struct LoginView: View {
                             .foregroundStyle(.white)
                             .fontWeight(.semibold)
                     }
+                }
+                .alert("오류", isPresented: $showAlert) {
+                    Button("확인", role: .cancel) { }
+                } message: {
+                    Text(alertMessage)
                 }
                 .disabled(!isFilled)
                 .padding(.bottom, 40)
@@ -143,6 +161,13 @@ struct LoginView: View {
             }
             .padding()
         }
+    }
+    
+    func isValidEmail(_ email: String) -> Bool {
+        let emailRegEx =
+        #"^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"#
+
+        return NSPredicate(format: "SELF MATCHES %@", emailRegEx).evaluate(with: email)
     }
 }
 
