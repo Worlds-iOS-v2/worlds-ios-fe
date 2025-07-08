@@ -8,12 +8,13 @@
 import SwiftUI
 
 struct SignUpDetailProfileView: View {
+    @EnvironmentObject var appState: AppState
+
     @State var name: String = ""
     @State var phoneNumber: String = ""
     @State var birthDate = Date()
     @State var isDatePickerPresented: Bool = false
     @State var isFilled: Bool = true
-    @State var isSuceed: Bool = false
     
     @State private var selectedGrade = "학년 선택"
     let options = ["1학년", "2학년", "3학년", "4학년", "5학년", "6학년"]
@@ -32,6 +33,7 @@ struct SignUpDetailProfileView: View {
                 
                 CommonSignUpTextField(title: "이름", placeholder: "이름을 입력해주세요", content: $name)
                     .padding(.bottom, 40)
+                    .padding(.top, 80)
                 
                 CommonSignUpTextField(title: "전화번호", placeholder: "전화번호를 입력해주세요", content: $phoneNumber)
                     .padding(.bottom, 40)
@@ -137,15 +139,11 @@ struct SignUpDetailProfileView: View {
                 // viewmodel에 데이터 전송
                 print("nextPage")
                 
-                // viewModel 호출 후 화면 전환 (어떤 방식이 더 효율적인지는 아직 모르겠음)
-                isSuceed = true
+                appState.flow = .login
             }
         }
         .padding()
         .background(.backgroundws)
-        .navigationDestination(isPresented: $isSuceed) {
-            ContentView()
-        }
     }
 }
 
