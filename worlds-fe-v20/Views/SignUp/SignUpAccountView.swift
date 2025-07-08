@@ -22,6 +22,7 @@ struct SignUpAccountView: View {
         VStack {
             CommonSignUpTextField(title: "이메일", placeholder: "이메일을 입력해주세요", content: $email)
                 .padding(.bottom, 40)
+                .padding(.top, 80)
             
             CommonSignUpTextField(title: "비밀번호", placeholder: "비밀번호를 입력해주세요", content: $password)
                 .padding(.bottom, 40)
