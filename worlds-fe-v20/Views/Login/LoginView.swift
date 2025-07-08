@@ -16,11 +16,11 @@ struct LoginView: View {
                 NavigationLink(destination: SignUpRoleSelectionView()) {
                     Text("회원가입")
                 }
-                .environmentObject(viewModel)
                 .padding(.top, 40)
             }
             .padding()
         }
+        .environmentObject(viewModel)
     }
 }
 
