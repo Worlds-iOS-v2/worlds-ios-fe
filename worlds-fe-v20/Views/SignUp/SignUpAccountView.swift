@@ -15,7 +15,13 @@ struct SignUpAccountView: View {
     @State var password: String = ""
     @State var passwordCheck: String = ""
     
-    @State var isFilled: Bool = true
+    var isFilled: Bool {
+        !email.isEmpty &&
+        isValidEmail(email) &&
+        !password.isEmpty &&
+        !passwordCheck.isEmpty &&
+        password == passwordCheck
+    }
     @State var isSuceed: Bool = false
     
     @EnvironmentObject var viewModel: SignUpViewModel
@@ -27,6 +33,12 @@ struct SignUpAccountView: View {
                 .padding(.bottom, 40)
                 .padding(.top, 80)
             
+            if !email.isEmpty && !isValidEmail(email) {
+                Text("올바른 이메일 형식이 아닙니다.")
+                    .foregroundColor(.red)
+                    .font(.caption)
+            }
+            
             CommonSignUpTextField(title: "비밀번호", placeholder: "비밀번호를 입력해주세요", isSecure: true, content: $password)
                 .padding(.bottom, 40)
                         
@@ -35,7 +47,7 @@ struct SignUpAccountView: View {
             
             Spacer()
             
-            CommonSignUpButton(text: "다음", isFilled: $isFilled) {
+            CommonSignUpButton(text: "다음", isFilled: isFilled) {
                 // viewmodel에 데이터 전송
                 print("SignUpDetailProfileView")
                 
@@ -62,6 +74,13 @@ struct SignUpAccountView: View {
         .navigationDestination(isPresented: $isSuceed) {
             SignUpDetailProfileView()
         }
+    }
+    
+    func isValidEmail(_ email: String) -> Bool {
+        let emailRegEx =
+        #"^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"#
+
+        return NSPredicate(format: "SELF MATCHES %@", emailRegEx).evaluate(with: email)
     }
 }
 
