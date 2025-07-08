@@ -7,12 +7,12 @@
 
 import SwiftUI
 
-struct SignUpMenteeProfileView: View {
+struct SignUpDetailProfileView: View {
     @State var name: String = ""
     @State var phoneNumber: String = ""
     @State var birthDate = Date()
     @State var isDatePickerPresented: Bool = false
-    @State var isFilled: Bool = false
+    @State var isFilled: Bool = true
     @State var isSuceed: Bool = false
     
     @State private var selectedGrade = "학년 선택"
@@ -23,6 +23,8 @@ struct SignUpMenteeProfileView: View {
         ["사회", "역사", "예체능"]
     ]
     @State var selectedSubjects: [String: Bool] = [:]
+    
+    @EnvironmentObject var viewModel: SignUpViewModel
     
     var body: some View {
         VStack {
@@ -68,27 +70,60 @@ struct SignUpMenteeProfileView: View {
                     .padding(.horizontal)
                 }
                 
-                Text("학년")
-                    .foregroundStyle(Color.gray)
-                    .font(.system(size: 20))
-                    .fontWeight(.semibold)
                 
-                Menu {
-                    ForEach(options, id: \.self) { option in
-                        Button(option) { selectedGrade = option }
+                if viewModel.role == .mentor {
+                    Text("과목")
+                        .foregroundStyle(Color.gray)
+                        .font(.system(size: 20))
+                        .fontWeight(.semibold)
+                    
+                    VStack(spacing: 12) {
+                        ForEach(subjectRows, id: \.self) { row in
+                            HStack(spacing: 8) {
+                                ForEach(row, id: \.self) { subject in
+                                    Button {
+                                        selectedSubjects[subject] = !(selectedSubjects[subject] ?? false)
+                                    } label: {
+                                        Text(subject)
+                                            .font(.system(size: 15))
+                                            .frame(maxWidth: .infinity)
+                                            .frame(height: 30)
+                                            .background(Color.white)
+                                            .foregroundColor(Color.black)
+                                            .cornerRadius(12)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 12)
+                                                    .stroke(Color.blue, lineWidth: 2)
+                                                    .opacity(selectedSubjects[subject] ?? false ? 1 : 0)
+                                            )
+                                    }
+                                }
+                            }
+                        }
                     }
-                } label: {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 10)
-                            .foregroundStyle(Color.white)
-                            .font(.system(size: 20))
-                            .fontWeight(.semibold)
-                            .frame(height: 50)
-                        
-                        Label(selectedGrade, systemImage: "chevron.down")                .foregroundStyle(Color.gray)
-                            .font(.system(size: 20))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.leading, 14)
+                } else {
+                    Text("학년")
+                        .foregroundStyle(Color.gray)
+                        .font(.system(size: 20))
+                        .fontWeight(.semibold)
+                    
+                    Menu {
+                        ForEach(options, id: \.self) { option in
+                            Button(option) { selectedGrade = option }
+                        }
+                    } label: {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 10)
+                                .foregroundStyle(Color.white)
+                                .font(.system(size: 20))
+                                .fontWeight(.semibold)
+                                .frame(height: 50)
+                            
+                            Label(selectedGrade, systemImage: "chevron.down")                .foregroundStyle(Color.gray)
+                                .font(.system(size: 20))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.leading, 14)
+                        }
                     }
                 }
                 
@@ -115,5 +150,6 @@ struct SignUpMenteeProfileView: View {
 }
 
 #Preview {
-    SignUpMenteeProfileView()
+    SignUpDetailProfileView()
+        .environmentObject(SignUpViewModel())
 }
