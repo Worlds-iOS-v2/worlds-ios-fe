@@ -23,13 +23,14 @@ struct SignUpAccountView: View {
     var body: some View {
         VStack {
             CommonSignUpTextField(title: "이메일", placeholder: "이메일을 입력해주세요", content: $email)
+                .keyboardType(.emailAddress)
                 .padding(.bottom, 40)
                 .padding(.top, 80)
             
-            CommonSignUpTextField(title: "비밀번호", placeholder: "비밀번호를 입력해주세요", content: $password)
+            CommonSignUpTextField(title: "비밀번호", placeholder: "비밀번호를 입력해주세요", isSecure: true, content: $password)
                 .padding(.bottom, 40)
                         
-            CommonSignUpTextField(title: "비밀번호 확인", placeholder: "비밀번호를 한 번 더 입력해주세요.", content: $passwordCheck)
+            CommonSignUpTextField(title: "비밀번호 확인", placeholder: "비밀번호를 한 번 더 입력해주세요.", isSecure: true, content: $passwordCheck)
                 .padding(.bottom, 40)
             
             Spacer()
