@@ -53,21 +53,58 @@ class APIService {
         }
     
     //질문 생성
-    func createQuestion(_ request: CreateQuestion) async throws {
+    func createQuestion(title: String, content: String, category: String, images: [Data]? = nil) async throws -> Bool {
         let headers = try getAuthHeaders()
         
-        let url = "\(baseURL)/questions"
-        //        let data: [String: Any] = ["title": title, "content": content]
-        
-        let response = try await AF.request(
-            url,
-            method: .post,
-            parameters: request,
-            encoder: JSONParameterEncoder.default,
-            headers: headers
-        )
-        .validate()
-        .value
+        // 이미지가 있으면 multipart/form-data 전송
+        if let imagesData = images, !imagesData.isEmpty {
+            return try await withCheckedThrowingContinuation { continuation in
+                AF.upload(
+                    multipartFormData: { multipartFormData in
+                        multipartFormData.append(title.data(using: .utf8)!, withName: "title")
+                        multipartFormData.append(content.data(using: .utf8)!, withName: "content")
+                        multipartFormData.append(category.data(using: .utf8)!, withName: "category")
+
+                        for (index, imageData) in imagesData.enumerated() {
+                            multipartFormData.append(imageData,
+                                                 withName: "images",
+                                                 fileName: "image\(index).jpg",
+                                                 mimeType: "image/jpeg")
+                        }
+                    },
+                    to: "\(baseURL)/questions",
+                    method: .post,
+                    headers: headers
+                )
+                .validate()
+                .response { response in
+                    switch response.result {
+                    case .success:
+                        continuation.resume(returning: true)
+                    case .failure(let error):
+                        continuation.resume(throwing: error)
+                    }
+                }
+            }
+        } else {
+            let params: [String: Any] = [
+                "title": title,
+                "content": content,
+                "category": category
+            ]
+            
+            let response = try await AF.request(
+                "\(baseURL)/questions",
+                method: .post,
+                parameters: params,
+                encoding: JSONEncoding.default,
+                headers: headers )
+            .validate()
+            .serializingData()
+            .response
+            
+            return response.error == nil
+        }
     }
 
     
