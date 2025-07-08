@@ -36,6 +36,7 @@ struct SignUpDetailProfileView: View {
                     .padding(.top, 80)
                 
                 CommonSignUpTextField(title: "전화번호", placeholder: "전화번호를 입력해주세요", content: $phoneNumber)
+                    .keyboardType(.numberPad)
                     .padding(.bottom, 40)
                 
                 Text("생년월일")
