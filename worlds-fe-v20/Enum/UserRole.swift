@@ -5,8 +5,8 @@
 //  Created by seohuibaek on 7/7/25.
 //
 
-enum UserRole {
-    case mentor
-    case mentee
+enum UserRole: String, Codable {
+    case mentor = "MENTOR"
+    case mentee = "MENTEE"
     case none
 }
