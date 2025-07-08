@@ -12,6 +12,7 @@ import PhotosUI
 struct ImagePickerView: UIViewControllerRepresentable {
     // **  1. 이미지 배열로 변경
     @Binding var selectedImages: [UIImage]
+    var sourceType: UIImagePickerController.SourceType = .photoLibrary
     
     // **  2. 사진첩 or 카메라
 //    var sourceType: UIImagePickerController.SourceType
