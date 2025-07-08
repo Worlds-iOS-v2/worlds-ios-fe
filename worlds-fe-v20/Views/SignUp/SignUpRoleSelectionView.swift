@@ -12,6 +12,8 @@ struct SignUpRoleSelectionView: View {
     @State var selectedRole: UserRole = .none
     @State var isSelected: Bool = false
     @State var isSuceed: Bool = false
+    
+    @EnvironmentObject var viewModel: SignUpViewModel
         
     var body: some View {
         
@@ -27,6 +29,8 @@ struct SignUpRoleSelectionView: View {
                     print("mentor")
                     selectedRole = .mentor
                     isSelected = true
+                    
+                    viewModel.role = .mentor
                 } label: {
                     VStack {
                         Image("mentor")
@@ -55,6 +59,8 @@ struct SignUpRoleSelectionView: View {
                     print("mentee")
                     selectedRole = .mentee
                     isSelected = true
+                    
+                    viewModel.role = .mentee
                 } label: {
                     VStack {
                         Image("mentee")
@@ -103,4 +109,5 @@ struct SignUpRoleSelectionView: View {
 
 #Preview {
     SignUpRoleSelectionView()
+        .environmentObject(SignUpViewModel())
 }
