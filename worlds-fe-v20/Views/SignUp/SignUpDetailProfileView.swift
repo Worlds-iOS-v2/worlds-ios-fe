@@ -141,9 +141,20 @@ struct SignUpDetailProfileView: View {
                 
                 appState.flow = .login
             }
+            .padding(.bottom, 12)
+            
+            Button {
+                appState.flow = .login
+            } label: {
+                Text("로그인 하기")
+                    .foregroundStyle(Color.gray)
+                    .font(.system(size: 14))
+            }
         }
         .padding()
         .background(.backgroundws)
+        .navigationTitle("회원가입")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

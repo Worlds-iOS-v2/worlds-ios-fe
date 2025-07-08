@@ -9,6 +9,8 @@ import SwiftUI
 
 /// 회원가입 1번째 페이지 - 멘토/멘티 선택 화면
 struct SignUpRoleSelectionView: View {
+    @EnvironmentObject var appState: AppState
+    
     @State var selectedRole: UserRole = .none
     @State var isSelected: Bool = false
     @State var isSuceed: Bool = false
@@ -18,7 +20,7 @@ struct SignUpRoleSelectionView: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading) {
-                Text("누구의 계정인가요?")
+                Text("누가 사용할 계정인가요?")
                     .font(.system(size: 27))
                     .padding(.top, 40)
                 
@@ -87,6 +89,7 @@ struct SignUpRoleSelectionView: View {
                     
                     Spacer()
                 }
+                .padding(.top, 24)
                 
                 Spacer()
                 
@@ -97,6 +100,17 @@ struct SignUpRoleSelectionView: View {
                     // viewModel 호출 후 화면 전환 (어떤 방식이 더 효율적인지는 아직 모르겠음)
                     isSuceed = true
                 }
+                .padding(.bottom, 12)
+                
+                Button {
+                    appState.flow = .login
+                } label: {
+                    Text("로그인 하기")
+                        .foregroundStyle(Color.gray)
+                        .font(.system(size: 14))
+                }
+                .frame(maxWidth: .infinity)
+                .multilineTextAlignment(.center)
             }
             .padding()
             .background(.backgroundws)
