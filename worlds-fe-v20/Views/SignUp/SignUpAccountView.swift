@@ -16,6 +16,8 @@ struct SignUpAccountView: View {
     @State var isFilled: Bool = false
     @State var isSuceed: Bool = false
     
+    @EnvironmentObject var viewModel: SignUpViewModel
+    
     var body: some View {
         VStack {
             CommonSignUpTextField(title: "이메일", placeholder: "이메일을 입력해주세요", content: $email)
@@ -29,7 +31,10 @@ struct SignUpAccountView: View {
             
             CommonSignUpButton(text: "다음", isFilled: $isFilled) {
                 // viewmodel에 데이터 전송
-                print("SignUpMenteeProfileView")
+                print("SignUpDetailProfileView")
+                
+                viewModel.email = email
+                viewModel.password = password
                 
                 // viewModel 호출 후 화면 전환 (어떤 방식이 더 효율적인지는 아직 모르겠음)
                 isSuceed = true
@@ -42,11 +47,12 @@ struct SignUpAccountView: View {
         .navigationTitle("회원가입")
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(isPresented: $isSuceed) {
-            SignUpMenteeProfileView()
+            SignUpDetailProfileView()
         }
     }
 }
 
 #Preview {
     SignUpAccountView()
+        .environmentObject(SignUpViewModel())
 }
