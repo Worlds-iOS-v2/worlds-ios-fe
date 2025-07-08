@@ -136,7 +136,7 @@ struct SignUpDetailProfileView: View {
             
             Spacer()
             
-            CommonSignUpButton(text: "완료", isFilled: $isFilled) {
+            CommonSignUpButton(text: "완료", isFilled: isFilled) {
                 // viewmodel에 데이터 전송
                 print("nextPage")
                 

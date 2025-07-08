@@ -93,7 +93,7 @@ struct SignUpRoleSelectionView: View {
                 
                 Spacer()
                 
-                CommonSignUpButton(text: "다음", isFilled: $isSelected) {
+                CommonSignUpButton(text: "다음", isFilled: isSelected) {
                     // viewmodel에 데이터 전송
                     print("SignUpAccountView")
                     
