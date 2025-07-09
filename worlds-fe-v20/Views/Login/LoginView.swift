@@ -12,10 +12,12 @@ struct LoginView: View {
     
     @State var email: String = ""
     @State var password: String = ""
-    var isFilled: Bool {
-        !email.isEmpty && !password.isEmpty
-    }
+//    var isFilled: Bool {
+//        !email.isEmpty && !password.isEmpty
+//    }
     
+    var isFilled = true
+
     @State private var showAlert = false
     @State private var alertMessage = ""
 
@@ -35,7 +37,6 @@ struct LoginView: View {
                     .keyboardType(.emailAddress)
                     .foregroundStyle(Color.gray)
                     .font(.system(size: 20))
-                    .fontWeight(.semibold)
                     .frame(height: 50)
                     .padding(.horizontal, 14)
                     .background(Color.white)
@@ -45,7 +46,6 @@ struct LoginView: View {
                 SecureField("비밀번호를 입력하세요", text: $password)
                     .foregroundStyle(Color.gray)
                     .font(.system(size: 20))
-                    .fontWeight(.semibold)
                     .frame(height: 50)
                     .padding(.horizontal, 14)
                     .background(Color.white)
@@ -53,16 +53,17 @@ struct LoginView: View {
                     .padding(.bottom, 32)
                 
                 Button {
-                    if email.isEmpty || password.isEmpty {
-                        alertMessage = "이메일과 비밀번호를 모두 입력해주세요."
-                        showAlert = true
-                    } else if !isValidEmail(email) {
-                        alertMessage = "이메일 형식이 올바르지 않습니다."
-                        showAlert = true
-                    } else {
-                        // 로그인 진행
-                        appState.flow = .main
-                    }
+//                    if email.isEmpty || password.isEmpty {
+//                        alertMessage = "이메일과 비밀번호를 모두 입력해주세요."
+//                        showAlert = true
+//                    } else if !isValidEmail(email) {
+//                        alertMessage = "이메일 형식이 올바르지 않습니다."
+//                        showAlert = true
+//                    } else {
+//                        // 로그인 진행
+//                        appState.flow = .main
+//                    }
+                    appState.flow = .main
                 } label: {
                     ZStack {
                         RoundedRectangle(cornerRadius: 25)
