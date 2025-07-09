@@ -15,13 +15,14 @@ struct SignUpAccountView: View {
     @State var password: String = ""
     @State var passwordCheck: String = ""
     
-    var isFilled: Bool {
-        !email.isEmpty &&
-        isValidEmail(email) &&
-        !password.isEmpty &&
-        !passwordCheck.isEmpty &&
-        password == passwordCheck
-    }
+//    var isFilled: Bool {
+//        !email.isEmpty &&
+//        isValidEmail(email) &&
+//        !password.isEmpty &&
+//        !passwordCheck.isEmpty &&
+//        password == passwordCheck
+//    }
+    var isFilled = true
     @State var isSuceed: Bool = false
     
     @EnvironmentObject var viewModel: SignUpViewModel
@@ -33,11 +34,11 @@ struct SignUpAccountView: View {
                 .padding(.bottom, 40)
                 .padding(.top, 80)
             
-            if !email.isEmpty && !isValidEmail(email) {
-                Text("올바른 이메일 형식이 아닙니다.")
-                    .foregroundColor(.red)
-                    .font(.caption)
-            }
+//            if !email.isEmpty && !isValidEmail(email) {
+//                Text("올바른 이메일 형식이 아닙니다.")
+//                    .foregroundColor(.red)
+//                    .font(.caption)
+//            }
             
             CommonSignUpTextField(title: "비밀번호", placeholder: "비밀번호를 입력해주세요", isSecure: true, content: $password)
                 .padding(.bottom, 40)
