@@ -8,16 +8,28 @@
 
 /* Begin PBXBuildFile section */
 		9F25395A2E17C57600B526A5 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 9F2539592E17C57600B526A5 /* Alamofire */; };
-		9F25395C2E17C57600B526A5 /* AlamofireDynamic in Frameworks */ = {isa = PBXBuildFile; productRef = 9F25395B2E17C57600B526A5 /* AlamofireDynamic */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		9F2539392E17C53900B526A5 /* worlds-fe-v20.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "worlds-fe-v20.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		9F2539812E1CFA3000B526A5 /* Exceptions for "worlds-fe-v20" folder in "worlds-fe-v20" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 9F2539382E17C53900B526A5 /* worlds-fe-v20 */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		9F25393B2E17C53900B526A5 /* worlds-fe-v20 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				9F2539812E1CFA3000B526A5 /* Exceptions for "worlds-fe-v20" folder in "worlds-fe-v20" target */,
+			);
 			path = "worlds-fe-v20";
 			sourceTree = "<group>";
 		};
@@ -29,7 +41,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				9F25395A2E17C57600B526A5 /* Alamofire in Frameworks */,
-				9F25395C2E17C57600B526A5 /* AlamofireDynamic in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -73,7 +84,6 @@
 			name = "worlds-fe-v20";
 			packageProductDependencies = (
 				9F2539592E17C57600B526A5 /* Alamofire */,
-				9F25395B2E17C57600B526A5 /* AlamofireDynamic */,
 			);
 			productName = "worlds-fe-v20";
 			productReference = 9F2539392E17C53900B526A5 /* worlds-fe-v20.app */;
@@ -267,11 +277,15 @@
 				DEVELOPMENT_TEAM = A64NU99HZZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "worlds-fe-v20/Info.plist";
+				INFOPLIST_KEY_NSCameraUsageDescription = "질문 등록을 위해 카메라 접근 권한이 필요합니다.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "질문 등록을 위해 사진 접근 권한이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -296,11 +310,15 @@
 				DEVELOPMENT_TEAM = A64NU99HZZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "worlds-fe-v20/Info.plist";
+				INFOPLIST_KEY_NSCameraUsageDescription = "질문 등록을 위해 카메라 접근 권한이 필요합니다.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "질문 등록을 위해 사진 접근 권한이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -353,11 +371,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9F2539582E17C57600B526A5 /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
-		};
-		9F25395B2E17C57600B526A5 /* AlamofireDynamic */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9F2539582E17C57600B526A5 /* XCRemoteSwiftPackageReference "Alamofire" */;
-			productName = AlamofireDynamic;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
