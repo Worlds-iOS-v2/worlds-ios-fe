@@ -17,6 +17,7 @@ struct QuestionList: Codable, Identifiable, Hashable {
     //답변 완료 유무?
     let id: Int
     let title: String
+    let content: String
     let createdAt: String
     let isAnswered: Bool
     let answerCount: Int
@@ -26,6 +27,7 @@ struct QuestionList: Codable, Identifiable, Hashable {
     enum CodingKeys: String, CodingKey {
         case id
         case title
+        case content 
         case createdAt = "created_at"
         case isAnswered = "is_answered"
         case answerCount = "answer_count"
