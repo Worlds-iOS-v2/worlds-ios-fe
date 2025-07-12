@@ -33,6 +33,6 @@ struct QuestionDetail: Codable, Identifiable, Hashable {
         case category
         case isAnswered = "is_answered"
         case answerCount = "answer_count"
-        case imageUrls = "image_urls"
+        case imageUrl = "image_urls"
     }
 }
