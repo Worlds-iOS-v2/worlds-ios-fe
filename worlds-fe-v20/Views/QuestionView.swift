@@ -63,7 +63,7 @@ struct QuestionView: View {
                     }
                     
                     .onAppear {
-                        viewModel.loadDummyData() //테스트 용 - 이후 삭제
+                        viewModel.loadDummyData() //테스트용 이후 삭제
 //                        Task {
 //                            await viewModel.fetchQuestions()
 //                        }
@@ -80,7 +80,7 @@ struct QuestionView: View {
                                 isCreatingQuestion = true
                                 Task {
                                     do {
-                                        let categoryKey = categoryMap[selectedCategory] ?? "free" // 기본값
+                                        let categoryKey = categoryMap[selectedCategory] ?? "free" //기본값==자.게
                                         let result = try await APIService.shared.createQuestion(
                                             title: newQuestionTitle,
                                             content: newQuestionContent,
