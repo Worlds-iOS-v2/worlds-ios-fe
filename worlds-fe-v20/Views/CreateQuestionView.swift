@@ -20,8 +20,8 @@ struct CreateQuestionView: View {
     @State private var imagePickerSourceType: UIImagePickerController.SourceType = .photoLibrary
     
     @State private var selectedCategory = ""
-    let categories = ["전체 보기", "학습 게시판", "자유 게시판"]
-    let categoryMap = ["전체 보기": "all", "학습 게시판": "study", "자유 게시판": "free"]
+    let categories = ["학습 게시판", "자유 게시판"]
+    let categoryMap = ["학습 게시판": "study", "자유 게시판": "free"]
     
     var categoryValue: String {
             categoryMap[selectedCategory] ?? selectedCategory
@@ -124,7 +124,7 @@ struct CreateQuestionView: View {
                         errorMessage = "카테고리 선택은 필수입니다."
                         return
                     }
-                    onSubmit(selectedImages, selectedCategory)
+                    onSubmit(selectedImages, categoryValue) //selectedCategory전달하면 한글이라 서버 못받
                 } label: {
                     Text("등록")
                         .foregroundColor(.black)
