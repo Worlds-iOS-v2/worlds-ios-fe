@@ -68,6 +68,7 @@ struct ImagePickerView: UIViewControllerRepresentable {
                 picker.dismiss(animated: true)
             }
         }
+        //이미지 선택 후 중복 문제 -> 중복 비교 함수 추가
         private func containsImage(_ images: [UIImage], _ newImage: UIImage) -> Bool {
             return images.contains(where: { $0.pngData() == newImage.pngData() })
         }
