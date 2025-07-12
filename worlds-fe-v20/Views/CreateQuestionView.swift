@@ -21,7 +21,12 @@ struct CreateQuestionView: View {
     
     @State private var selectedCategory = ""
     let categories = ["전체 보기", "학습 게시판", "자유 게시판"]
+    let categoryMap = ["전체 보기": "all", "학습 게시판": "study", "자유 게시판": "free"]
     
+    var categoryValue: String {
+            categoryMap[selectedCategory] ?? selectedCategory
+    }
+
     var onSubmit: (_ images: [UIImage], _ category: String) -> Void
     
     var body: some View {
