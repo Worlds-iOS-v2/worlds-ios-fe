@@ -19,7 +19,7 @@ struct QuestionDetail: Codable, Identifiable, Hashable {
     let category: Category
     let isAnswered: Bool
     let answerCount: Int
-    let imageUrl: String?
+    let imageUrl: [String]?
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -33,6 +33,6 @@ struct QuestionDetail: Codable, Identifiable, Hashable {
         case category
         case isAnswered = "is_answered"
         case answerCount = "answer_count"
-        case imageUrl = "image_url"
+        case imageUrls = "image_urls"
     }
 }
