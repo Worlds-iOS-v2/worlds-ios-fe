@@ -20,7 +20,7 @@ struct CreateQuestionView: View {
     @State private var imagePickerSourceType: UIImagePickerController.SourceType = .photoLibrary
     
     @State private var selectedCategory = ""
-    let categories = ["학습질문", "학교생활", "한국문화"]
+    let categories = ["전체 보기", "학습 게시판", "자유 게시판"]
     
     var onSubmit: (_ images: [UIImage], _ category: String) -> Void
     
@@ -108,7 +108,7 @@ struct CreateQuestionView: View {
                         .padding(.horizontal)
                 }
                 
-                //등록 중 로딩
+                //등록되는 동안 로딩
                 if isCreating {
                     ProgressView()
                         .frame(maxWidth: .infinity)
@@ -116,7 +116,7 @@ struct CreateQuestionView: View {
                 
                 Button {
                     if selectedCategory.isEmpty {
-                        errorMessage = "카테고리를 선택해주세요."
+                        errorMessage = "카테고리 선택은 필수입니다."
                         return
                     }
                     onSubmit(selectedImages, selectedCategory)
