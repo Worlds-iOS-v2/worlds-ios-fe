@@ -15,7 +15,7 @@ struct ImagePickerView: UIViewControllerRepresentable {
     var sourceType: UIImagePickerController.SourceType = .photoLibrary
     
     // **  2. 사진첩 or 카메라
-//    var sourceType: UIImagePickerController.SourceType
+    //    var sourceType: UIImagePickerController.SourceType
     
     // 3. 뷰 닫기용 환경변수
     @Environment(\.presentationMode) var presentationMode
@@ -30,7 +30,7 @@ struct ImagePickerView: UIViewControllerRepresentable {
         var config = PHPickerConfiguration()
         config.selectionLimit = 3
         config.filter = .images
-
+        
         let picker = PHPickerViewController(configuration: config)
         picker.delegate = context.coordinator
         return picker
@@ -41,32 +41,36 @@ struct ImagePickerView: UIViewControllerRepresentable {
     
     // **  7. 델리게이트 처리(SwiftUI로 사진 전송)
     class Coordinator: NSObject, PHPickerViewControllerDelegate {
-            var parent: ImagePickerView
-
-            init(_ parent: ImagePickerView) {
-                self.parent = parent
-            }
-
-            func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-                parent.selectedImages = []
-
-                let group = DispatchGroup()
-
-                for result in results {
-                    group.enter()
-                    result.itemProvider.loadObject(ofClass: UIImage.self) { (object, error) in
-                        defer { group.leave() }
-                        if let image = object as? UIImage {
-                            DispatchQueue.main.async {
-                                self.parent.selectedImages.append(image)
-                            }
+        var parent: ImagePickerView
+        
+        init(_ parent: ImagePickerView) {
+            self.parent = parent
+        }
+        
+        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            parent.selectedImages = []
+            
+            let group = DispatchGroup()
+            
+            for result in results {
+                group.enter()
+                result.itemProvider.loadObject(ofClass: UIImage.self) { (object, error) in
+                    defer { group.leave() }
+                    if let image = object as? UIImage {
+                        DispatchQueue.main.async {
+                            self.parent.selectedImages.append(image)
                         }
                     }
                 }
-
-                group.notify(queue: .main) {
-                    picker.dismiss(animated: true)
-                }
+            }
+            
+            group.notify(queue: .main) {
+                picker.dismiss(animated: true)
             }
         }
+        private func containsImage(_ images: [UIImage], _ newImage: UIImage) -> Bool {
+            return images.contains(where: { $0.pngData() == newImage.pngData() })
+        }
     }
+}
+
