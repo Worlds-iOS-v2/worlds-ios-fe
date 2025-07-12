@@ -14,18 +14,32 @@ class QuestionViewModel: ObservableObject {
     @Published var selectedQuestion: QuestionDetail?
     @Published var isLoading = false
     @Published var errorMessage: String?
+    
+    //더미데이터로 테스트
+    func loadDummyData() {
+        let id: Int
+        let name: String
+        let email: String
+        let role: String
+            questions = [
+                QuestionList(id: 1, title: "첫 질문", content: "내용이다", createdAt: "2025-07-12", isAnswered: false, answerCount: 0, category: .study, user: QuestionUser(id: 1, name: "홍길동", email:"123@naver.com", role:"mentee")),
+                QuestionList(id: 2, title: "두번째 질문", content: "두번재내용이다", createdAt: "2025-07-10", isAnswered: true, answerCount: 2, category: .free, user: QuestionUser(id: 2, name: "홍길동", email:"123@naver.com", role:"mentee"))
+            ]
+        }
+    
+    
 
     // 질문 목록 조회
     func fetchQuestions() async {
         isLoading = true
         do {
             let list = try await APIService.shared.fetchQuestions()
-            questions = list
-            errorMessage = nil
+            self.questions = list
+            self.errorMessage = nil
         } catch {
-            errorMessage = "질문 목록을 불러오는데 실패했습니다: \(error.localizedDescription)"
+            self.errorMessage = "질문 목록을 불러오는데 실패했습니다: \(error.localizedDescription)"
+            self.isLoading = false
         }
-        isLoading = false
     }
 
     // 질문 상세 조회
