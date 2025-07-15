@@ -9,31 +9,30 @@ import SwiftUI
 
 struct SignUpDetailProfileView: View {
     @EnvironmentObject var appState: AppState
+    @Environment(\.dismiss) var dismiss
 
     @State var name: String = ""
     @State var phoneNumber: String = ""
-    @State var birthDate = Date()
+
+    @State var birthYear: Int = Calendar.current.component(.year, from: Date())
+    @State var birthMonth: Int = Calendar.current.component(.month, from: Date())
+    @State var birthDay: Int = Calendar.current.component(.day, from: Date())
+    
     @State var isDatePickerPresented: Bool = false
     @State var isFilled: Bool = true
-    
-    @State private var selectedGrade = "학년 선택"
-    let options = ["1학년", "2학년", "3학년", "4학년", "5학년", "6학년"]
-
-    let subjectRows = [
-        ["국어", "영어", "수학", "과학"],
-        ["사회", "역사", "예체능"]
-    ]
-    @State var selectedSubjects: [String: Bool] = [:]
     
     @EnvironmentObject var viewModel: SignUpViewModel
     
     var body: some View {
         VStack {
             VStack(alignment: .leading) {
+                Text("사용자 정보를 입력해주세요.")
+                    .font(.system(size: 27, weight: .bold))
+                    .padding(.top, 40)
                 
                 CommonSignUpTextField(title: "이름", placeholder: "이름을 입력해주세요", content: $name)
                     .padding(.bottom, 40)
-                    .padding(.top, 80)
+                    .padding(.top, 40)
                 
                 CommonSignUpTextField(title: "전화번호", placeholder: "전화번호를 입력해주세요", content: $phoneNumber)
                     .keyboardType(.numberPad)
@@ -48,90 +47,53 @@ struct SignUpDetailProfileView: View {
                     isDatePickerPresented.toggle()
                 } label: {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 10)
+                        RoundedRectangle(cornerRadius: 16)
                             .foregroundStyle(Color.white)
                             .font(.system(size: 20))
                             .fontWeight(.semibold)
-                            .frame(height: 50)
+                            .frame(height: 60)
                         
-                        Text("\(birthDate.toString())")
+                        Text("\(String(birthYear))년 \(birthMonth)월 \(birthDay)일")
                             .foregroundStyle(Color.gray)
                             .font(.system(size: 20))
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.leading, 14)
                     }
                 }
-                .padding(.bottom, 40)
-                
-                if isDatePickerPresented {
-                    DatePicker(
-                        "",
-                        selection: $birthDate,
-                        displayedComponents: [.date]
-                    )
-                    .datePickerStyle(.wheel)
-                    .padding(.horizontal)
-                }
-                
-                
-                if viewModel.role == .mentor {
-                    Text("과목")
-                        .foregroundStyle(Color.gray)
-                        .font(.system(size: 20))
-                        .fontWeight(.semibold)
                     
-                    VStack(spacing: 12) {
-                        ForEach(subjectRows, id: \.self) { row in
-                            HStack(spacing: 8) {
-                                ForEach(row, id: \.self) { subject in
-                                    Button {
-                                        selectedSubjects[subject] = !(selectedSubjects[subject] ?? false)
-                                    } label: {
-                                        Text(subject)
-                                            .font(.system(size: 15))
-                                            .frame(maxWidth: .infinity)
-                                            .frame(height: 30)
-                                            .background(Color.white)
-                                            .foregroundColor(Color.black)
-                                            .cornerRadius(12)
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 12)
-                                                    .stroke(Color.blue, lineWidth: 2)
-                                                    .opacity(selectedSubjects[subject] ?? false ? 1 : 0)
-                                            )
-                                    }
-                                }
+                if isDatePickerPresented {
+                    HStack(spacing: 0) {
+                        // 년
+                        Picker("년도", selection: $birthYear) {
+                            ForEach(1900...Calendar.current.component(.year, from: Date()), id: \.self) { year in
+                                Text("\(String(year))년").tag(year)
                             }
                         }
-                    }
-                } else {
-                    Text("학년")
-                        .foregroundStyle(Color.gray)
-                        .font(.system(size: 20))
-                        .fontWeight(.semibold)
-                    
-                    Menu {
-                        ForEach(options, id: \.self) { option in
-                            Button(option) { selectedGrade = option }
+                        .pickerStyle(.wheel)
+                        .frame(maxWidth: .infinity)
+                        
+                        // 월
+                        Picker("월", selection: $birthMonth) {
+                            ForEach(1...12, id: \.self) { month in
+                                Text("\(month)월").tag(month)
+                            }
                         }
-                    } label: {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 10)
-                                .foregroundStyle(Color.white)
-                                .font(.system(size: 20))
-                                .fontWeight(.semibold)
-                                .frame(height: 50)
-                            
-                            Label(selectedGrade, systemImage: "chevron.down")                .foregroundStyle(Color.gray)
-                                .font(.system(size: 20))
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.leading, 14)
+                        .pickerStyle(.wheel)
+                        .frame(maxWidth: .infinity)
+                        
+                        // 일
+                        Picker("일", selection: $birthDay) {
+                            ForEach(1...31, id: \.self) { day in
+                                Text("\(day)일").tag(day)
+                            }
                         }
+                        .pickerStyle(.wheel)
+                        .frame(maxWidth: .infinity)
                     }
+                    .background(Color.white)
+                    .cornerRadius(16)
+                    .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
                 }
-                
-                Spacer()
-                
             }
             
             Spacer()
@@ -156,6 +118,18 @@ struct SignUpDetailProfileView: View {
         .background(.backgroundws)
         .navigationTitle("회원가입")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.black)
+                        .font(.system(size: 18, weight: .semibold))
+                }
+            }
+        }
     }
 }
 
