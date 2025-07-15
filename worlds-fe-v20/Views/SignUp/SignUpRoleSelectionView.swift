@@ -21,7 +21,7 @@ struct SignUpRoleSelectionView: View {
         NavigationStack {
             VStack(alignment: .leading) {
                 Text("누가 사용할 계정인가요?")
-                    .font(.system(size: 27))
+                    .font(.system(size: 27, weight: .bold))
                     .padding(.top, 40)
                 
                 HStack(alignment: .center) {
@@ -116,6 +116,18 @@ struct SignUpRoleSelectionView: View {
             .background(.backgroundws)
             .navigationTitle("회원가입")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        appState.flow = .login
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(.black)
+                            .font(.system(size: 18, weight: .semibold))
+                    }
+                }
+            }
             .navigationDestination(isPresented: $isSuceed) {
                 SignUpAccountView()
             }
