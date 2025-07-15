@@ -25,19 +25,19 @@ struct CommonSignUpTextField: View {
                 SecureField("\(placeholder)", text: $content)
                     .foregroundStyle(Color.gray)
                     .font(.system(size: 20))
-                    .frame(height: 50)
+                    .frame(height: 60)
                     .padding(.horizontal, 14)
                     .background(Color.white)
-                    .cornerRadius(10)
-                
+                    .cornerRadius(16)
+
             } else {
                 TextField("\(placeholder)", text: $content)
                     .foregroundStyle(Color.gray)
                     .font(.system(size: 20))
-                    .frame(height: 50)
+                    .frame(height: 60)
                     .padding(.horizontal, 14)
                     .background(Color.white)
-                    .cornerRadius(10)
+                    .cornerRadius(16)
             }
         }
     }
