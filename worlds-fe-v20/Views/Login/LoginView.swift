@@ -66,6 +66,7 @@ struct LoginView: View {
                         RoundedRectangle(cornerRadius: 16)
                             .fill(isFilled ? Color.mainws: Color.gray)
                             .frame(height: 60)
+                            .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
                         
                         Text("로그인")
                             .font(.system(size: 24))
