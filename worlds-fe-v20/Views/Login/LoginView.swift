@@ -28,29 +28,26 @@ struct LoginView: View {
             
             VStack {
                 Image("logo")
-                    .resizable()
-                    .frame(width: 295)
-                    .scaledToFit()
                     .padding(.bottom, 80)
                 
                 TextField("이메일을 입력하세요", text: $email)
                     .keyboardType(.emailAddress)
                     .foregroundStyle(Color.gray)
                     .font(.system(size: 20))
-                    .frame(height: 50)
+                    .frame(height: 60)
                     .padding(.horizontal, 14)
                     .background(Color.white)
-                    .cornerRadius(25)
-                    .padding(.bottom, 24)
+                    .cornerRadius(16)
+                    .padding(.bottom, 12)
                 
                 SecureField("비밀번호를 입력하세요", text: $password)
                     .foregroundStyle(Color.gray)
                     .font(.system(size: 20))
-                    .frame(height: 50)
+                    .frame(height: 60)
                     .padding(.horizontal, 14)
                     .background(Color.white)
-                    .cornerRadius(25)
-                    .padding(.bottom, 32)
+                    .cornerRadius(16)
+                    .padding(.bottom, 20)
                 
                 Button {
 //                    if email.isEmpty || password.isEmpty {
@@ -66,9 +63,9 @@ struct LoginView: View {
                     appState.flow = .main
                 } label: {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 25)
-                            .fill(isFilled ? Color.brownws: Color.gray)
-                            .frame(height: 50)
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(isFilled ? Color.mainws: Color.gray)
+                            .frame(height: 60)
                         
                         Text("로그인")
                             .font(.system(size: 24))
