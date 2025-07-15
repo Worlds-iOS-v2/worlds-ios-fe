@@ -16,8 +16,9 @@ struct CommonSignUpButton: View {
         Button (action: action) {
             ZStack {
                 RoundedRectangle(cornerRadius: 10)
-                    .fill(isFilled ? Color.brownws: Color.gray)
+                    .fill(isFilled ? Color.mainws: Color.gray)
                     .frame(height: 60)
+                    .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
                 
                 Text("\(text)")
                     .font(.system(size: 24))
