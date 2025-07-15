@@ -21,7 +21,7 @@ struct CommonSignUpButton: View {
                     .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
                 
                 Text("\(text)")
-                    .font(.system(size: 24))
+                    .font(.system(size: 24, weight: .bold))
                     .foregroundStyle(.white)
             }
         }
