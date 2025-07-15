@@ -48,11 +48,11 @@ struct SignUpRoleSelectionView: View {
                                 .foregroundStyle(Color.black)
                         }
                         .padding()
-                        .background(selectedRole == .mentor ? Color.beigews.opacity(0.2) : Color.white)
+                        .background(selectedRole == .mentor ? Color.sub2Ws : Color.white)
                         .cornerRadius(16)
                         .overlay(
                             RoundedRectangle(cornerRadius: 16)
-                                .stroke(Color.beigews, lineWidth: 2)
+                                .stroke(Color.sub1Ws, lineWidth: 2)
                                 .opacity(selectedRole == .mentor ? 1 : 0)
                         )
                         .frame(width: 155, height: 166)
@@ -77,11 +77,11 @@ struct SignUpRoleSelectionView: View {
                                 .foregroundStyle(Color.black)
                         }
                         .padding()
-                        .background(selectedRole == .mentee ? Color.beigews.opacity(0.2) : Color.white)
+                        .background(selectedRole == .mentee ? Color.sub2Ws : Color.white)
                         .cornerRadius(16)
                         .overlay(
                             RoundedRectangle(cornerRadius: 16)
-                                .stroke(Color.beigews, lineWidth: 2)
+                                .stroke(Color.sub1Ws, lineWidth: 2)
                                 .opacity(selectedRole == .mentee ? 1 : 0)
                         )
                         .frame(width: 155, height: 166)
