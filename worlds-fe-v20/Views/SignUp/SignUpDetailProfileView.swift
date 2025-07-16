@@ -13,7 +13,8 @@ struct SignUpDetailProfileView: View {
 
     @State var name: String = ""
     @State var phoneNumber: String = ""
-
+    
+    @State var birthDate = Date()
     @State var birthYear: Int = Calendar.current.component(.year, from: Date())
     @State var birthMonth: Int = Calendar.current.component(.month, from: Date())
     @State var birthDay: Int = Calendar.current.component(.day, from: Date())
@@ -22,7 +23,6 @@ struct SignUpDetailProfileView: View {
     @State var isFilled: Bool = true
     
     @EnvironmentObject var viewModel: SignUpViewModel
-    
     var body: some View {
         VStack {
             VStack(alignment: .leading) {
@@ -46,53 +46,70 @@ struct SignUpDetailProfileView: View {
                 Button {
                     isDatePickerPresented.toggle()
                 } label: {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 16)
-                            .foregroundStyle(Color.white)
-                            .font(.system(size: 20))
-                            .fontWeight(.semibold)
-                            .frame(height: 60)
-                        
+                    HStack {
                         Text("\(String(birthYear))년 \(birthMonth)월 \(birthDay)일")
                             .foregroundStyle(Color.gray)
                             .font(.system(size: 20))
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.leading, 14)
+                        
+                        Spacer()
+                        
+                        Image(systemName: "calendar")
+                            .foregroundColor(Color.mainws)
+                            .padding(.horizontal, 16)
+                    }
+                    .background{
+                        RoundedRectangle(cornerRadius: 16)
+                            .foregroundStyle(Color.white)
+                            .frame(height: 60)
                     }
                 }
-                    
+                .padding(.vertical, 16)
+                
                 if isDatePickerPresented {
-                    HStack(spacing: 0) {
-                        // 년
-                        Picker("년도", selection: $birthYear) {
-                            ForEach(1900...Calendar.current.component(.year, from: Date()), id: \.self) { year in
-                                Text("\(String(year))년").tag(year)
-                            }
-                        }
-                        .pickerStyle(.wheel)
-                        .frame(maxWidth: .infinity)
-                        
-                        // 월
-                        Picker("월", selection: $birthMonth) {
-                            ForEach(1...12, id: \.self) { month in
-                                Text("\(month)월").tag(month)
-                            }
-                        }
-                        .pickerStyle(.wheel)
-                        .frame(maxWidth: .infinity)
-                        
-                        // 일
-                        Picker("일", selection: $birthDay) {
-                            ForEach(1...31, id: \.self) { day in
-                                Text("\(day)일").tag(day)
-                            }
-                        }
-                        .pickerStyle(.wheel)
-                        .frame(maxWidth: .infinity)
-                    }
-                    .background(Color.white)
-                    .cornerRadius(16)
-                    .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
+                    // 커스텀 데이터피커 오류 발생 이슈로 주석처리..
+                    //                    HStack(spacing: 0) {
+                    //                        // 년
+                    //                        Picker("년도", selection: $birthYear) {
+                    //                            ForEach(1900...Calendar.current.component(.year, from: Date()), id: \.self) { year in
+                    //                                Text("\(String(year))년").tag(year)
+                    //                            }
+                    //                        }
+                    //                        .pickerStyle(.wheel)
+                    //                        .frame(maxWidth: .infinity)
+                    //
+                    //                        // 월
+                    //                        Picker("월", selection: $birthMonth) {
+                    //                            ForEach(1...12, id: \.self) { month in
+                    //                                Text("\(month)월").tag(month)
+                    //                            }
+                    //                        }
+                    //                        .pickerStyle(.wheel)
+                    //                        .frame(maxWidth: .infinity)
+                    //
+                    //                        // 일
+                    //                        Picker("일", selection: $birthDay) {
+                    //                            ForEach(1...daysInMonth(year: birthYear, month: birthMonth), id: \.self) { day in
+                    //                                Text("\(day)일").tag(day)
+                    //                            }
+                    //                        }
+                    //                        .pickerStyle(.wheel)
+                    //                        .frame(maxWidth: .infinity)
+                    //                    }
+                    //                    .background(Color.white)
+                    //                    .cornerRadius(16)
+                    //                    .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
+                    //                }
+                    
+                    DatePicker(
+                        "",
+                        selection: $birthDate,
+                        displayedComponents: [.date]
+                    )
+                    .datePickerStyle(.wheel)
+                    .frame(height: 200)
+                    .padding(.horizontal)
                 }
             }
             
@@ -100,7 +117,17 @@ struct SignUpDetailProfileView: View {
             
             CommonSignUpButton(text: "완료", isFilled: isFilled) {
                 // viewmodel에 데이터 전송
-                print("nextPage")
+//                viewModel.name = name
+//                viewModel.phoneNumber = phoneNumber
+//                
+//                let calendar = Calendar.current
+//                var dateComponents = DateComponents()
+//                dateComponents.year = birthYear
+//                dateComponents.month = birthMonth
+//                dateComponents.day = birthDay
+//                viewModel.birthDate = calendar.date(from: dateComponents) ?? Date()
+                
+                print("회원가입 완료")
                 
                 appState.flow = .login
             }
@@ -130,6 +157,17 @@ struct SignUpDetailProfileView: View {
                 }
             }
         }
+    }
+    
+    func daysInMonth(year: Int, month: Int) -> Int {
+        var comps = DateComponents()
+        comps.year = year
+        comps.month = month
+        let cal = Calendar.current
+        // 해당 월 1일로 날짜 생성
+        let date = cal.date(from: comps)!
+        // 그 달의 일 개수 얻기
+        return cal.range(of: .day, in: .month, for: date)!.count
     }
 }
 
