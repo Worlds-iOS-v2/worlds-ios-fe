@@ -18,7 +18,7 @@ struct MainView: View {
             VStack {
                 VStack {
                     Text("안녕하세요! \(viewModel.name)님")
-                        .font(.system(size: 27, weight: .bold))
+                        .font(.system(size: 27))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 24)
                     
@@ -26,10 +26,11 @@ struct MainView: View {
                     ZStack() {
                         RoundedRectangle(cornerRadius: 16)
                             .fill(Color.white)
-                            .frame(width: 360, height: 120)
+                            .frame(height: 120)
+                            .frame(maxWidth: .infinity)
                             .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
                         
-                        HStack(spacing: 12) {
+                        HStack() {
                             ForEach(1...7, id: \.self) { weekday in
                                 AttendanceRowView(
                                     weekday: weekday,
@@ -37,16 +38,17 @@ struct MainView: View {
                                     isToday: weekday == Calendar.current.component(.weekday, from: Date()))
                             }
                         }
-                        .padding(.horizontal, 24)
                     }
+                    .padding(.horizontal, 24)
                 }
                 .background(
                     Rectangle()
-                        .fill(Color.white)
+                        .fill(Color.sub2Ws)
                         .padding(.bottom, 60)
+                        .padding(.top, -120)
                 )
-                .padding(.bottom, 40)
-                
+                .padding(.vertical, 40)
+
                 Text("이번주 소식")
                     .font(.system(size: 27))
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -54,7 +56,7 @@ struct MainView: View {
                     .padding(.bottom, 20)
                 
                 AutoSlideViewWithTimer()
-                    .frame(width: 360, height: 300)
+                    .frame(height: 300)
                     .padding(.horizontal, 24)
                 
                 Text("인기글")
@@ -64,32 +66,37 @@ struct MainView: View {
                     .padding(.bottom, 20)
 
                 VStack(spacing: 12) {
+                    Spacer()
+
                     ForEach(0..<5, id: \.self) { _ in
                         Button {
-                            
+                            // 해당 게시물로 화면 이동
                         } label: {
                             HStack(spacing: 40){
                                 Text("학습")
+                                    .font(.system(size: 20))
+                                    .foregroundStyle(Color.black)
+                                
                                 Text("제목")
+                                    .font(.system(size: 20))
+                                    .foregroundStyle(Color.black)
                                 
                                 Spacer()
                             }
-                            .frame(maxWidth: .infinity)
-                            .padding(.horizontal, 24)
-                            .padding(.bottom, 8)
+                            .padding(.horizontal, 48)
                         }
                     }
+                    Spacer()
                 }
                 .background(
                     RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.white)
-                        .frame(width: 360, height: 240)
-                        .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
+                        .fill(.backgroundws)
+                        .padding(.horizontal, 24)
+                        .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
                 )
-                .padding(24)
             }
             .padding(.bottom, 100)
-            .background(Color.gray)
+            .background(Color.white)
         }
         .scrollIndicators(.hidden)
     }
