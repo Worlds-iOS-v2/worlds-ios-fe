@@ -27,39 +27,33 @@ struct InfinitePageBaseView<C, T>: View where C: View, T: Hashable {
         let previousIndex = before(selection)
         let nextIndex = after(selection)
         
-        if #available(iOS 17.0, *) {
-            TabView(selection: $currentTab) {
-                
-                // 이전 항목 표시 뷰
-                view(previousIndex)
-                    .tag(-1)
-                
-                // 현재 뷰
-                view(selection)
-                    .onDisappear() {
-                        if currentTab != 0 {
-                            selection = currentTab < 0 ? previousIndex : nextIndex
-                            currentTab = 0
-                        }
-                    }
-                    .tag(0)
-                
-                // 다음 항목을 표시하는 뷰
-                view(nextIndex)
-                    .tag(1)
-            }
-            .tabViewStyle(.page(indexDisplayMode: .never))
-            .onChange(of: selection) { newValue in  // iOS 16 방식
-                selection = newValue
-            }
+        TabView(selection: $currentTab) {
+            // 이전 항목 표시 뷰
+            view(previousIndex)
+                .tag(-1)
             
-            // FIXME: workaround to avoid glitch when swiping twice very quickly
-            // 탭이 0이 아닐 때 스와이프를 비활성화하여 빠른 스와이프 시 발생하는 글리치 방지
-            .disabled(currentTab != 0)
-        } else {
-            // Fallback on earlier versions
+            // 현재 뷰
+            view(selection)
+                .onDisappear() {
+                    if currentTab != 0 {
+                        selection = currentTab < 0 ? previousIndex : nextIndex
+                        currentTab = 0
+                    }
+                }
+                .tag(0)
+            
+            // 다음 항목을 표시하는 뷰
+            view(nextIndex)
+                .tag(1)
+        }
+        .tabViewStyle(.page(indexDisplayMode: .never))
+        .onChange(of: selection) { newValue in  // iOS 16 방식
+            selection = newValue
         }
         
+        // FIXME: workaround to avoid glitch when swiping twice very quickly
+        // 탭이 0이 아닐 때 스와이프를 비활성화하여 빠른 스와이프 시 발생하는 글리치 방지
+        .disabled(currentTab != 0)
     }
 }
 
