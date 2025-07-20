@@ -11,6 +11,7 @@ struct CommentRow: View {
     let comment: Comment
     let depth: Int
     let allComments: [Comment]
+    let currentUserId = UserDefaults.standard.integer(forKey: "userId")
     
     @State private var showDeleteConfirm = false
     @State private var showReportAlert = false
@@ -50,12 +51,14 @@ struct CommentRow: View {
                         Spacer()
                         // 메뉴 (삭제 / 신고)
                         Menu {
-                            Button(role: .destructive) {
-                                Task {
-                                    await commentVM.deleteComment(comment.id, for: comment.questionId)
+                            if comment.user.id == currentUserId {
+                                Button(role: .destructive) {
+                                    Task {
+                                        await commentVM.deleteComment(comment.id, for: comment.questionId)
+                                    }
+                                } label: {
+                                    Label("삭제", systemImage: "trash")
                                 }
-                            } label: {
-                                Label("삭제", systemImage: "trash")
                             }
                             
                             Button {
