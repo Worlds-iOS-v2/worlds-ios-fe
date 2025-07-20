@@ -51,7 +51,7 @@ struct AutoSlideViewWithTimer: View {
                 stopTimer()
             }
             .cornerRadius(16)
-            
+            .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
             
             // 인디케이터
             imageCustomIndicator()
@@ -121,10 +121,10 @@ extension AutoSlideViewWithTimer {
                 HStack(spacing: 4) {
                     ForEach(colors.indices, id: \.self) { index in
                         Capsule()
-                            .stroke(.white, lineWidth: 1)
+                            .stroke(.sub1Ws, lineWidth: 1)
                             .frame(width: currentIndex == index ? 16 : 6, height: 6)
                             .opacity(currentIndex == index ? 1 : 0.5)
-                            .background(currentIndex == index ? .white : Color.clear)
+                            .background(currentIndex == index ? .sub1Ws : .backgroundws)
                     }
                 } // H
                 .padding(.bottom, 24)
