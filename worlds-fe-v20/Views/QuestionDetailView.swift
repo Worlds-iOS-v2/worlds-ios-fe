@@ -10,13 +10,12 @@ import SwiftUI
 
 struct QuestionDetailView: View {
     let question: QuestionList
-//    @State var answer: [Answer] = []
-//    @State var attatchmentImage: [Attachment] = []
-    
-    @State private var goToCreateAnswerView = false
+    @State private var goToCreateCommentView = false
+    @StateObject private var commentVM = CommentViewModel(preview: true)
     
     var body: some View {
-        VStack(spacing:0) {
+        VStack(spacing: 0) {
+            // 질문 정보 영역
             VStack(alignment: .leading, spacing: 15) {
                 Text(question.title)
                     .font(.title)
@@ -35,66 +34,85 @@ struct QuestionDetailView: View {
                 Text(question.content)
                     .font(.body)
                     .padding(.vertical)
-
-                Text("답변")
-                    .font(.title3)
+                
+                Color.gray.opacity(0.1)
+                    .frame(height: 13)
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, -20)
+                
+                Text("댓글 \(commentVM.comments.count)개")
+                    .font(.subheadline)
                     .bold()
+                    .padding(.bottom, 5)
             }
             .padding(.top, 10)
             
-            Divider()
-            
-//            ScrollView {
-//                VStack(alignment: .leading, spacing: 15) {
-//                    if answer.isEmpty {
-//                        Text("아직 답변이 없습니다.")
-//                            .foregroundColor(.gray)
-//                    } else {
-//                        ForEach(answer) { answer in
-//                            VStack(alignment: .leading, spacing: 8) {
-//                                Text("\(answer.user.name) 멘토")
-//                                    .font(.subheadline)
-//                                    .bold()
-//                                Text(answer.content)
-//                                    .font(.body)
-//                                Divider()
-//                            }
-//                        }
-//                    }
-//                }
-//                .padding()
-//            }
-            
-            Spacer()
-            
-            Button(action: {
-                goToCreateAnswerView = true
-            })
-            {
-                Text("답변 작성하기")
-                    .foregroundColor(.white)
-                    .fontWeight(.medium)
-                    .padding()
-                    .frame(width: 150)
-                    .background(Color("darkbrown"))
-                    .cornerRadius(25)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 25)
-                            .stroke(Color.black, lineWidth: 0))
-                
+            // 댓글 리스트
+            ScrollView {
+                VStack(alignment: .leading, spacing: 15) {
+                    if commentVM.comments.isEmpty {
+                        Text("아직 답변이 없습니다.")
+                            .foregroundColor(.gray)
+                    } else {
+                        ForEach(commentVM.replies(for: nil)) { comment in
+                            CommentRow(comment: comment, depth: 0, allComments: commentVM.comments)
+                        }
+                    }
+                }
+                .padding(.top, 10)
             }
-            .padding(.bottom, 20)
+            
+            // 댓글 입력창
+            HStack {
+                TextField("댓글을 입력하세요", text: $commentVM.replyContent)
+                    .padding(12)
+                    .background(Color.white)
+                    .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color.brown, lineWidth: 1)
+                        )
+
+                Button(action: {
+                    Task {
+                        await commentVM.submitComment(
+                            for: question.id,
+                            parentId: commentVM.replyingTo
+                        )
+                    }
+                }) {
+                    Text("등록")
+                        .frame(minWidth: 60)
+                        .padding(.vertical, 12)
+                        .background(Color.brown)
+                        .foregroundColor(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                }
+                .padding(.leading, 8)
+            }
+            .padding(.top, 10)
         }
-        .padding(.horizontal, 20) //양쪽 패딩값
+        .padding(.horizontal, 20)
         .padding(.bottom, 20)
-//        .onAppear {
-//            Task {
-//                do {
-//                    self.answer = try await APIService.shared.fetchAnswers(questionId: question.id)
-//                } catch {
-//                    print("답변 로딩 실패: \(error.localizedDescription)")
-//                }
-//            }
-//        }
+        .onAppear {
+            Task {
+                do {
+                    self.commentVM.comments = try await APIService.shared.fetchComments(for: question.id)
+                } catch {
+                    print("답변 로딩 실패: \(error.localizedDescription)")
+                }
+            }
+        }
     }
+}
+
+#Preview {
+    let vm = QuestionViewModel()
+    vm.loadDummyData()
+    
+    let commentVM = CommentViewModel(preview: true)
+    
+    return QuestionDetailView(
+        question: vm.questions.first!
+    )
+    .environmentObject(commentVM)
 }
