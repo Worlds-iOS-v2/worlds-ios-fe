@@ -263,9 +263,11 @@ class UserAPIManager {
                 
                 print("액세스 토큰 재발급: \(response)")
                 
+                UserDefaults.standard.set(response.accessToken, forKey: "accessToken")
+                
                 return response
             } catch {
-                throw UserAPIError.decodingError(description: "User 디코딩 실패: \(error)")
+                throw UserAPIError.decodingError(description: "디코딩 실패: \(error)")
             }
             
         case .failure:
@@ -298,6 +300,9 @@ class UserAPIManager {
                 
                 print("로그아웃 정보: \(response)")
                 
+                UserDefaults.standard.removeObject(forKey: "accessToken")
+                UserDefaults.standard.removeObject(forKey: "refreshToken")
+                
                 return response
             } catch {
                 throw UserAPIError.decodingError(description: "디코딩 실패: \(error)")
@@ -308,7 +313,7 @@ class UserAPIManager {
         }
     }
     
-    // 사용자 정보 조히
+    // 사용자 정보 조회
     func getUserInfo() async throws -> APIResponse {
         guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
             print("토큰 값이 유효하지 않습니다.")
@@ -422,23 +427,26 @@ extension UserAPIManager {
         let languageCode = preferredLanguage.components(separatedBy: "-").first ?? "en" //ko만 출력
         
         // 서버에서 요구하는 형태로 매핑
-        switch languageCode.lowercased() {
-        case "ko":
-            return "Korean"
-        case "en":
-            return "English"
-        case "vi":
-            return "Vietnam"
-        case "ja":
-            return "Japanese"
-        case "zh":
-            return "Chinese"
-        case "es":
-            return "Spanish"
-        case "fr":
-            return "French"
-        default:
-            return "English" // 기본값
-        }
+        // ko로 바꿔서 주게 해주기 . . . . !!!!
+//        switch languageCode.lowercased() {
+//        case "ko":
+//            return "Korean"
+//        case "en":
+//            return "English"
+//        case "vi":
+//            return "Vietnam"
+//        case "ja":
+//            return "Japanese"
+//        case "zh":
+//            return "Chinese"
+//        case "es":
+//            return "Spanish"
+//        case "fr":
+//            return "French"
+//        default:
+//            return "English" // 기본값
+//        }
+        
+        return languageCode.lowercased()
     }
 }
