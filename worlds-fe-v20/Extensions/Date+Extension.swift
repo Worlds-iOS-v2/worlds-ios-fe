@@ -13,4 +13,10 @@ extension Date {
         formatters.dateFormat = format
         return formatters.string(from: self)
     }
+    
+    func toStringForServer(format: String = "yyyy-MM-dd" ) -> String {
+        let formatters = DateFormatter()
+        formatters.dateFormat = format
+        return formatters.string(from: self)
+    }
 }
