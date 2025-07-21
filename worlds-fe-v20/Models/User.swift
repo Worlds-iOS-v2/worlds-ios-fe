@@ -9,10 +9,10 @@ import Foundation
 
 struct User: Codable, Hashable, Identifiable {
     let id: Int
-    let userName: String
-    let birthday: Date
     let userEmail: String
+    let userName: String
+    let birthday: String
     let isMentor: Bool
-    let reportedCount: Int
+    let reportCount: Int
     let menteeTranslations: [String?]
 }
