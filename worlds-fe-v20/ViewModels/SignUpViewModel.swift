@@ -23,10 +23,15 @@ final class SignUpViewModel: ObservableObject {
     @MainActor
     func signup() async {
         do {
-            print("email: \(email), password: \(password)")
             let user = try await UserAPIManager.shared.signUp(name: name, email: email, password: password, birth: birthDate, isMentor: isMentor, mentorCode: mentorCode)
+            print("회원 가입 정보: \(user)")
+            self.errorMessage = nil
+        } catch UserAPIError.serverError(let message) {
+            self.errorMessage = message
+            print(message)
         } catch {
-            self.errorMessage = error.localizedDescription
+            self.errorMessage = "회원가입 실패: \(error.localizedDescription)"
+            print(errorMessage)
         }
     }
     
