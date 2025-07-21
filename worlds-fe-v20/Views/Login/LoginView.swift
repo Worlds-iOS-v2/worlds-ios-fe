@@ -20,6 +20,8 @@ struct LoginView: View {
 
     @State private var showAlert = false
     @State private var alertMessage = ""
+    
+    @ObservedObject var viewModel: LoginViewModel = .init()
 
     var body: some View {
         ZStack {
@@ -60,7 +62,19 @@ struct LoginView: View {
 //                        // 로그인 진행
 //                        appState.flow = .main
 //                    }
-                    appState.flow = .main
+                    
+                    viewModel.email = email
+                    viewModel.password = password
+                    
+                    print("loginView: \(viewModel.email)")
+                    print("loginView: \(viewModel.password)")
+                    
+                    Task {
+                        await viewModel.login()
+                        print("로그인 완료")
+                        
+                        appState.flow = .main
+                    }
                 } label: {
                     ZStack {
                         RoundedRectangle(cornerRadius: 16)
