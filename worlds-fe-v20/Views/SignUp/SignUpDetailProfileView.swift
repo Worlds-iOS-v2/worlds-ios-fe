@@ -47,7 +47,8 @@ struct SignUpDetailProfileView: View {
                     isDatePickerPresented.toggle()
                 } label: {
                     HStack {
-                        Text("\(String(birthYear))년 \(birthMonth)월 \(birthDay)일")
+                        // Text("\(String(birthYear))년 \(birthMonth)월 \(birthDay)일")
+                        Text("\(birthDate.toString())")
                             .foregroundStyle(Color.gray)
                             .font(.system(size: 20))
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -119,13 +120,14 @@ struct SignUpDetailProfileView: View {
                 viewModel.name = name
                // viewModel.phoneNumber = phoneNumber
                 
-                let calendar = Calendar.current
-                var dateComponents = DateComponents()
-                dateComponents.year = birthYear
-                dateComponents.month = birthMonth
-                dateComponents.day = birthDay
-                viewModel.birthDate = calendar.date(from: dateComponents)?.toStringForServer() ?? Date().toStringForServer()
+//                let calendar = Calendar.current
+//                var dateComponents = DateComponents()
+//                dateComponents.year = birthYear
+//                dateComponents.month = birthMonth
+//                dateComponents.day = birthDay
+//                viewModel.birthDate = calendar.date(from: dateComponents)?.toStringForServer() ?? Date().toStringForServer()
                 
+                viewModel.birthDate = birthDate.toStringForServer()
                 
                 print("signup Detail View: \(viewModel.email)")
                 print("signup Detail View: \(viewModel.password)")
