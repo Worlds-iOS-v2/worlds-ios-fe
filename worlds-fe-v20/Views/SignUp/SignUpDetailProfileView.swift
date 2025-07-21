@@ -116,7 +116,6 @@ struct SignUpDetailProfileView: View {
             Spacer()
             
             CommonSignUpButton(text: "완료", isFilled: isFilled) {
-                // viewmodel에 데이터 전송
                 viewModel.name = name
                // viewModel.phoneNumber = phoneNumber
                 
@@ -125,7 +124,6 @@ struct SignUpDetailProfileView: View {
                 dateComponents.year = birthYear
                 dateComponents.month = birthMonth
                 dateComponents.day = birthDay
-                // viewModel.birthDate = calendar.date(from: dateComponents) ?? Date()
                 viewModel.birthDate = calendar.date(from: dateComponents)?.toStringForServer() ?? Date().toStringForServer()
                 
                 
@@ -138,8 +136,6 @@ struct SignUpDetailProfileView: View {
                 
                 Task {
                     await viewModel.signup()
-                    print("회원가입 완료")
-                    
                     appState.flow = .login
                 }
             }
