@@ -33,7 +33,7 @@ struct SignUpRoleSelectionView: View {
                         selectedRole = .mentor
                         isSelected = true
                         
-                        viewModel.role = .mentor
+                        viewModel.isMentor = true
                     } label: {
                         VStack {
                             Image("mentor")
@@ -63,7 +63,7 @@ struct SignUpRoleSelectionView: View {
                         selectedRole = .mentee
                         isSelected = true
                         
-                        viewModel.role = .mentee
+                        viewModel.isMentor = false
                     } label: {
                         VStack {
                             Image("mentee")
@@ -96,6 +96,8 @@ struct SignUpRoleSelectionView: View {
                 CommonSignUpButton(text: "다음", isFilled: isSelected) {
                     // viewmodel에 데이터 전송
                     print("SignUpAccountView")
+                    
+                    print("SignUpAccountView: \(viewModel.isMentor)")
                     
                     // viewModel 호출 후 화면 전환 (어떤 방식이 더 효율적인지는 아직 모르겠음)
                     isSuceed = true

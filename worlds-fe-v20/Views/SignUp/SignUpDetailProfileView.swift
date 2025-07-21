@@ -117,19 +117,31 @@ struct SignUpDetailProfileView: View {
             
             CommonSignUpButton(text: "완료", isFilled: isFilled) {
                 // viewmodel에 데이터 전송
-//                viewModel.name = name
-//                viewModel.phoneNumber = phoneNumber
-//                
-//                let calendar = Calendar.current
-//                var dateComponents = DateComponents()
-//                dateComponents.year = birthYear
-//                dateComponents.month = birthMonth
-//                dateComponents.day = birthDay
-//                viewModel.birthDate = calendar.date(from: dateComponents) ?? Date()
+                viewModel.name = name
+               // viewModel.phoneNumber = phoneNumber
                 
-                print("회원가입 완료")
+                let calendar = Calendar.current
+                var dateComponents = DateComponents()
+                dateComponents.year = birthYear
+                dateComponents.month = birthMonth
+                dateComponents.day = birthDay
+                // viewModel.birthDate = calendar.date(from: dateComponents) ?? Date()
+                viewModel.birthDate = calendar.date(from: dateComponents)?.toStringForServer() ?? Date().toStringForServer()
                 
-                appState.flow = .login
+                
+                print("signup Detail View: \(viewModel.email)")
+                print("signup Detail View: \(viewModel.password)")
+                print("signup Detail View: \(viewModel.name)")
+                print("signup Detail View: \(viewModel.password)")
+                print("signup Detail View: \(viewModel.birthDate)")
+                print("signup Detail View: \(viewModel.isMentor)")
+                
+                Task {
+                    await viewModel.signup()
+                    print("회원가입 완료")
+                    
+                    appState.flow = .login
+                }
             }
             .padding(.bottom, 12)
             
