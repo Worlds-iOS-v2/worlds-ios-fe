@@ -71,7 +71,6 @@ struct LoginView: View {
                     
                     Task {
                         await viewModel.login()
-                        print("로그인 완료")
                         
                         appState.flow = .main
                     }
