@@ -55,11 +55,12 @@ struct SignUpAccountView: View {
                 Spacer()
                 
                 CommonSignUpButton(text: "다음", isFilled: isFilled) {
-                    // viewmodel에 데이터 전송
-                    print("SignUpDetailProfileView")
-                    
+                    // viewmodel에 데이터 전송                    
                     viewModel.email = email
                     viewModel.password = password
+                    
+                    print("signup Account View: \(viewModel.email)")
+                    print("signup Account View: \(viewModel.password)")
                     
                     // viewModel 호출 후 화면 전환 (어떤 방식이 더 효율적인지는 아직 모르겠음)
                     isSuceed = true
