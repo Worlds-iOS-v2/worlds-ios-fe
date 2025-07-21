@@ -167,6 +167,7 @@ struct SignUpDetailProfileView: View {
                 }
             }
         }
+        .hideKeyboardOnTap()
     }
     
     func daysInMonth(year: Int, month: Int) -> Int {

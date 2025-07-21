@@ -95,6 +95,7 @@ struct SignUpAccountView: View {
         .navigationDestination(isPresented: $isSuceed) {
             SignUpDetailProfileView()
         }
+        .hideKeyboardOnTap()
     }
     
     func isValidEmail(_ email: String) -> Bool {
