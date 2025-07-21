@@ -7,7 +7,7 @@
 
 struct APIResponse: Codable {
     var statusCode: Int
-    var message: String
+    var message: String?
     var accessToken: String?
     var refreshToken: String?
     var error: String?
