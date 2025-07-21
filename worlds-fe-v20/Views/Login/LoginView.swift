@@ -173,6 +173,7 @@ struct LoginView: View {
             }
             .padding()
         }
+        .hideKeyboardOnTap()
     }
     
     func isValidEmail(_ email: String) -> Bool {
