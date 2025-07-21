@@ -17,6 +17,6 @@ struct APIResponse: Codable {
     enum CodingKeys: String, CodingKey {
         case accessToken = "access_token"
         case refreshToken = "refresh_token"
-        case error, statusCode, message, userInfo
+        case error, statusCode, message, userInfo, userEmail
     }
 }
