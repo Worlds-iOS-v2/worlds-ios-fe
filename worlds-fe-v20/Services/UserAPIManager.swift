@@ -65,6 +65,8 @@ class UserAPIManager {
             throw UserAPIError.invalidEndPoint
         }
         
+        print("API 엔드포인트: \(endPoint)")
+        
         let targetLanguage = getTargetLanguage()
         
         print("targetLanguage: \(targetLanguage)")
@@ -79,17 +81,52 @@ class UserAPIManager {
             "targetLanguage": targetLanguage
         ]
         
-        let response = try await AF.request(endPoint, method: .post, parameters: parameters)
-            .serializingDecodable(APIResponse.self, decoder: JSONDecoder())
-            .value
+        print("요청 파라미터: \(parameters)")
+
+        let dataResponse = await AF.request(endPoint, method: .post, parameters: parameters, encoding: JSONEncoding.default)
+            .validate()
+            .serializingData()
+            .response
         
-        print("회원가입 결과: \(response)")
+        print("응답 결과: \(dataResponse.result)")
         
-        // 유저 정보 저장
-        /// 유저 정보 저장하는게 필요한지 다시 고려해보기
-        // saveUserInfo(response: response)
-        
-        return response
+        switch dataResponse.result {
+        case .success(let data):
+            do {
+                let response = try JSONDecoder().decode(APIResponse.self, from: data)
+                print("signup: \(response)")
+                
+                return response
+            } catch {
+                print("디코딩 에러: \(error.localizedDescription)")
+
+                if let rawJSON = String(data: data, encoding: .utf8) {
+                    print("원본 JSON 응답:\n\(rawJSON)")
+                }
+                
+                throw UserAPIError.decodingError(description: "디코딩 실패: \(error)")
+            }
+            
+        case .failure:
+            if let rawData = dataResponse.data,
+               let rawString = String(data: rawData, encoding: .utf8) {
+                print("서버 원본 응답: \(rawString)")
+                
+                do {
+                    let errorResponse = try JSONDecoder().decode(APIErrorResponse.self, from: rawData)
+                    print("파싱된 에러 응답: \(errorResponse)")
+                    
+                    var errorMessage = errorResponse.error
+                    
+                    throw UserAPIError.serverError(message: errorMessage)
+                } catch {
+                    print("에러 응답 파싱 실패: \(error)")
+                    throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
+                }
+            } else {
+                throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
+            }
+        }
     }
     
     // 로그인
@@ -97,6 +134,8 @@ class UserAPIManager {
         guard let endPoint = Bundle.main.object(forInfoDictionaryKey: "APILoginURL") as? String else {
             throw UserAPIError.invalidEndPoint
         }
+        
+        print("API 엔드포인트: \(endPoint)")
         
         let parameters: [String: Any] = [
             "userEmail": email,
@@ -114,36 +153,36 @@ class UserAPIManager {
                 let response = try JSONDecoder().decode(APIResponse.self, from: data)
                 
                 print("로그인 정보: \(response)")
-                // 유저 정보 저장
-                // saveUserInfo(response: user)
                 
                 // 유저 토큰 저장
                 UserDefaults.standard.set(response.accessToken, forKey: "accessToken")
                 UserDefaults.standard.set(response.refreshToken, forKey: "refreshToken")
                 
-                print("로그인 성공")
-                //
-                //                if let savedData = UserDefaults.standard.data(forKey: "user"),
-                //                   let savedUser = try? JSONDecoder().decode(User.self, from: savedData) {
-                //                    print(user)
-                //                }
-                
                 return response
             } catch {
-                throw UserAPIError.decodingError(description: "User 디코딩 실패: \(error)")
+                throw UserAPIError.decodingError(description: "Login 디코딩 실패: \(error)")
             }
             
         case .failure:
-            throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
-            //            if let data = dataResponse.data {
-            //                if let serverError = try? JSONDecoder().decode(ErrorResponse.self, from: data) {
-            //                    throw UserAPIError.serverError(message: serverError.message.joined(separator: ", "))
-            //                } else {
-            //                    throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
-            //                }
-            //            } else {
-            //                throw UserAPIError.unknown
-            //            }
+            if let rawData = dataResponse.data,
+               let rawString = String(data: rawData, encoding: .utf8) {
+                print("로그인 서버 원본 응답: \(rawString)")
+                
+                // 서버 에러 응답 파싱 시도
+                do {
+                    let errorResponse = try JSONDecoder().decode(APIErrorResponse.self, from: rawData)
+                    print("로그인 파싱된 에러 응답: \(errorResponse)")
+                    
+                    var errorMessage = errorResponse.error
+                    
+                    throw UserAPIError.serverError(message: errorMessage)
+                } catch {
+                    print("로그인 에러 응답 파싱 실패: \(error)")
+                    throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
+                }
+            } else {
+                throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
+            }
         }
     }
     
@@ -175,7 +214,24 @@ class UserAPIManager {
             }
             
         case .failure:
-            throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
+            if let rawData = dataResponse.data,
+               let rawString = String(data: rawData, encoding: .utf8) {
+                print("이메일 체크 서버 원본 응답: \(rawString)")
+                
+                do {
+                    let errorResponse = try JSONDecoder().decode(APIErrorResponse.self, from: rawData)
+                    print("이메일 체크 파싱된 에러 응답: \(errorResponse)")
+                    
+                    var errorMessage = errorResponse.error
+                    
+                    throw UserAPIError.serverError(message: errorMessage)
+                } catch {
+                    print("이메일 체크 에러 응답 파싱 실패: \(error)")
+                    throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
+                }
+            } else {
+                throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
+            }
         }
     }
     
