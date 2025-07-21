@@ -13,14 +13,19 @@ final class LoginViewModel: ObservableObject {
     
     @Published var errorMessage: String?
     
-    // 회원가입 함수
+    // 로그인 함수
     @MainActor
     func login() async {
         do {
-            // print("email: \(email), password: \(password)")
             let user = try await UserAPIManager.shared.login(email: email, password: password)
+            print("로그인 정보: \(user)")
+            self.errorMessage = nil
+        } catch UserAPIError.serverError(let message) {
+            self.errorMessage = message
+            print(message)
         } catch {
-            self.errorMessage = error.localizedDescription
+            self.errorMessage = "로그인 실패: \(error.localizedDescription)"
+            print(errorMessage)
         }
     }
 }
