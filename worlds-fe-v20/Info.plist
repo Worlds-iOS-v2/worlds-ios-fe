@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>APIAccessTokenURL</key>
+	<string>$(API_ACCESS_TOKEN_URL)</string>
+	<key>APIChangePasswordURL</key>
+	<string>$(API_CHANGE_PASSWORD_URL)</string>
+	<key>APICheckEmailURL</key>
+	<string>$(API_CHECK_EMAIL_URL)</string>
+	<key>APIFindEmailURL</key>
+	<string>$(API_FIND_EMAIL_URL)</string>
+	<key>APILoginURL</key>
+	<string>$(API_LOGIN_URL)</string>
+	<key>APILogoutURL</key>
+	<string>$(API_LOGOUT_URL)</string>
+	<key>APISignupURL</key>
+	<string>$(API_SIGNUP_URL)</string>
+	<key>APIUserInfoURL</key>
+	<string>$(API_USER_INFO_URL)</string>
+</dict>
+</plist>

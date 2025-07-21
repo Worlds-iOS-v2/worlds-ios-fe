@@ -7,17 +7,29 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9F25395A2E17C57600B526A5 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 9F2539592E17C57600B526A5 /* Alamofire */; };
-		9F25395C2E17C57600B526A5 /* AlamofireDynamic in Frameworks */ = {isa = PBXBuildFile; productRef = 9F25395B2E17C57600B526A5 /* AlamofireDynamic */; };
+		B38410232E28DBCC00742717 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = B38410222E28DBCC00742717 /* Alamofire */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		9F2539392E17C53900B526A5 /* worlds-fe-v20.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "worlds-fe-v20.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		B384109C2E2DDE1C00742717 /* Exceptions for "worlds-fe-v20" folder in "worlds-fe-v20" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 9F2539382E17C53900B526A5 /* worlds-fe-v20 */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		9F25393B2E17C53900B526A5 /* worlds-fe-v20 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				B384109C2E2DDE1C00742717 /* Exceptions for "worlds-fe-v20" folder in "worlds-fe-v20" target */,
+			);
 			path = "worlds-fe-v20";
 			sourceTree = "<group>";
 		};
@@ -28,8 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9F25395A2E17C57600B526A5 /* Alamofire in Frameworks */,
-				9F25395C2E17C57600B526A5 /* AlamofireDynamic in Frameworks */,
+				B38410232E28DBCC00742717 /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,8 +83,7 @@
 			);
 			name = "worlds-fe-v20";
 			packageProductDependencies = (
-				9F2539592E17C57600B526A5 /* Alamofire */,
-				9F25395B2E17C57600B526A5 /* AlamofireDynamic */,
+				B38410222E28DBCC00742717 /* Alamofire */,
 			);
 			productName = "worlds-fe-v20";
 			productReference = 9F2539392E17C53900B526A5 /* worlds-fe-v20.app */;
@@ -104,7 +114,7 @@
 			mainGroup = 9F2539302E17C53900B526A5;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				9F2539582E17C57600B526A5 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				B38410212E28DBCC00742717 /* XCRemoteSwiftPackageReference "Alamofire" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9F25393A2E17C53900B526A5 /* Products */;
@@ -189,7 +199,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -246,7 +256,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -267,6 +277,7 @@
 				DEVELOPMENT_TEAM = A64NU99HZZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "worlds-fe-v20/Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -296,6 +307,7 @@
 				DEVELOPMENT_TEAM = A64NU99HZZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "worlds-fe-v20/Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -338,7 +350,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		9F2539582E17C57600B526A5 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+		B38410212E28DBCC00742717 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
 			requirement = {
@@ -349,15 +361,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		9F2539592E17C57600B526A5 /* Alamofire */ = {
+		B38410222E28DBCC00742717 /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 9F2539582E17C57600B526A5 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			package = B38410212E28DBCC00742717 /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
-		};
-		9F25395B2E17C57600B526A5 /* AlamofireDynamic */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9F2539582E17C57600B526A5 /* XCRemoteSwiftPackageReference "Alamofire" */;
-			productName = AlamofireDynamic;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
