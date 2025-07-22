@@ -18,128 +18,138 @@ struct CreateQuestionView: View {
     @State private var isShowingImagePicker = false
     @State private var selectedImages: [UIImage] = []
     @State private var imagePickerSourceType: UIImagePickerController.SourceType = .photoLibrary
-    
     @State private var selectedCategory = ""
+    
     let categories = ["학습 게시판", "자유 게시판"]
     let categoryMap = ["학습 게시판": "study", "자유 게시판": "free"]
     
     var categoryValue: String {
-            categoryMap[selectedCategory] ?? selectedCategory
+        categoryMap[selectedCategory] ?? selectedCategory
     }
-
     var onSubmit: (_ images: [UIImage], _ category: String) -> Void
     
     var body: some View {
         NavigationView {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 14) {
+                Spacer().frame(height: 15)
                 
+                // 게시판 카테고리 선택
+                Menu {
+                    ForEach(categories, id: \.self) { category in
+                        Button(category) {
+                            selectedCategory = category
+                        }
+                    }
+                } label: {
+                    HStack {
+                        Text(selectedCategory.isEmpty ? "게시판 선택" : selectedCategory)
+                            .font(.system(size: 15))
+                            .foregroundColor(.gray)
+                        Image(systemName: "chevron.down")
+                            .foregroundColor(.gray)
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 6)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color(.systemGray4), lineWidth: 1)
+                    )
+                }
+                .padding(.horizontal, 0)
+                
+                // 제목
                 TextField("제목", text: $title)
-                    .padding(12)
+                    .padding(13)
                     .background(Color.white)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color("darkbrown"), lineWidth: 2)
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color(red: 105/255, green: 131/255, blue: 255/255), lineWidth: 1)
                     )
-                    .cornerRadius(10)
-                    .padding(.horizontal)
+                    .font(.system(size: 17))
                 
-                //카테고리 선택 + 사진추가
+                // 내용
+                ZStack(alignment: .topLeading) {
+                    if content.isEmpty {
+                        Text("내용")
+                            .foregroundColor(Color(.systemGray3))
+                            .padding(.top, 13)
+                            .padding(.leading, 17)
+                    }
+                    TextEditor(text: $content)
+                        .padding(8)
+                        .background(Color.white)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color(red: 105/255, green: 131/255, blue: 255/255), lineWidth: 1)
+                        )
+                        .font(.system(size: 17))
+                        .frame(height: 370)
+                }
+                
+                
                 HStack {
-                    Menu {
-                        ForEach(categories, id: \.self) { category in
-                            Button(category) {
-                                selectedCategory = category
-                            }
-                        }
+                    Button {
+                        imagePickerSourceType = .photoLibrary
+                        isShowingImagePicker = true
                     } label: {
-                        HStack {
-                            Text(selectedCategory.isEmpty ? "카테고리 선택" : selectedCategory)
-                            Image(systemName: "chevron.down")
+                        VStack(spacing: 2) {
+                            Image(systemName: "photo.on.rectangle.angled")
+                                .resizable()
+                                .frame(width: 32, height: 28)
+                                .foregroundColor(Color(.systemGray))
+                            Text("\(selectedImages.count)/3")
+                                .font(.caption2)
+                                .foregroundColor(.gray)
                         }
-                        .foregroundColor(.black)
-                        .padding(10)
-                        .background(Color.gray.opacity(0.2))
-                        .cornerRadius(8)
+                        .frame(width: 60, height: 48)
+                        .background(Color.white)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color(red: 105/255, green: 131/255, blue: 255/255), lineWidth: 1.2)
+                        )
                     }
-                    
-                    Spacer()
-                    
-                    
-                    Menu("사진 추가하기") {
-                        Button("Camera") {
-                            imagePickerSourceType = .camera
-                            isShowingImagePicker = true
-                        }
-                        Button("Photo") {
-                            imagePickerSourceType = .photoLibrary
-                            isShowingImagePicker = true
-                        }
-                    }
-                }
-                .padding(.horizontal)
-                
-                //사진 여러장
-                if !selectedImages.isEmpty {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack {
-                            ForEach(selectedImages, id: \.self) { image in
-                                Image(uiImage: image)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 100, height: 100)
-                                    .clipped()
-                                    .cornerRadius(8)
+                    if !selectedImages.isEmpty {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack {
+                                ForEach(selectedImages, id: \.self) { image in
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 100, height: 100)
+                                        .clipped()
+                                        .cornerRadius(8)
+                                }
                             }
+                            .padding(.leading, 30)
                         }
-                        .padding(.leading, 30)
                     }
+                    Spacer()
                 }
+                .padding(.top, 4)
                 
-                
-                TextEditor(text: $content)
-                    .padding(10)
-                    .frame(height: 300)
-                    .background(Color.white)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color("darkbrown"), lineWidth: 2)
-                    )
-                    .cornerRadius(10)
-                    .padding(.horizontal)
-                
-                if let error = errorMessage {
-                    Text(error)
-                        .foregroundColor(.red)
-                        .padding(.horizontal)
-                }
-                
-                //등록되는 동안 로딩
-                if isCreating {
-                    ProgressView()
-                        .frame(maxWidth: .infinity)
-                }
+                Spacer()
                 
                 Button {
                     if selectedCategory.isEmpty {
                         errorMessage = "카테고리 선택은 필수입니다."
                         return
                     }
-                    onSubmit(selectedImages, categoryValue) //selectedCategory전달하면 한글이라 서버 못받
+                    onSubmit(selectedImages, categoryValue)
                 } label: {
                     Text("등록")
-                        .foregroundColor(.black)
-                        .fontWeight(.medium)
-                        .padding()
-                        .frame(width: 150)
-                        .background(Color("lightbrown"))
-                        .cornerRadius(25)
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity, minHeight: 48)
+                        .background(Color(red: 105/255, green: 131/255, blue: 255/255))
+                        .cornerRadius(13)
+                        .shadow(color: Color(.systemGray3), radius: 3, x: 0, y: 3)
                 }
-                .frame(maxWidth: .infinity, alignment: .center)
-                .padding(.top, 30)
+                .padding(.bottom, 18)
                 
-                Spacer()
             }
-            .padding()
+            .padding(.horizontal, 10)
             .navigationTitle("질문하기")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -148,21 +158,18 @@ struct CreateQuestionView: View {
                         presentationMode.wrappedValue.dismiss()
                     }) {
                         Image(systemName: "chevron.left")
-                            .foregroundColor(.gray)
-                            .padding(.leading, 15)
-                            .frame(width: 20, height: 30)
+                            .foregroundColor(.black)
+                            .font(.system(size: 20, weight: .medium))
                     }
                 }
             }
             .sheet(isPresented: $isShowingImagePicker) {
                 if imagePickerSourceType == .camera {
-                        CameraPickerView(selectedImages: $selectedImages)
-                    } else {
-                        ImagePickerView(selectedImages: $selectedImages)
-                    }
+                    CameraPickerView(selectedImages: $selectedImages)
+                } else {
+                    ImagePickerView(selectedImages: $selectedImages)
+                }
             }
         }
     }
 }
-
-
