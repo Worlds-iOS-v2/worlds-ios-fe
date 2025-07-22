@@ -12,6 +12,13 @@ enum Category: String, Codable {
     case free = "자유 게시판"
 }
 
+enum ReportReason: String, Codable {
+    case offensive = "비속어"
+    case sexual = "음란"
+    case ad = "광고"
+    case etc = "기타"
+}
+
 //질문 목록
 struct QuestionList: Codable, Identifiable, Hashable {
     //답변 완료 유무?
@@ -43,7 +50,7 @@ struct QuestionUser: Codable, Hashable {
     let email: String
     let role: String
     
-    enum CoingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey {
         case id
         case name = "user_name"
         case email = "user_email"
