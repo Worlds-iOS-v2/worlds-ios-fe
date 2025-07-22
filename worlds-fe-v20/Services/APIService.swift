@@ -122,4 +122,33 @@ class APIService {
             return response.error == nil
             
         }
+    
+    //질문 신고
+    func reportQuestion(
+            questionId: Int,
+            reason: ReportReason,
+            etcReason: String? = nil
+        ) async throws -> Bool {
+            let headers = try getAuthHeaders()
+            var params: [String: Any] = [
+                "reason": reason.rawValue  
+            ]
+            if let etc = etcReason, !etc.isEmpty {
+                params["etcReason"] = etc
+            }
+            
+            let response = try await AF.request(
+                "\(baseURL)/questions/\(questionId)/report",
+                method: .post,
+                parameters: params,
+                encoding: JSONEncoding.default,
+                headers: headers
+            )
+            .validate()
+            .serializingData()
+            .response
+            
+            print("신고 응답: \(response)")
+            return response.error == nil
+        }
 }

@@ -77,7 +77,7 @@ class QuestionViewModel: ObservableObject {
         }
     }
 
-    // 질문 삭제 (필요시)
+    // 질문 삭제
     func deleteQuestion(id: Int) async throws {
         isLoading = true
         defer { isLoading = false }
@@ -92,4 +92,30 @@ class QuestionViewModel: ObservableObject {
             throw NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "질문 삭제에 실패했습니다."])
         }
     }
+    
+    // 질문 신고
+    func reportQuestion(
+            questionId: Int,
+            reason: ReportReason,
+            etcReason: String? = nil
+        ) async throws {
+            isLoading = true
+            defer { isLoading = false }
+
+            do {
+                let success = try await APIService.shared.reportQuestion(
+                    questionId: questionId,
+                    reason: reason,
+                    etcReason: etcReason
+                )
+                if success {
+                    errorMessage = nil
+                } else {
+                    throw NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "질문 신고에 실패했습니다."])
+                }
+            } catch {
+                errorMessage = "질문 신고 실패: \(error.localizedDescription)"
+                throw error
+            }
+        }
 }
