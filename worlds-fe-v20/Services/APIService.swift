@@ -162,6 +162,27 @@ class APIService {
         return response
     }
     
+    // 댓글 신고
+    func reportComment(commentId: Int, reason: String) async throws -> Bool {
+        let headers = try getAuthHeaders()
+        let params: [String: Any] = [
+            "reason": reason
+        ]
+
+        let response = try await AF.request(
+            "\(baseURL)/comment/\(commentId)/report",
+            method: .post,
+            parameters: params,
+            encoding: JSONEncoding.default,
+            headers: headers
+        )
+        .validate()
+        .serializingData()
+        .response
+
+        return response.error == nil
+    }
+    
     // 댓글 삭제
     func deleteComment(commentId: Int) async throws -> Bool {
         let headers = try getAuthHeaders()

@@ -15,6 +15,11 @@ struct CommentRow: View {
     
     @State private var showDeleteConfirm = false
     @State private var showReportAlert = false
+    @State private var showReportSheet = false
+    @State private var seletedReason: ReportReason?
+    @State private var showReportResultAlert = false
+    @State private var reportResultMessage = ""
+    
     @EnvironmentObject var commentVM: CommentViewModel
 
     var replies: [Comment] {
@@ -62,7 +67,7 @@ struct CommentRow: View {
                             }
                             
                             Button {
-                                showReportAlert = true
+                                showReportSheet = true
                             } label: {
                                 Label("신고하기", systemImage: "exclamationmark.bubble")
                             }
@@ -71,8 +76,26 @@ struct CommentRow: View {
                                 .foregroundColor(.gray)
                                 .rotationEffect(.degrees(90))
                         }
-                        .alert("신고가 접수되었습니다.", isPresented: $showReportAlert) {
-                            Button("확인", role: .cancel) { }
+                        .actionSheet(isPresented: $showReportSheet) {
+                            ActionSheet(
+                                title: Text("신고 사유를 선택하세요"),
+                                buttons: ReportReason.allCases.map { reason in
+                                    .default(Text(reason.label)) {
+                                        Task {
+                                            do {
+                                                try await APIService.shared.reportComment(commentId: comment.id, reason: reason.rawValue)
+                                                reportResultMessage = "신고가 접수되었습니다."
+                                            } catch {
+                                                reportResultMessage = "신고에 실패했습니다: \(error.localizedDescription)"
+                                            }
+                                            showReportResultAlert = true
+                                        }
+                                    }
+                                } + [.cancel()]
+                            )
+                        }
+                        .alert(reportResultMessage, isPresented: $showReportResultAlert) {
+                            Button("확인", role: .cancel) {}
                         }
                     }
 
