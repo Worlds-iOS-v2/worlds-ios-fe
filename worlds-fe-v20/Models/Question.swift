@@ -55,9 +55,9 @@ struct QuestionList: Codable, Identifiable, Hashable {
         case id
         case title
         case content 
-        case createdAt = "created_at"
-        case isAnswered = "is_answered"
-        case answerCount = "answer_count"
+        case createdAt = "createdAt"
+        case isAnswered = "isAnswered"
+        case answerCount = "answerCount"
         case category
         case user
     }
@@ -68,7 +68,7 @@ struct QuestionUser: Codable, Hashable {
     let id: Int
     let name: String
     let email: String
-    let role: String
+    let role: Bool
     
     enum CodingKeys: String, CodingKey {
         case id
