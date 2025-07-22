@@ -4,7 +4,7 @@
 //
 //  Created by 이서하 on 7/4/25.
 //
-//  TODO: 이미지 등록 안댄다...zz
+//  TODO: 이미지 백딴 전송, 삭제하면 바로 창 닫히게
 
 import SwiftUI
 
@@ -13,9 +13,9 @@ struct QuestionDetailView: View {
     @State private var goToCreateAnswerView = false
     @State private var showOptions = false
     @State private var showReportReasons = false
-    @State private var showDeleteAlert = false
     @ObservedObject var viewModel: QuestionViewModel
     @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) var dismiss
 
     let reportReasons: [(label: String, value: ReportReason)] = [
         ("비속어", .offensive),
@@ -148,7 +148,9 @@ struct QuestionDetailView: View {
             Button("삭제", role: .destructive) {
                 Task {
                     try await viewModel.deleteQuestion(id: question.id)
-                    showDeleteAlert = true
+                            await MainActor.run {
+                                dismiss()
+                    }
                 }
             }
             Button("취소", role: .cancel) {}
@@ -163,12 +165,6 @@ struct QuestionDetailView: View {
                 }
             }
             Button("취소", role: .cancel) {}
-        }
-        // 삭제 완료 알림
-        .alert("질문이 삭제되었습니다.", isPresented: $showDeleteAlert) {
-            Button("확인") {
-                presentationMode.wrappedValue.dismiss()
-            }
         }
     }
 
