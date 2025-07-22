@@ -7,9 +7,9 @@
 import Foundation
 
 enum Category: String, Codable {
-    case all = "전체 보기"
-    case study = "학습 게시판"
-    case free = "자유 게시판"
+    case all = "전 체"
+    case study = "학 습"
+    case free = "자 유"
 }
 
 enum ReportReason: String, Codable {
