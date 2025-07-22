@@ -13,7 +13,7 @@ struct QuestionView: View {
     @State private var newQuestionContent = ""
     @State private var isCreatingQuestion = false
     @State private var createQuestionError: String?
-
+    @State private var searchText: String = ""
 
     @State private var selectedCategory: Category = .all
 
@@ -24,11 +24,16 @@ struct QuestionView: View {
 
     // 카테고리별
     var filteredQuestions: [QuestionList] {
-        if selectedCategory == .all {
-            return viewModel.questions
+        let categoryFiltered = selectedCategory == .all
+            ? viewModel.questions
+            : viewModel.questions.filter { $0.category == selectedCategory }
+
+        if searchText.isEmpty {
+            return categoryFiltered
         } else {
-            return viewModel.questions.filter {
-                $0.category == selectedCategory
+            return categoryFiltered.filter {
+                $0.title.localizedCaseInsensitiveContains(searchText) ||
+                $0.content.localizedCaseInsensitiveContains(searchText)
             }
         }
     }
@@ -38,7 +43,6 @@ struct QuestionView: View {
             Color(red: 0.94, green: 0.96, blue: 1.0).ignoresSafeArea()
 
             VStack(spacing: 0) {
-               
                 HStack {
                     Text("게시판")
                         .font(.system(size: 26, weight: .semibold))
@@ -57,7 +61,7 @@ struct QuestionView: View {
                 HStack {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(.gray)
-                    TextField("검색", text: .constant(""))
+                    TextField("검색", text: $searchText)
                         .font(.system(size: 16))
                 }
                 .padding(12)
@@ -181,7 +185,6 @@ struct QuestionCard: View {
                 Text(question.title)
                     .font(.system(size: 20, weight: .bold))
                     .foregroundColor(.black)
-
                 // 답변수
                 if question.answerCount > 0 {
                     Text("답변 \(question.answerCount)개")
@@ -196,7 +199,6 @@ struct QuestionCard: View {
                 Spacer()
             }
             .padding(.top, 2)
-            
             // 내용
             Text(question.content)
                 .font(.system(size: 15))
