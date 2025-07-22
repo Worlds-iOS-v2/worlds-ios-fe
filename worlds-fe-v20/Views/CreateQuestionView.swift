@@ -14,35 +14,33 @@ struct CreateQuestionView: View {
     @Binding var isCreating: Bool
     @Binding var errorMessage: String?
     @Environment(\.presentationMode) var presentationMode
-    
+
     @State private var isShowingImagePicker = false
     @State private var selectedImages: [UIImage] = []
     @State private var imagePickerSourceType: UIImagePickerController.SourceType = .photoLibrary
-    @State private var selectedCategory = ""
-    
-    let categories = ["학습 게시판", "자유 게시판"]
-    let categoryMap = ["학습 게시판": "study", "자유 게시판": "free"]
-    
-    var categoryValue: String {
-        categoryMap[selectedCategory] ?? selectedCategory
-    }
+
+    // ✅ enum 기반 선택된 카테고리
+    @State private var selectedCategory: Category? = nil
+
     var onSubmit: (_ images: [UIImage], _ category: String) -> Void
-    
+
     var body: some View {
         NavigationView {
-            VStack(alignment: .leading, spacing: 14) {
+            
+            ScrollView {
+                VStack(alignment: .leading, spacing: 14) {
                 Spacer().frame(height: 15)
-                
-                // 게시판 카테고리 선택
+
+                // ✅ 카테고리 선택 (enum 기반)
                 Menu {
-                    ForEach(categories, id: \.self) { category in
-                        Button(category) {
+                    ForEach([Category.study, Category.free], id: \.self) { category in
+                        Button(category.displayName) {
                             selectedCategory = category
                         }
                     }
                 } label: {
                     HStack {
-                        Text(selectedCategory.isEmpty ? "게시판 선택" : selectedCategory)
+                        Text(selectedCategory?.displayName ?? "게시판 선택")
                             .font(.system(size: 15))
                             .foregroundColor(.gray)
                         Image(systemName: "chevron.down")
@@ -57,9 +55,9 @@ struct CreateQuestionView: View {
                             .stroke(Color(.systemGray4), lineWidth: 1)
                     )
                 }
-                .padding(.horizontal, 0)
-                
-                // 제목
+                .padding(.horizontal, 4)
+
+                // 제목 입력
                 TextField("제목", text: $title)
                     .padding(13)
                     .background(Color.white)
@@ -68,8 +66,9 @@ struct CreateQuestionView: View {
                             .stroke(Color(red: 105/255, green: 131/255, blue: 255/255), lineWidth: 1)
                     )
                     .font(.system(size: 17))
-                
-                // 내용
+                    .padding(.horizontal, 4)
+
+                // 내용 입력
                 ZStack(alignment: .topLeading) {
                     if content.isEmpty {
                         Text("내용")
@@ -87,8 +86,9 @@ struct CreateQuestionView: View {
                         .font(.system(size: 17))
                         .frame(height: 370)
                 }
-                
-                
+                .padding(.horizontal, 4)
+
+                // 이미지 선택 영역
                 HStack {
                     Button {
                         imagePickerSourceType = .photoLibrary
@@ -110,6 +110,7 @@ struct CreateQuestionView: View {
                                 .stroke(Color(red: 105/255, green: 131/255, blue: 255/255), lineWidth: 1.2)
                         )
                     }
+
                     if !selectedImages.isEmpty {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack {
@@ -125,18 +126,21 @@ struct CreateQuestionView: View {
                             .padding(.leading, 30)
                         }
                     }
+
                     Spacer()
                 }
                 .padding(.top, 4)
-                
+                .padding(.horizontal, 4)
+
                 Spacer()
-                
+
+                // 등록 버튼
                 Button {
-                    if selectedCategory.isEmpty {
+                    guard let selected = selectedCategory else {
                         errorMessage = "카테고리 선택은 필수입니다."
                         return
                     }
-                    onSubmit(selectedImages, categoryValue)
+                    onSubmit(selectedImages, selected.rawValue) // ✅ 서버로 "study"/"free" 전송
                 } label: {
                     Text("등록")
                         .font(.system(size: 18, weight: .semibold))
@@ -147,16 +151,17 @@ struct CreateQuestionView: View {
                         .shadow(color: Color(.systemGray3), radius: 3, x: 0, y: 3)
                 }
                 .padding(.bottom, 18)
-                
-            }
-            .padding(.horizontal, 10)
+                .padding(.horizontal, 4)
+                }
+            } // Close ScrollView
+            .padding(.horizontal, 20)
             .navigationTitle("질문하기")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
+                    Button {
                         presentationMode.wrappedValue.dismiss()
-                    }) {
+                    } label: {
                         Image(systemName: "chevron.left")
                             .foregroundColor(.black)
                             .font(.system(size: 20, weight: .medium))
@@ -169,6 +174,12 @@ struct CreateQuestionView: View {
                 } else {
                     ImagePickerView(selectedImages: $selectedImages)
                 }
+            }
+            .onDisappear {
+                title = ""
+                content = ""
+                selectedImages = []
+                selectedCategory = nil
             }
         }
     }
