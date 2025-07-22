@@ -17,7 +17,7 @@ class APIService {
     }
     //JWT 토큰 가져오기
     func getToken() -> String? {
-        return UserDefaults.standard.string(forKey: "jwt_token")
+        return UserDefaults.standard.string(forKey: "accessToken")
     }
     //토큰이 필요한 API 호출을 위한 HTTP헤더 생성
     private func getAuthHeaders() throws -> HTTPHeaders {
