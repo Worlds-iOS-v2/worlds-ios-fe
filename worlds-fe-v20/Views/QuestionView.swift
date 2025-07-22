@@ -14,20 +14,20 @@ struct QuestionView: View {
     @State private var isCreatingQuestion = false
     @State private var createQuestionError: String?
     @State private var searchText: String = ""
-
+    
     @State private var selectedCategory: Category = .all
-
+    
     @ObservedObject var viewModel: QuestionViewModel
-
+    
     // 버튼 표시용 카테고리 목록
     let categories: [Category] = [.all, .study, .free]
-
+    
     // 카테고리별
     var filteredQuestions: [QuestionList] {
         let categoryFiltered = selectedCategory == .all
-            ? viewModel.questions
-            : viewModel.questions.filter { $0.category == selectedCategory }
-
+        ? viewModel.questions
+        : viewModel.questions.filter { $0.category == selectedCategory }
+        
         if searchText.isEmpty {
             return categoryFiltered
         } else {
@@ -37,11 +37,11 @@ struct QuestionView: View {
             }
         }
     }
-
+    
     var body: some View {
         ZStack(alignment: .top) {
             Color(red: 0.94, green: 0.96, blue: 1.0).ignoresSafeArea()
-
+            
             VStack(spacing: 0) {
                 HStack {
                     Text("게시판")
@@ -56,7 +56,7 @@ struct QuestionView: View {
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 28)
-
+                
                 // 검색 바
                 HStack {
                     Image(systemName: "magnifyingglass")
@@ -70,7 +70,7 @@ struct QuestionView: View {
                 .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
                 .padding(.horizontal, 20)
                 .padding(.top, 14)
-
+                
                 // 카테고리 선택 + 정렬
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 16) {
@@ -87,7 +87,7 @@ struct QuestionView: View {
                                     .shadow(color: selectedCategory == category ? Color.blue.opacity(0.1) : .clear, radius: 2, y: 2)
                             }
                         }
-
+                        
                         Menu {
                             Button("최신순", action: {})
                             Button("조회순", action: {})
@@ -107,7 +107,7 @@ struct QuestionView: View {
                     .padding(.leading, 20)
                     .padding(.vertical, 8)
                 }
-
+                
                 // 게시물 목록
                 ScrollView {
                     VStack(spacing: 18) {
@@ -121,10 +121,10 @@ struct QuestionView: View {
                     }
                     .padding(.top, 8)
                 }
-
+                
                 Spacer()
             }
-
+            
             // 질문 작성 뷰
             .fullScreenCover(isPresented: $showingCreateQuestionSheet) {
                 CreateQuestionView(
@@ -160,10 +160,10 @@ struct QuestionView: View {
                 )
             }
             .onAppear {
-                viewModel.loadDummyData()
-                //                        Task {
-                                    //                            await viewModel.fetchQuestions()
-                                    //                        }
+                
+                Task {
+                    await viewModel.fetchQuestions()
+                }
             }
         }
         .navigationBarHidden(true)
@@ -195,7 +195,7 @@ struct QuestionCard: View {
                         .background(Color.blue)
                         .cornerRadius(14)
                 }
-
+                
                 Spacer()
             }
             .padding(.top, 2)
