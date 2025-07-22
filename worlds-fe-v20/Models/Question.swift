@@ -7,16 +7,36 @@
 import Foundation
 
 enum Category: String, Codable {
-    case all = "전 체"
-    case study = "학 습"
-    case free = "자 유"
-}
+    case all = "all"
+    case study = "study"
+    case free = "free"
+    
+    var KoreanName: String {
+            switch self {
+            case .study: return "학습 게시판"
+            case .free: return "자유 게시판"
+            case .all: return "전체 게시판"
+            }
+        }
+    }
+
 
 enum ReportReason: String, Codable {
-    case offensive = "비속어"
-    case sexual = "음란"
-    case ad = "광고"
-    case etc = "기타"
+    case offensive
+    case sexual
+    case ad
+    case etc
+}
+
+extension ReportReason {
+    var displayName: String {
+        switch self {
+        case .offensive: return "비속어"
+        case .sexual: return "음란"
+        case .ad: return "광고"
+        case .etc: return "기타"
+        }
+    }
 }
 
 //질문 목록
