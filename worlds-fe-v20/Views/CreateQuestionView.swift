@@ -19,7 +19,6 @@ struct CreateQuestionView: View {
     @State private var selectedImages: [UIImage] = []
     @State private var imagePickerSourceType: UIImagePickerController.SourceType = .photoLibrary
 
-    // ✅ enum 기반 선택된 카테고리
     @State private var selectedCategory: Category? = nil
 
     var onSubmit: (_ images: [UIImage], _ category: String) -> Void
@@ -31,7 +30,7 @@ struct CreateQuestionView: View {
                 VStack(alignment: .leading, spacing: 14) {
                 Spacer().frame(height: 15)
 
-                // ✅ 카테고리 선택 (enum 기반)
+                // 카테고리 선택
                 Menu {
                     ForEach([Category.study, Category.free], id: \.self) { category in
                         Button(category.displayName) {
@@ -140,7 +139,7 @@ struct CreateQuestionView: View {
                         errorMessage = "카테고리 선택은 필수입니다."
                         return
                     }
-                    onSubmit(selectedImages, selected.rawValue) // ✅ 서버로 "study"/"free" 전송
+                    onSubmit(selectedImages, selected.rawValue)
                 } label: {
                     Text("등록")
                         .font(.system(size: 18, weight: .semibold))
@@ -153,7 +152,8 @@ struct CreateQuestionView: View {
                 .padding(.bottom, 18)
                 .padding(.horizontal, 4)
                 }
-            } // Close ScrollView
+            } // ScrollView 끗
+            
             .padding(.horizontal, 20)
             .navigationTitle("질문하기")
             .navigationBarTitleDisplayMode(.inline)
