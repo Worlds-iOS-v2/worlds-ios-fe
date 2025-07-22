@@ -25,9 +25,9 @@ struct QuestionDetailView: View {
     ]
 
     let badgeColorMap: [String: Color] = [
-        "학 습": .blue,
-        "자 유": .purple,
-        "전 체": .gray
+        "학습": .blue,
+        "자유": .purple,
+        "전체": .gray
     ]
 
     var body: some View {
@@ -36,13 +36,13 @@ struct QuestionDetailView: View {
 
                 // 카테고리 뱃지 + ... 버튼
                 HStack {
-                    Text(question.category.rawValue)
+                    Text(question.category.displayName)
                         .font(.subheadline)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
-                        .background(badgeColorMap[question.category.rawValue] ?? .gray)
+                        .background(badgeColorMap[question.category.displayName] ?? .gray)
                         .cornerRadius(16)
 
                     Spacer()
