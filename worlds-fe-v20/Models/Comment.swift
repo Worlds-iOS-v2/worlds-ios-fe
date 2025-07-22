@@ -27,3 +27,21 @@ struct CommentLike: Codable, Identifiable {
     var count: Int
     var isLiked: Bool
 }
+
+enum ReportReason: String, CaseIterable, Codable, Identifiable {
+    case offensive = "offensive"
+    case sexual = "sexual"
+    case ad = "ad"
+    case etc = "etc"
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .offensive: return "욕설/비방"
+        case .sexual: return "성적인 내용"
+        case .ad: return "광고/도배"
+        case .etc: return "기타"
+        }
+    }
+}
