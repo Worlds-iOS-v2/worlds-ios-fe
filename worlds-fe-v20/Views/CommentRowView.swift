@@ -122,6 +122,7 @@ struct CommentRow: View {
             // 재귀적으로 대댓글 표시
             ForEach(replies) { reply in
                 CommentRow(comment: reply, depth: depth + 1, allComments: allComments)
+                    .environmentObject(commentVM)
             }
         }
         // 신고 사유 선택 다이얼로그

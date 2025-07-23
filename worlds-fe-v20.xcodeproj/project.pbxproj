@@ -151,6 +151,8 @@
 /* Begin XCBuildConfiguration section */
 		9F2539452E17C53B00B526A5 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 9F25393B2E17C53900B526A5 /* worlds-fe-v20 */;
+			baseConfigurationReferenceRelativePath = Endpoint.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -270,6 +272,8 @@
 		};
 		9F2539482E17C53B00B526A5 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 9F25393B2E17C53900B526A5 /* worlds-fe-v20 */;
+			baseConfigurationReferenceRelativePath = Endpoint.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

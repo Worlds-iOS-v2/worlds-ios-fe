@@ -17,7 +17,11 @@ class APIService {
     }
     //JWT 토큰 가져오기
     func getToken() -> String? {
-        return UserDefaults.standard.string(forKey: "accessToken")
+            guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
+                return "getToken 토큰 옵셔널 언래핑 실패"
+            }
+            return token
+        
     }
     //토큰이 필요한 API 호출을 위한 HTTP헤더 생성
     private func getAuthHeaders() throws -> HTTPHeaders {
@@ -26,10 +30,7 @@ class APIService {
         }
         return ["Authorization": "Bearer \(token)"] //이걸 헤더에 실어보내는 것
     }
-    
-    //로긘 횐가입
-    //..........
-    
+
     //질문 목록 조회
     func fetchQuestions() async throws -> [QuestionList] {
         let headers = try getAuthHeaders()

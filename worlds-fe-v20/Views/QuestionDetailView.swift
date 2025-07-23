@@ -13,7 +13,8 @@ struct QuestionDetailView: View {
     let question: QuestionList
 
     @State private var goToCreateAnswerView = false
-    @StateObject private var commentVM = CommentViewModel()
+    @EnvironmentObject var commentVM: CommentViewModel
+
     @State private var showOptions = false
     @State private var showReportReasons = false
     @ObservedObject var viewModel: QuestionViewModel
@@ -128,6 +129,7 @@ struct QuestionDetailView: View {
                         } else {
                             ForEach(commentVM.replies(for: nil)) { comment in
                                 CommentRow(comment: comment, depth: 0, allComments: commentVM.comments)
+                                    .environmentObject(commentVM)
                             }
                         }
                     }
@@ -233,3 +235,4 @@ struct QuestionDetailView: View {
         return dateStr.prefix(10) + " " + dateStr.dropFirst(11).prefix(5)
     }
 }
+
