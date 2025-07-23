@@ -17,7 +17,7 @@ class APIService {
     }
     //JWT 토큰 가져오기
     func getToken() -> String? {
-        return UserDefaults.standard.string(forKey: "jwt_token")
+        return UserDefaults.standard.string(forKey: "accessToken")
     }
     //토큰이 필요한 API 호출을 위한 HTTP헤더 생성
     private func getAuthHeaders() throws -> HTTPHeaders {
@@ -123,6 +123,37 @@ class APIService {
             
         }
     
+    //질문 신고
+    func reportQuestion(
+            questionId: Int,
+            reason: ReportReason,
+            etcReason: String? = nil
+        ) async throws -> Bool {
+            let headers = try getAuthHeaders()
+            var params: [String: Any] = [
+                "reason": reason.rawValue  
+            ]
+            if let etc = etcReason, !etc.isEmpty {
+                params["etcReason"] = etc
+            }
+            
+            let response = try await AF.request(
+                "\(baseURL)/questions/\(questionId)/report",
+                method: .post,
+                parameters: params,
+                encoding: JSONEncoding.default,
+                headers: headers
+              )
+              .validate()
+              .serializingData()
+              .response
+
+              print("신고 응답: \(response)")
+              return response.error == nil
+          }
+  }
+
+    
     // 댓글 또는 대댓글 작성
     func postComment(content: String, questionId: Int, parentId: Int? = nil) async throws -> Bool {
         let headers = try getAuthHeaders()
@@ -163,11 +194,20 @@ class APIService {
     }
     
     // 댓글 신고
-    func reportComment(commentId: Int, reason: String) async throws -> Bool {
+    func reportComment(commentId: Int, reason: String, etcReason: String? = nil, questionId: Int? = nil) async throws -> Bool {
         let headers = try getAuthHeaders()
-        let params: [String: Any] = [
+        
+        var params: [String: Any] = [
             "reason": reason
         ]
+        
+        if let etcReason = etcReason {
+            params["etcReason"] = etcReason
+        }
+        
+        if let questionId = questionId {
+            params["questionId"] = questionId
+        }
 
         let response = try await AF.request(
             "\(baseURL)/comment/\(commentId)/report",
