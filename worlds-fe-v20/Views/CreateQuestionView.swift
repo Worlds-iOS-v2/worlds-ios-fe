@@ -14,7 +14,6 @@ struct CreateQuestionView: View {
     @Binding var isCreating: Bool
     @Binding var errorMessage: String?
     @Environment(\.presentationMode) var presentationMode
-
     @State private var isShowingImagePicker = false
     @State private var selectedImages: [UIImage] = []
     @State private var imagePickerSourceType: UIImagePickerController.SourceType = .photoLibrary
@@ -159,6 +158,7 @@ struct CreateQuestionView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
+
                     Button {
                         presentationMode.wrappedValue.dismiss()
                     } label: {

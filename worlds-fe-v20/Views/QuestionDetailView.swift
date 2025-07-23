@@ -4,12 +4,14 @@
 //
 //  Created by 이서하 on 7/4/25.
 //
+
 //  TODO: 이미지 백딴 전송, 삭제하면 바로 창 닫히게
 
 import SwiftUI
 
 struct QuestionDetailView: View {
     let question: QuestionList
+
     @State private var goToCreateAnswerView = false
     @StateObject private var commentVM = CommentViewModel(preview: true)
     @State private var showOptions = false
@@ -164,17 +166,17 @@ struct QuestionDetailView: View {
                 }
                 .padding(.leading, 8)
             }
+//             .padding(.top, 10)
+//         }
+//         .padding(.horizontal, 20)
+//         .padding(.bottom, 20)
             .padding()
             .background(Color.white)
         }
         .ignoresSafeArea(.keyboard, edges: .bottom) // 키보드 올라올 때 대응
         .onAppear {
             Task {
-                do {
-                    self.commentVM.comments = try await APIService.shared.fetchComments(for: question.id)
-                } catch {
-                    print("답변 로딩 실패: \(error.localizedDescription)")
-                }
+                await commentVM.fetchComments(for: question.id)
             }
         }
         // 네비게이션
@@ -231,15 +233,3 @@ struct QuestionDetailView: View {
         return dateStr.prefix(10) + " " + dateStr.dropFirst(11).prefix(5)
     }
 }
-    
-//#Preview {
-//    let vm = QuestionViewModel()
-//    vm.loadDummyData()
-//    
-//    let commentVM = CommentViewModel(preview: true)
-//    
-//    return QuestionDetailView(
-//        question: vm.questions.first!
-//    )
-//    .environmentObject(commentVM)
-//}

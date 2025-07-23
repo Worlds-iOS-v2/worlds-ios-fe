@@ -23,6 +23,7 @@ class QuestionViewModel: ObservableObject {
             self.questions = list
             self.errorMessage = nil
         } catch {
+
             print("❌ 에러 발생:", error)
             self.errorMessage = "질문 목록을 불러오는데 실패했습니다: \(error.localizedDescription)"
             self.isLoading = false
@@ -63,7 +64,6 @@ class QuestionViewModel: ObservableObject {
             throw NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "질문 등록에 실패했습니다."])
         }
     }
-
 
     // 질문 삭제
     func deleteQuestion(id: Int) async throws {

@@ -240,7 +240,7 @@ class APIService {
     // 댓글 좋아요 토글
     func toggleCommentLike(commentId: Int) async throws -> CommentLike {
         let headers = try getAuthHeaders()
-        
+      
         // 먼저 POST 요청 (좋아요 시도)
         let postResponse = try await AF.request(
             "\(baseURL)/comment/like/\(commentId)",
@@ -265,7 +265,7 @@ class APIService {
                 .validate()
                 .serializingData()
                 .response
-            
+          
             if deleteResponse.error == nil {
                 // 좋아요 취소 성공 → count 다시 조회
                 let count = try await fetchLikeCount(commentId: commentId)
@@ -283,7 +283,6 @@ class APIService {
     // 3. 그 정보를 바탕으로 CommentLike 구조체 생성해서 반환
     func fetchCommentLike(commentId: Int) async throws -> CommentLike {
         let headers = try getAuthHeaders()
-        
         let count = try await fetchLikeCount(commentId: commentId)
         let isLiked = try await fetchIsLiked(commentId: commentId)
         
@@ -293,7 +292,7 @@ class APIService {
     // 좋아요 수
     func fetchLikeCount(commentId: Int) async throws -> Int {
         let headers = try getAuthHeaders()
-        
+
         let count = try await AF.request(
             "\(baseURL)/comment/like/\(commentId)/count",
             headers: headers
@@ -308,7 +307,7 @@ class APIService {
     // 유저가 좋아요를 눌렀는지 여부
     func fetchIsLiked(commentId: Int) async throws -> Bool {
         let headers = try getAuthHeaders()
-        
+      
         let response = try await AF.request(
             "\(baseURL)/comment/like/\(commentId)/isLiked",
             method: .get,
