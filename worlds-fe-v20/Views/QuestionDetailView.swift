@@ -13,7 +13,7 @@ struct QuestionDetailView: View {
     let question: QuestionList
 
     @State private var goToCreateAnswerView = false
-    @StateObject private var commentVM = CommentViewModel(preview: true)
+    @StateObject private var commentVM = CommentViewModel()
     @State private var showOptions = false
     @State private var showReportReasons = false
     @ObservedObject var viewModel: QuestionViewModel
