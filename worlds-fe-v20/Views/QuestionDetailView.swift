@@ -11,6 +11,7 @@ import SwiftUI
 struct QuestionDetailView: View {
     let question: QuestionList
     @State private var goToCreateAnswerView = false
+    @StateObject private var commentVM = CommentViewModel(preview: true)
     @State private var showOptions = false
     @State private var showReportReasons = false
     @ObservedObject var viewModel: QuestionViewModel
@@ -31,99 +32,150 @@ struct QuestionDetailView: View {
     ]
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
+        VStack(spacing: 0) {
+            // 상단 ScrollView
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
 
-                // 카테고리 뱃지 + ... 버튼
-                HStack {
-                    Text(question.category.displayName)
-                        .font(.subheadline)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                        .background(badgeColorMap[question.category.displayName] ?? .gray)
-                        .cornerRadius(16)
-
-                    Spacer()
-
-                    Button {
-                        showOptions = true
-                    } label: {
-                        Image(systemName: "ellipsis")
-                            .rotationEffect(.degrees(90))
-                            .font(.title2)
-                            .foregroundColor(.gray)
-                    }
-                }
-                .padding(.horizontal)
-                .padding(.top, 10)
-                .padding(.bottom, 12) // 유저 정보와 간격 확보
-
-                // 유저 정보
-                HStack(spacing: 10) {
-                    Image(systemName: "person.circle.fill")
-                        .resizable()
-                        .frame(width: 38, height: 38)
-                        .foregroundColor(.gray)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(question.user.name)
-                            .font(.callout)
+                    // 카테고리 뱃지 + 옵션 버튼
+                    HStack {
+                        Text(question.category.displayName)
+                            .font(.subheadline)
                             .fontWeight(.bold)
-                        Text(formatDate(question.createdAt))
-                            .font(.caption)
-                            .foregroundColor(.gray)
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(badgeColorMap[question.category.displayName] ?? .gray)
+                            .cornerRadius(16)
+
+                        Spacer()
+
+                        Button {
+                            showOptions = true
+                        } label: {
+                            Image(systemName: "ellipsis")
+                                .rotationEffect(.degrees(90))
+                                .font(.title2)
+                                .foregroundColor(.gray)
+                        }
                     }
-                    Spacer()
-                }
-                .padding(.horizontal)
-                .padding(.top, 0)
+                    .padding(.horizontal)
+                    .padding(.top, 10)
+                    .padding(.bottom, 12)
 
-                // 제목
-                Text(question.title)
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .padding(.top, 24)
+                    // 유저 정보
+                    HStack(spacing: 10) {
+                        Image(systemName: "person.circle.fill")
+                            .resizable()
+                            .frame(width: 38, height: 38)
+                            .foregroundColor(.gray)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(question.user.name)
+                                .font(.callout)
+                                .fontWeight(.bold)
+                            Text(formatDate(question.createdAt))
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                        }
+                        Spacer()
+                    }
                     .padding(.horizontal)
 
-                // 본문
-                Text(question.content)
-                    .font(.body)
-                    .foregroundColor(.black)
-                    .padding(.top, 18)
+                    // 제목
+                    Text(question.title)
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .padding(.top, 24)
+                        .padding(.horizontal)
+
+                    // 본문
+                    Text(question.content)
+                        .font(.body)
+                        .foregroundColor(.black)
+                        .padding(.top, 18)
+                        .padding(.horizontal)
+                        .frame(maxWidth: .infinity, minHeight: 150, alignment: .leading)
+
+                    // 번역 버튼
+                    Button("번역하기") {
+                        // 번역 기능
+                    }
+                    .font(.callout)
+                    .foregroundColor(.blue)
                     .padding(.horizontal)
-                    .frame(maxWidth: .infinity, minHeight: 150, alignment: .leading)
+                    .padding(.top, 14)
 
-                // 번역 버튼 (더미)
-                Button("번역하기") {
-                    // 번역 기능
+                    Color.gray.opacity(0.1)
+                        .frame(height: 13)
+                        .frame(maxWidth: .infinity)
+                        .padding(.horizontal, -20)
+
+                    Text("댓글 \(commentVM.comments.count)개")
+                        .font(.subheadline)
+                        .bold()
+                        .padding(.top, 12)
+                        .padding(.horizontal)
+
+                    // 댓글 리스트
+                    VStack(alignment: .leading, spacing: 15) {
+                        if commentVM.comments.isEmpty {
+                            Text("아직 답변이 없습니다.")
+                                .foregroundColor(.gray)
+                                .padding(.horizontal)
+                                .padding(.top, 10)
+                        } else {
+                            ForEach(commentVM.replies(for: nil)) { comment in
+                                CommentRow(comment: comment, depth: 0, allComments: commentVM.comments)
+                            }
+                        }
+                    }
+                    .padding(.top, 10)
+                    .padding(.horizontal)
                 }
-                .font(.callout)
-                .foregroundColor(.blue)
-                .padding(.horizontal)
-                .padding(.top, 14)
-
-                Divider()
-                    .padding(.top, 16)
-
-                Spacer()
-
-                // 답변 작성 버튼
-                Button(action: { goToCreateAnswerView = true }) {
-                    Text("답변 작성하기")
-                        .foregroundColor(.white)
-                        .fontWeight(.medium)
-                        .padding()
-                        .frame(width: 150)
-                        .background(Color("darkbrown"))
-                        .cornerRadius(25)
-                }
-                .padding(.bottom, 20)
-                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.top, 10)
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 20)
+
+            Divider()
+
+            // 댓글 입력창 (항상 하단 고정)
+            HStack {
+                TextField("댓글을 입력하세요", text: $commentVM.replyContent)
+                    .padding(12)
+                    .background(Color.white)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.brown, lineWidth: 1)
+                    )
+
+                Button(action: {
+                    Task {
+                        await commentVM.submitComment(
+                            for: question.id,
+                            parentId: commentVM.replyingTo
+                        )
+                    }
+                }) {
+                    Text("등록")
+                        .frame(minWidth: 60)
+                        .padding(.vertical, 12)
+                        .background(Color.brown)
+                        .foregroundColor(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                }
+                .padding(.leading, 8)
+            }
+            .padding()
             .background(Color.white)
+        }
+        .ignoresSafeArea(.keyboard, edges: .bottom) // 키보드 올라올 때 대응
+        .onAppear {
+            Task {
+                do {
+                    self.commentVM.comments = try await APIService.shared.fetchComments(for: question.id)
+                } catch {
+                    print("답변 로딩 실패: \(error.localizedDescription)")
+                }
+            }
         }
         // 네비게이션
         .navigationBarBackButtonHidden(true)
@@ -148,8 +200,8 @@ struct QuestionDetailView: View {
             Button("삭제", role: .destructive) {
                 Task {
                     try await viewModel.deleteQuestion(id: question.id)
-                            await MainActor.run {
-                                dismiss()
+                    await MainActor.run {
+                        dismiss()
                     }
                 }
             }
@@ -168,6 +220,7 @@ struct QuestionDetailView: View {
         }
     }
 
+    // 날짜 포맷터
     func formatDate(_ dateStr: String) -> String {
         let inputFormatter = ISO8601DateFormatter()
         if let date = inputFormatter.date(from: dateStr) {
@@ -177,4 +230,16 @@ struct QuestionDetailView: View {
         }
         return dateStr.prefix(10) + " " + dateStr.dropFirst(11).prefix(5)
     }
+}
+    
+#Preview {
+    let vm = QuestionViewModel()
+    vm.loadDummyData()
+    
+    let commentVM = CommentViewModel(preview: true)
+    
+    return QuestionDetailView(
+        question: vm.questions.first!
+    )
+    .environmentObject(commentVM)
 }
