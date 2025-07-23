@@ -232,14 +232,14 @@ struct QuestionDetailView: View {
     }
 }
     
-#Preview {
-    let vm = QuestionViewModel()
-    vm.loadDummyData()
-    
-    let commentVM = CommentViewModel(preview: true)
-    
-    return QuestionDetailView(
-        question: vm.questions.first!
-    )
-    .environmentObject(commentVM)
-}
+//#Preview {
+//    let vm = QuestionViewModel()
+//    vm.loadDummyData()
+//    
+//    let commentVM = CommentViewModel(preview: true)
+//    
+//    return QuestionDetailView(
+//        question: vm.questions.first!
+//    )
+//    .environmentObject(commentVM)
+//}

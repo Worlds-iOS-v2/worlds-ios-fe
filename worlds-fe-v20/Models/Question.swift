@@ -20,24 +20,23 @@ enum Category: String, Codable {
         }
     }
 
-
-enum ReportReason: String, Codable {
-    case offensive
-    case sexual
-    case ad
-    case etc
-}
-
-extension ReportReason {
-    var displayName: String {
-        switch self {
-        case .offensive: return "비속어"
-        case .sexual: return "음란"
-        case .ad: return "광고"
-        case .etc: return "기타"
-        }
-    }
-}
+//enum ReportReason: String, Codable {
+//    case offensive
+//    case sexual
+//    case ad
+//    case etc
+//}
+//
+//extension ReportReason {
+//    var displayName: String {
+//        switch self {
+//        case .offensive: return "비속어"
+//        case .sexual: return "음란"
+//        case .ad: return "광고"
+//        case .etc: return "기타"
+//        }
+//    }
+//}
 
 //질문 목록
 struct QuestionList: Codable, Identifiable, Hashable {
