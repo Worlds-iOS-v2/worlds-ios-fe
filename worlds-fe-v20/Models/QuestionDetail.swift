@@ -12,8 +12,6 @@ struct QuestionDetail: Codable, Identifiable, Hashable {
     let title: String
     let content: String
     let createdAt: String
-//    let updatedAt: String?
-    let deletedAt: String?
     let userId: Int
     let user: QuestionUser
     let category: Category
@@ -25,14 +23,12 @@ struct QuestionDetail: Codable, Identifiable, Hashable {
         case id
         case title
         case content
-        case createdAt = "created_at"
-//        case updatedAt = "updated_at"
-        case deletedAt = "deleted_at"
+        case createdAt = "createdAt"
         case userId = "user_id"
         case user
         case category
-        case isAnswered = "is_answered"
-        case answerCount = "answer_count"
+        case isAnswered = "isAnswered"
+        case answerCount = "answerCount"
         case imageUrl = "image_urls"
     }
 }

@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9F25395A2E17C57600B526A5 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 9F2539592E17C57600B526A5 /* Alamofire */; };
+		9F25395A2E17C57600B526A5 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
+		B3A398032E308E9600FC2798 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = B3A398022E308E9600FC2798 /* Alamofire */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,7 +41,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9F25395A2E17C57600B526A5 /* Alamofire in Frameworks */,
+				9F25395A2E17C57600B526A5 /* (null) in Frameworks */,
+				B3A398032E308E9600FC2798 /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,7 +85,7 @@
 			);
 			name = "worlds-fe-v20";
 			packageProductDependencies = (
-				9F2539592E17C57600B526A5 /* Alamofire */,
+				B3A398022E308E9600FC2798 /* Alamofire */,
 			);
 			productName = "worlds-fe-v20";
 			productReference = 9F2539392E17C53900B526A5 /* worlds-fe-v20.app */;
@@ -114,7 +116,7 @@
 			mainGroup = 9F2539302E17C53900B526A5;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				9F2539582E17C57600B526A5 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				B3A398012E308E9600FC2798 /* XCRemoteSwiftPackageReference "Alamofire" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9F25393A2E17C53900B526A5 /* Products */;
@@ -356,9 +358,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		9F2539582E17C57600B526A5 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+		B3A398012E308E9600FC2798 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			repositoryURL = "https://github.com/Alamofire/Alamofire";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 5.10.2;
@@ -367,9 +369,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		9F2539592E17C57600B526A5 /* Alamofire */ = {
+		B3A398022E308E9600FC2798 /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 9F2539582E17C57600B526A5 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			package = B3A398012E308E9600FC2798 /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
 		};
 /* End XCSwiftPackageProductDependency section */

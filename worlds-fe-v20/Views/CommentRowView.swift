@@ -26,7 +26,7 @@ struct CommentRow: View {
     var replies: [Comment] {
         allComments.filter { $0.parentId == comment.id }
     }
-
+  
     var isReplyingTarget: Bool {
         commentVM.replyingTo == comment.id
     }
@@ -48,10 +48,6 @@ struct CommentRow: View {
                                 .font(.caption)
                                 .foregroundColor(.blue)
                         }
-
-                        Text("| \(comment.createdAt)")
-                            .font(.caption)
-                            .foregroundColor(.gray)
 
                         Spacer()
 

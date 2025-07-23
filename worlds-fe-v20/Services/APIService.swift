@@ -17,7 +17,7 @@ class APIService {
     }
     //JWT 토큰 가져오기
     func getToken() -> String? {
-        return UserDefaults.standard.string(forKey: "jwt_token")
+        return UserDefaults.standard.string(forKey: "accessToken")
     }
     //토큰이 필요한 API 호출을 위한 HTTP헤더 생성
     private func getAuthHeaders() throws -> HTTPHeaders {
@@ -32,25 +32,25 @@ class APIService {
     
     //질문 목록 조회
     func fetchQuestions() async throws -> [QuestionList] {
-            let headers = try getAuthHeaders()
-
-            let response = try await AF.request("\(baseURL)/questions", headers: headers)
-                .serializingDecodable([QuestionList].self)
-                .value
-                
-            return response
-        }
+        let headers = try getAuthHeaders()
+        
+        let response = try await AF.request("\(baseURL)/questions", headers: headers)
+            .serializingDecodable([QuestionList].self)
+            .value
+        
+        return response
+    }
     
     //질문 상세
     func fetchQuestionDetail(questionId: Int) async throws -> QuestionDetail {
-            let headers = try getAuthHeaders()
-
-            let response = try await AF.request("\(baseURL)/questions/\(questionId)", headers: headers)
-                .serializingDecodable(QuestionDetail.self)
-                .value
-            
-            return response
-        }
+        let headers = try getAuthHeaders()
+        
+        let response = try await AF.request("\(baseURL)/questions/\(questionId)", headers: headers)
+            .serializingDecodable(QuestionDetail.self)
+            .value
+        
+        return response
+    }
     
     //질문 생성
     func createQuestion(title: String, content: String, category: String, images: [Data]? = nil) async throws -> Bool {
@@ -64,12 +64,12 @@ class APIService {
                         multipartFormData.append(title.data(using: .utf8)!, withName: "title")
                         multipartFormData.append(content.data(using: .utf8)!, withName: "content")
                         multipartFormData.append(category.data(using: .utf8)!, withName: "category")
-
+                        
                         for (index, imageData) in imagesData.enumerated() {
                             multipartFormData.append(imageData,
-                                                 withName: "images",
-                                                 fileName: "image\(index).jpg",
-                                                 mimeType: "image/jpeg")
+                                                     withName: "images",
+                                                     fileName: "image\(index).jpg",
+                                                     mimeType: "image/jpeg")
                         }
                     },
                     to: "\(baseURL)/questions",
@@ -99,40 +99,69 @@ class APIService {
                 parameters: params,
                 encoding: JSONEncoding.default,
                 headers: headers )
-            .validate()
-            .serializingData()
-            .response
+                .validate()
+                .serializingData()
+                .response
             
             return response.error == nil
         }
     }
-
+    
     
     //질문 삭제
     func deleteQuestion(questionId: Int) async throws -> Bool {
-            let headers = try getAuthHeaders()
-
-            let response = try await AF.request("\(baseURL)/questions/\(questionId)", method: .delete,
-                                                headers: headers)
-                .validate()
-                .serializingData()
-                .response
+        let headers = try getAuthHeaders()
         
-            print("삭제 완료: \(response)")
-            return response.error == nil
-            
+        let response = try await AF.request("\(baseURL)/questions/\(questionId)", method: .delete,
+                                            headers: headers)
+            .validate()
+            .serializingData()
+            .response
+        
+        print("삭제 완료: \(response)")
+        return response.error == nil
+        
+    }
+    
+    //질문 신고
+    func reportQuestion(
+        questionId: Int,
+        reason: ReportReason,
+        etcReason: String? = nil
+    ) async throws -> Bool {
+        let headers = try getAuthHeaders()
+        var params: [String: Any] = [
+            "reason": reason.rawValue  
+        ]
+        if let etc = etcReason, !etc.isEmpty {
+            params["etcReason"] = etc
         }
+        
+        let response = try await AF.request(
+            "\(baseURL)/questions/\(questionId)/report",
+            method: .post,
+            parameters: params,
+            encoding: JSONEncoding.default,
+            headers: headers
+        )
+            .validate()
+            .serializingData()
+            .response
+        
+        print("신고 응답: \(response)")
+        return response.error == nil
+    }
     
     // 댓글 또는 대댓글 작성
     func postComment(content: String, questionId: Int, parentId: Int? = nil) async throws -> Bool {
         let headers = try getAuthHeaders()
-
+        
         // parentId가 있을 경우만 포함되도록 params 구성
         var params: [String: Any] = ["content": content]
         if let parentId = parentId {
             params["parentId"] = parentId
         }
-
+        
         let response = try await AF.request(
             "\(baseURL)/comment/question/\(questionId)",
             method: .post,
@@ -140,25 +169,25 @@ class APIService {
             encoding: JSONEncoding.default,
             headers: headers
         )
-        .validate()
-        .serializingData()
-        .response
-
+            .validate()
+            .serializingData()
+            .response
+        
         return response.error == nil
     }
     
     // 댓글 조회
     func fetchComments(for questionId: Int) async throws -> [Comment] {
         let headers = try getAuthHeaders()
-
+        
         let response = try await AF.request(
             "\(baseURL)/comment/question/\(questionId)",
             headers: headers
         )
-        .validate()
-        .serializingDecodable([Comment].self)
-        .value
-
+            .validate()
+            .serializingDecodable([Comment].self)
+            .value
+        
         return response
     }
     
@@ -177,7 +206,7 @@ class APIService {
         if let questionId = questionId {
             params["questionId"] = questionId
         }
-
+        
         let response = try await AF.request(
             "\(baseURL)/comment/\(commentId)/report",
             method: .post,
@@ -185,43 +214,43 @@ class APIService {
             encoding: JSONEncoding.default,
             headers: headers
         )
-        .validate()
-        .serializingData()
-        .response
-
+            .validate()
+            .serializingData()
+            .response
+        
         return response.error == nil
     }
     
     // 댓글 삭제
     func deleteComment(commentId: Int) async throws -> Bool {
         let headers = try getAuthHeaders()
-
+        
         let response = try await AF.request(
             "\(baseURL)/comment/\(commentId)",
             method: .delete,
             headers: headers
         )
-        .validate()
-        .serializingData()
-        .response
-
+            .validate()
+            .serializingData()
+            .response
+        
         return response.error == nil
     }
     
     // 댓글 좋아요 토글
     func toggleCommentLike(commentId: Int) async throws -> CommentLike {
         let headers = try getAuthHeaders()
-
+      
         // 먼저 POST 요청 (좋아요 시도)
         let postResponse = try await AF.request(
             "\(baseURL)/comment/like/\(commentId)",
             method: .post,
             headers: headers
         )
-        .validate()
-        .serializingData()
-        .response
-
+            .validate()
+            .serializingData()
+            .response
+        
         if postResponse.error == nil {
             // 좋아요 성공 → count 다시 조회
             let count = try await fetchLikeCount(commentId: commentId)
@@ -233,10 +262,10 @@ class APIService {
                 method: .delete,
                 headers: headers
             )
-            .validate()
-            .serializingData()
-            .response
-
+                .validate()
+                .serializingData()
+                .response
+          
             if deleteResponse.error == nil {
                 // 좋아요 취소 성공 → count 다시 조회
                 let count = try await fetchLikeCount(commentId: commentId)
@@ -254,10 +283,9 @@ class APIService {
     // 3. 그 정보를 바탕으로 CommentLike 구조체 생성해서 반환
     func fetchCommentLike(commentId: Int) async throws -> CommentLike {
         let headers = try getAuthHeaders()
-
         let count = try await fetchLikeCount(commentId: commentId)
         let isLiked = try await fetchIsLiked(commentId: commentId)
-
+        
         return CommentLike(id: commentId, count: count, isLiked: isLiked)
     }
     
@@ -269,26 +297,26 @@ class APIService {
             "\(baseURL)/comment/like/\(commentId)/count",
             headers: headers
         )
-        .validate()
-        .serializingDecodable(Int.self)
-        .value
-
+            .validate()
+            .serializingDecodable(Int.self)
+            .value
+        
         return count
     }
     
     // 유저가 좋아요를 눌렀는지 여부
     func fetchIsLiked(commentId: Int) async throws -> Bool {
         let headers = try getAuthHeaders()
-
+      
         let response = try await AF.request(
             "\(baseURL)/comment/like/\(commentId)/isLiked",
             method: .get,
             headers: headers
         )
-        .validate()
-        .serializingDecodable(Bool.self)
-        .value
-
+            .validate()
+            .serializingDecodable(Bool.self)
+            .value
+        
         return response
     }
 }

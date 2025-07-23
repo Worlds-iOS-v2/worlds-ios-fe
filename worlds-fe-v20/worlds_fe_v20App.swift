@@ -14,25 +14,24 @@ struct worlds_fe_v20App: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
-            
-            //            switch appState.flow {
-            //            // 로그인 화면
-            //            case .login:
-            //                LoginView()
-            //                    .environmentObject(appState)
-            //
-            //            // 회원가입 화면
-            //            case .signUp:
-            //                SignUpRoleSelectionView()
-            //                    .environmentObject(appState)
-            //                    .environmentObject(signUpViewModel)
-            //
-            //            // 추후 메인 화면으로 변경
-            //            case .main:
-            //                ContentView()
-            //                    .environmentObject(appState)
-            //            }
+            // OCRCameraView()
+            switch appState.flow {
+                // 로그인 화면
+            case .login:
+                LoginView()
+                    .environmentObject(appState)
+                
+                // 회원가입 화면
+            case .signUp:
+                SignUpRoleSelectionView()
+                    .environmentObject(appState)
+                    .environmentObject(signUpViewModel)
+                
+                // 추후 메인 화면으로 변경
+            case .main:
+                QuestionView(viewModel: QuestionViewModel())
+                    .environmentObject(appState)
+            }
         }
     }
 }
