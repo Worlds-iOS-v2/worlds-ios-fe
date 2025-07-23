@@ -121,10 +121,10 @@ class UserAPIManager {
                     throw UserAPIError.serverError(message: errorMessage)
                 } catch {
                     print("에러 응답 파싱 실패: \(error)")
-                    throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
+                    throw UserAPIError.serverError(message: "signUp 서버 응답 파싱 실패")
                 }
             } else {
-                throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
+                throw UserAPIError.serverError(message: "signUp 서버 응답 파싱 실패")
             }
         }
     }
@@ -178,10 +178,10 @@ class UserAPIManager {
                     throw UserAPIError.serverError(message: errorMessage)
                 } catch {
                     print("로그인 에러 응답 파싱 실패: \(error)")
-                    throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
+                    throw UserAPIError.serverError(message: "login 서버 응답 파싱 실패")
                 }
             } else {
-                throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
+                throw UserAPIError.serverError(message: "login 서버 응답 파싱 실패")
             }
         }
     }
