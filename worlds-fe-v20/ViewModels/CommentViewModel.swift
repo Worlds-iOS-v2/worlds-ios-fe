@@ -17,38 +17,7 @@ class CommentViewModel: ObservableObject {
     @Published var likes: [Int: CommentLike] = [:] // 좋아요 상태 관리용
     @Published var errorMessage: String?
     
-    init(preview: Bool = false) {
-            if preview {
-                self.comments = dummyComments
-            }
-        }
-    
-    let dummyComments: [Comment] = [
-        Comment(
-            id: 1,
-            content: "이 질문은 정말 좋은 질문이네요!",
-            createdAt: "2025-07-20",
-            questionId: 1,
-            user: .init(id: 1, userName: "멘토홍", isMentor: true),
-            parentId: nil
-        ),
-        Comment(
-            id: 2,
-            content: "저도 궁금했는데 덕분에 이해했어요.",
-            createdAt: "2025-07-20",
-            questionId: 1,
-            user: .init(id: 2, userName: "홍멘티", isMentor: false),
-            parentId: 1
-        ),
-        Comment(
-            id: 3,
-            content: "도움이 되셨다니 다행이에요!",
-            createdAt: "2025-07-20",
-            questionId: 1,
-            user: .init(id: 1, userName: "멘토홍", isMentor: true),
-            parentId: 2
-        )
-    ]
+    init() {}
     
     // 계층 구조로 정리하는 함수
     func replies(for parentId: Int?) -> [Comment] {

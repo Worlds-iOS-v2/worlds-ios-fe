@@ -10,8 +10,8 @@ import SwiftUI
 
 struct QuestionDetailView: View {
     let question: QuestionList
-    @State private var goToCreateCommentView = false
-    @StateObject private var commentVM = CommentViewModel(preview: true)
+    
+    @StateObject private var commentVM = CommentViewModel()
     
     var body: some View {
         VStack(spacing: 0) {
@@ -56,6 +56,7 @@ struct QuestionDetailView: View {
                     } else {
                         ForEach(commentVM.replies(for: nil)) { comment in
                             CommentRow(comment: comment, depth: 0, allComments: commentVM.comments)
+                                .environmentObject(commentVM)
                         }
                     }
                 }
@@ -95,24 +96,8 @@ struct QuestionDetailView: View {
         .padding(.bottom, 20)
         .onAppear {
             Task {
-                do {
-                    self.commentVM.comments = try await APIService.shared.fetchComments(for: question.id)
-                } catch {
-                    print("답변 로딩 실패: \(error.localizedDescription)")
-                }
+                await commentVM.fetchComments(for: question.id)
             }
         }
     }
-}
-
-#Preview {
-    let vm = QuestionViewModel()
-    vm.loadDummyData()
-    
-    let commentVM = CommentViewModel(preview: true)
-    
-    return QuestionDetailView(
-        question: vm.questions.first!
-    )
-    .environmentObject(commentVM)
 }

@@ -163,11 +163,20 @@ class APIService {
     }
     
     // 댓글 신고
-    func reportComment(commentId: Int, reason: String) async throws -> Bool {
+    func reportComment(commentId: Int, reason: String, etcReason: String? = nil, questionId: Int? = nil) async throws -> Bool {
         let headers = try getAuthHeaders()
-        let params: [String: Any] = [
+        
+        var params: [String: Any] = [
             "reason": reason
         ]
+        
+        if let etcReason = etcReason {
+            params["etcReason"] = etcReason
+        }
+        
+        if let questionId = questionId {
+            params["questionId"] = questionId
+        }
 
         let response = try await AF.request(
             "\(baseURL)/comment/\(commentId)/report",
