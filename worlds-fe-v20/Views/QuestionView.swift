@@ -111,10 +111,15 @@ struct QuestionView: View {
                     ScrollView {
                         VStack(spacing: 18) {
                             ForEach(filteredQuestions) { question in
-                                NavigationLink(destination: QuestionDetailView(question: question, viewModel: viewModel)
+//                                NavigationLink(destination: QuestionDetailView(question: question, viewModel: viewModel)
+//                                    .environmentObject(CommentViewModel())) {
+//                                    QuestionCard(question: question)
+//                                        .padding(.horizontal, 15)
+//                                }
+                                
+                                NavigationLink(destination: QuestionDetailView(questionId: question.id, viewModel: viewModel)
                                     .environmentObject(CommentViewModel())) {
                                     QuestionCard(question: question)
-                                        .padding(.horizontal, 15)
                                 }
                                 .buttonStyle(PlainButtonStyle())
                             }
@@ -141,7 +146,7 @@ struct QuestionView: View {
                                         title: newQuestionTitle,
                                         content: newQuestionContent,
                                         category: category,
-                                        images: nil
+                                        images: images.map { $0.jpegData(compressionQuality: 0.7)! }
                                     )
                                     if result {
                                         await viewModel.fetchQuestions()
