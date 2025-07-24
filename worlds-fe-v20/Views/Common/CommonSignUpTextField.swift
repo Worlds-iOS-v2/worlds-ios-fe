@@ -32,6 +32,7 @@ struct CommonSignUpTextField: View {
 
             } else {
                 TextField("\(placeholder)", text: $content)
+                    .textInputAutocapitalization(.never) // 자동 대문자처리 해제
                     .foregroundStyle(Color.gray)
                     .font(.system(size: 20))
                     .frame(height: 60)

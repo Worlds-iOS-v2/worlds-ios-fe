@@ -33,6 +33,7 @@ struct LoginView: View {
                     .padding(.bottom, 80)
                 
                 TextField("이메일을 입력하세요", text: $email)
+                    .textInputAutocapitalization(.never) // 자동 대문자처리 해제
                     .keyboardType(.emailAddress)
                     .foregroundStyle(Color.gray)
                     .font(.system(size: 20))
