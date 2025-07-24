@@ -131,13 +131,16 @@ struct CreateQuestionView: View {
                 .padding(.horizontal, 4)
 
                 Spacer()
-
+                   
                 // 등록 버튼
                 Button {
                     guard let selected = selectedCategory else {
                         errorMessage = "카테고리 선택은 필수입니다."
                         return
                     }
+                    for (index, image) in selectedImages.enumerated() {
+                    }
+                    
                     onSubmit(selectedImages, selected.rawValue)
                 } label: {
                     Text("등록")
