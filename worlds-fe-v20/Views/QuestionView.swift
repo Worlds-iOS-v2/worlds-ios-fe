@@ -111,17 +111,12 @@ struct QuestionView: View {
                     ScrollView {
                         VStack(spacing: 18) {
                             ForEach(filteredQuestions) { question in
-//                                NavigationLink(destination: QuestionDetailView(question: question, viewModel: viewModel)
-//                                    .environmentObject(CommentViewModel())) {
-//                                    QuestionCard(question: question)
-//                                        .padding(.horizontal, 15)
-//                                }
                                 
                                 NavigationLink(destination: QuestionDetailView(questionId: question.id, viewModel: viewModel)
                                     .environmentObject(CommentViewModel())) {
-                                    QuestionCard(question: question)
-                                }
-                                .buttonStyle(PlainButtonStyle())
+                                        QuestionCard(question: question)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
                             }
                         }
                         .padding(.top, 8)
