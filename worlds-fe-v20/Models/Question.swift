@@ -49,6 +49,7 @@ struct QuestionList: Codable, Identifiable, Hashable {
     let answerCount: Int
     let category: Category
     let user: QuestionUser
+    let imageUrls: [String]?
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -59,6 +60,7 @@ struct QuestionList: Codable, Identifiable, Hashable {
         case answerCount = "answerCount"
         case category
         case user
+        case imageUrls = "attachments"
     }
 }
 
