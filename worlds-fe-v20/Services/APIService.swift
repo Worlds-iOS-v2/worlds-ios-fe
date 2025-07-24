@@ -59,6 +59,9 @@ class APIService {
         
         // 이미지가 있으면 multipart/form-data 전송
         if let imagesData = images, !imagesData.isEmpty {
+//            print("multipart 업로드 시작")
+            let url = "\(baseURL)/questions/with-image"
+            
             return try await withCheckedThrowingContinuation { continuation in
                 AF.upload(
                     multipartFormData: { multipartFormData in
@@ -73,7 +76,7 @@ class APIService {
                                                      mimeType: "image/jpeg")
                         }
                     },
-                    to: "\(baseURL)/questions",
+                    to: url,
                     method: .post,
                     headers: headers
                 )
@@ -88,14 +91,14 @@ class APIService {
                 }
             }
         } else {
+            let url = "\(baseURL)/questions"
             let params: [String: Any] = [
                 "title": title,
                 "content": content,
                 "category": category
             ]
-            
             let response = try await AF.request(
-                "\(baseURL)/questions",
+                url,
                 method: .post,
                 parameters: params,
                 encoding: JSONEncoding.default,
@@ -132,7 +135,7 @@ class APIService {
     ) async throws -> Bool {
         let headers = try getAuthHeaders()
         var params: [String: Any] = [
-            "reason": reason.rawValue  
+            "reason": reason.rawValue
         ]
         if let etc = etcReason, !etc.isEmpty {
             params["etcReason"] = etc

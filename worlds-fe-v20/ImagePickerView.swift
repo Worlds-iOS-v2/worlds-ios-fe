@@ -65,7 +65,9 @@ struct ImagePickerView: UIViewControllerRepresentable {
             }
             
             group.notify(queue: .main) {
-                picker.dismiss(animated: true)
+                DispatchQueue.main.async {
+                    picker.dismiss(animated: true)
+                }
             }
         }
         //이미지 선택 후 중복 문제 -> 중복 비교 함수 추가
