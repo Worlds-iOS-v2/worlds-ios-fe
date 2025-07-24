@@ -152,6 +152,9 @@ struct CreateQuestionView: View {
                 .padding(.horizontal, 4)
                 }
             } // ScrollView 끗
+            .onTapGesture {
+                UIApplication.shared.endEditing()
+            }
             
             .padding(.horizontal, 20)
             .navigationTitle("질문하기")
