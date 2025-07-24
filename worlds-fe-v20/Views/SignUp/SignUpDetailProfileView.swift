@@ -22,6 +22,9 @@ struct SignUpDetailProfileView: View {
     @State var isDatePickerPresented: Bool = false
     @State var isFilled: Bool = true
     
+    @State private var showAlert = false
+    @State private var alertMessage = ""
+    
     @EnvironmentObject var viewModel: SignUpViewModel
     var body: some View {
         VStack {
@@ -137,8 +140,15 @@ struct SignUpDetailProfileView: View {
                 print("signup Detail View: \(viewModel.isMentor)")
                 
                 Task {
-                    await viewModel.signup()
-                    appState.flow = .login
+                    let isSignIn = await viewModel.signup()
+                    
+                    if isSignIn {
+                        // 확인 버튼 액션
+                        appState.flow = .login
+                    } else {
+                        showAlert = true
+                        alertMessage = viewModel.errorMessage ?? "알 수 없는 에러 발생"
+                    }
                 }
             }
             .padding(.bottom, 12)
@@ -150,6 +160,9 @@ struct SignUpDetailProfileView: View {
                     .foregroundStyle(Color.gray)
                     .font(.system(size: 14))
             }
+        }
+        .alert(alertMessage, isPresented: $showAlert) {
+            Button("확인", role: .cancel) { }
         }
         .padding()
         .background(.backgroundws)
