@@ -5,7 +5,7 @@
 //  Created by 이서하 on 7/4/25.
 //
 
-//  TODO: 이미지 백딴 전송, 삭제하면 바로 창 닫히게
+//  TODO: 삭제하면 바로 창 닫히게
 
 import SwiftUI
 
@@ -199,11 +199,8 @@ struct QuestionDetailView: View {
         .ignoresSafeArea(.keyboard, edges: .bottom)
         .onAppear {
             Task {
-                print("🔄 상세 불러오는 중")
                 await viewModel.fetchQuestionDetail(questionId: questionId)
-                print("✅ selectedQuestion:", viewModel.selectedQuestion ?? "nil")
                 self.questionDetail = viewModel.selectedQuestion
-                print("✅ questionDetail 설정됨:", self.questionDetail ?? "nil")
                 await commentVM.fetchComments(for: questionId)
             }
         }
