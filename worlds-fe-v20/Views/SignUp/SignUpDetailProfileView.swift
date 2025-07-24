@@ -20,7 +20,12 @@ struct SignUpDetailProfileView: View {
     @State var birthDay: Int = Calendar.current.component(.day, from: Date())
     
     @State var isDatePickerPresented: Bool = false
-    @State var isFilled: Bool = true
+    
+    // @State var isFilled: Bool = true
+    var isFilled: Bool {
+        !name.isEmpty &&
+        !phoneNumber.isEmpty
+    }
     
     @State private var showAlert = false
     @State private var alertMessage = ""
