@@ -41,7 +41,6 @@ struct QuestionDetailView: View {
             // 상단 ScrollView
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-
                     // 카테고리 뱃지 + 옵션 버튼
                     HStack {
                         Text(question.category.displayName)
@@ -139,55 +138,57 @@ struct QuestionDetailView: View {
                     .padding(.horizontal)
                 }
                 .padding(.top, 10)
-                .onTapGesture {
-                    isTextFieldFocused = false // 빈 공간 탭 시 키보드 내려감
-                }
             }
+            // ✅ 키보드 내리기 위한 탭 제스처
+            .simultaneousGesture(
+                TapGesture().onEnded {
+                    isTextFieldFocused = false
+                }
+            )
 
             Divider()
 
             // 댓글 입력창 (항상 하단 고정)
-                .safeAreaInset(edge: .bottom) {
-                    HStack {
-                        TextField("댓글을 입력하세요",
-                                  text: commentVM.replyingTo == nil ? $commentVM.newComment : $commentVM.replyContent)
-                        .padding(12)
-                        .background(Color.white)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.brown, lineWidth: 1)
-                        )
-                        .focused($isTextFieldFocused)
-                        
-                        Button(action: {
-                            Task {
-                                await commentVM.submitComment(
-                                    for: question.id,
-                                    parentId: commentVM.replyingTo // nil이면 일반 댓글
-                                )
-                                isTextFieldFocused = false
-                            }
-                        }) {
-                            Text("등록")
-                                .frame(minWidth: 60)
-                                .padding(.vertical, 12)
-                                .background(Color.brown)
-                                .foregroundColor(.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                        }
-                        .padding(.leading, 8)
-                    }
-                    .padding()
+            .safeAreaInset(edge: .bottom) {
+                HStack {
+                    TextField("댓글을 입력하세요",
+                              text: commentVM.replyingTo == nil ? $commentVM.newComment : $commentVM.replyContent)
+                    .padding(12)
                     .background(Color.white)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.brown, lineWidth: 1)
+                    )
+                    .focused($isTextFieldFocused)
+                    
+                    Button(action: {
+                        Task {
+                            await commentVM.submitComment(
+                                for: question.id,
+                                parentId: commentVM.replyingTo // nil이면 일반 댓글
+                            )
+                            isTextFieldFocused = false
+                        }
+                    }) {
+                        Text("등록")
+                            .frame(minWidth: 60)
+                            .padding(.vertical, 12)
+                            .background(Color.brown)
+                            .foregroundColor(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                    }
+                    .padding(.leading, 8)
                 }
+                .padding()
+                .background(Color.white)
+            }
         }
-        
+
         .onAppear {
             Task {
                 await commentVM.fetchComments(for: question.id)
             }
         }
-//        .ignoresSafeArea(.keyboard, edges: .bottom)
         // 네비게이션
         .navigationBarBackButtonHidden(true)
         .navigationTitle("")
