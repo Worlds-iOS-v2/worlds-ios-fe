@@ -20,6 +20,8 @@ struct QuestionDetailView: View {
     @ObservedObject var viewModel: QuestionViewModel
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.dismiss) var dismiss
+    
+    @FocusState private var isTextFieldFocused: Bool
 
     let reportReasons: [(label: String, value: ReportReason)] = [
         ("비속어", .offensive),
@@ -137,47 +139,55 @@ struct QuestionDetailView: View {
                     .padding(.horizontal)
                 }
                 .padding(.top, 10)
+                .onTapGesture {
+                    isTextFieldFocused = false // 빈 공간 탭 시 키보드 내려감
+                }
             }
 
             Divider()
 
             // 댓글 입력창 (항상 하단 고정)
-            HStack {
-                TextField("댓글을 입력하세요",
-                          text: commentVM.replyingTo == nil ? $commentVM.newComment : $commentVM.replyContent)
-                    .padding(12)
-                    .background(Color.white)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.brown, lineWidth: 1)
-                    )
-
-                Button(action: {
-                    Task {
-                        await commentVM.submitComment(
-                            for: question.id,
-                            parentId: commentVM.replyingTo // nil이면 일반 댓글
+                .safeAreaInset(edge: .bottom) {
+                    HStack {
+                        TextField("댓글을 입력하세요",
+                                  text: commentVM.replyingTo == nil ? $commentVM.newComment : $commentVM.replyContent)
+                        .padding(12)
+                        .background(Color.white)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color.brown, lineWidth: 1)
                         )
+                        .focused($isTextFieldFocused)
+                        
+                        Button(action: {
+                            Task {
+                                await commentVM.submitComment(
+                                    for: question.id,
+                                    parentId: commentVM.replyingTo // nil이면 일반 댓글
+                                )
+                                isTextFieldFocused = false
+                            }
+                        }) {
+                            Text("등록")
+                                .frame(minWidth: 60)
+                                .padding(.vertical, 12)
+                                .background(Color.brown)
+                                .foregroundColor(.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                        }
+                        .padding(.leading, 8)
                     }
-                }) {
-                    Text("등록")
-                        .frame(minWidth: 60)
-                        .padding(.vertical, 12)
-                        .background(Color.brown)
-                        .foregroundColor(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .padding()
+                    .background(Color.white)
                 }
-                .padding(.leading, 8)
-            }
-            .padding()
-            .background(Color.white)
         }
-        .ignoresSafeArea(.keyboard, edges: .bottom) // 키보드 올라올 때 대응
+        
         .onAppear {
             Task {
                 await commentVM.fetchComments(for: question.id)
             }
         }
+//        .ignoresSafeArea(.keyboard, edges: .bottom)
         // 네비게이션
         .navigationBarBackButtonHidden(true)
         .navigationTitle("")
