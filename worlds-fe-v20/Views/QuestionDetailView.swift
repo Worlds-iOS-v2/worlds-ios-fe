@@ -143,7 +143,8 @@ struct QuestionDetailView: View {
 
             // 댓글 입력창 (항상 하단 고정)
             HStack {
-                TextField("댓글을 입력하세요", text: $commentVM.replyContent)
+                TextField("댓글을 입력하세요",
+                          text: commentVM.replyingTo == nil ? $commentVM.newComment : $commentVM.replyContent)
                     .padding(12)
                     .background(Color.white)
                     .overlay(
@@ -155,7 +156,7 @@ struct QuestionDetailView: View {
                     Task {
                         await commentVM.submitComment(
                             for: question.id,
-                            parentId: commentVM.replyingTo
+                            parentId: commentVM.replyingTo // nil이면 일반 댓글
                         )
                     }
                 }) {
@@ -168,10 +169,6 @@ struct QuestionDetailView: View {
                 }
                 .padding(.leading, 8)
             }
-//             .padding(.top, 10)
-//         }
-//         .padding(.horizontal, 20)
-//         .padding(.bottom, 20)
             .padding()
             .background(Color.white)
         }

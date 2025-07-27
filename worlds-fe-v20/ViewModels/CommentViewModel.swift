@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Alamofire
 
 @MainActor
 class CommentViewModel: ObservableObject {
@@ -26,11 +27,20 @@ class CommentViewModel: ObservableObject {
 
     // 댓글 작성
     func submitComment(for questionId: Int, parentId: Int? = nil) async {
-        // 댓글 또는 답글에 맞게 내용 가져오기
-        let content = parentId == nil ? newComment.trimmingCharacters(in: .whitespacesAndNewlines)
-                                      : replyContent.trimmingCharacters(in: .whitespacesAndNewlines)
+        print("🟡 댓글 등록 시작")
+                print("📩 입력 상태 - newComment: '\(newComment)', replyContent: '\(replyContent)', parentId: \(parentId?.description ?? "nil")")
+        let content: String
+            if let parentId = parentId {
+                content = replyContent.trimmingCharacters(in: .whitespacesAndNewlines)
+            } else {
+                content = newComment.trimmingCharacters(in: .whitespacesAndNewlines)
+            }
 
-        guard !content.isEmpty else { return }
+
+        guard !content.isEmpty else {
+            print("내용이 비어 있어 댓글을 등록하지 않음")
+            return
+        }
 
         isLoading = true
         defer { isLoading = false }
@@ -43,20 +53,26 @@ class CommentViewModel: ObservableObject {
                 parentId: parentId
             )
 
+            print("댓글 등록 API 응답: \(success)")
+
             if success {
                 // 입력 필드 초기화
                 self.newComment = ""
                 self.replyContent = ""
                 self.replyingTo = nil
-                
+
                 // 댓글 갱신
                 await fetchComments(for: questionId)
             } else {
                 self.errorMessage = "댓글 등록에 실패했습니다."
+                print("댓글 등록 실패: 서버에서 false 반환")
             }
         } catch {
             self.errorMessage = "댓글 등록 중 오류 발생"
             print("댓글 작성 실패: \(error.localizedDescription)")
+            if let afError = error as? AFError {
+                print("AFError 디버그 정보: \(afError)")
+            }
         }
     }
     
@@ -68,6 +84,8 @@ class CommentViewModel: ObservableObject {
         do {
             let result = try await APIService.shared.fetchComments(for: questionId)
             self.comments = result
+            
+            print("서버에서 받아온 댓글: \(result.map { $0.content })")
             
             // 댓글별 좋아요 정보 동기화
             for comment in result {
