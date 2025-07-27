@@ -139,7 +139,7 @@ struct QuestionDetailView: View {
                 }
                 .padding(.top, 10)
             }
-            // ✅ 키보드 내리기 위한 탭 제스처
+            // 키보드 내리기 위한 탭 제스처
             .simultaneousGesture(
                 TapGesture().onEnded {
                     isTextFieldFocused = false
