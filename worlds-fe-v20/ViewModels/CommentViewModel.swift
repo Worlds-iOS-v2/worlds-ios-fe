@@ -20,6 +20,18 @@ class CommentViewModel: ObservableObject {
     
     init() {}
     
+    // 댓글 데이터 초기화
+    func resetComments() {
+        comments = []
+        newComment = ""
+        isLoading = false
+        replyingTo = nil
+        replyContent = ""
+        likes = [:]
+        errorMessage = nil
+        print("🔄 댓글 데이터 초기화 완료")
+    }
+    
     // 계층 구조로 정리하는 함수
     func replies(for parentId: Int?) -> [Comment] {
         return comments.filter { $0.parentId == parentId }

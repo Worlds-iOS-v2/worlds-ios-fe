@@ -11,7 +11,6 @@ import SwiftUI
 struct worlds_fe_v20App: App {
     @StateObject private var appState = AppState()
     @StateObject private var signUpViewModel = SignUpViewModel()
-    @StateObject private var commentViewModel = CommentViewModel()
 
     var body: some Scene {
         WindowGroup {
@@ -32,7 +31,6 @@ struct worlds_fe_v20App: App {
             case .main:
                 QuestionView(viewModel: QuestionViewModel())
                     .environmentObject(appState)
-                    .environmentObject(commentViewModel)
             }
         }
     }
