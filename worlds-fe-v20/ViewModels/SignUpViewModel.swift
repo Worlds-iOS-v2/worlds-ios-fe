@@ -21,17 +21,23 @@ final class SignUpViewModel: ObservableObject {
     
     // 회원가입 함수
     @MainActor
-    func signup() async {
+    func signup() async -> Bool {
         do {
             let user = try await UserAPIManager.shared.signUp(name: name, email: email, password: password, birth: birthDate, isMentor: isMentor, mentorCode: mentorCode)
             print("회원 가입 정보: \(user)")
             self.errorMessage = nil
+            
+            return true
         } catch UserAPIError.serverError(let message) {
             self.errorMessage = message
             print(message)
+            
+            return false
         } catch {
             self.errorMessage = "회원가입 실패: \(error.localizedDescription)"
             print(errorMessage)
+            
+            return false
         }
     }
     

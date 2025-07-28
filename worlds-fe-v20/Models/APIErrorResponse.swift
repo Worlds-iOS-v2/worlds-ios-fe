@@ -6,7 +6,7 @@
 //
 
 struct APIErrorResponse: Codable {
-    let message: [String]?
+    let message: [String]
     let error: String
     let statusCode: Int
 }

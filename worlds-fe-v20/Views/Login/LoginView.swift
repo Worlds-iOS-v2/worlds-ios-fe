@@ -33,6 +33,7 @@ struct LoginView: View {
                     .padding(.bottom, 80)
                 
                 TextField("이메일을 입력하세요", text: $email)
+                    .textInputAutocapitalization(.never) // 자동 대문자처리 해제
                     .keyboardType(.emailAddress)
                     .foregroundStyle(Color.gray)
                     .font(.system(size: 20))
@@ -52,28 +53,35 @@ struct LoginView: View {
                     .padding(.bottom, 20)
                 
                 Button {
-//                    if email.isEmpty || password.isEmpty {
-//                        alertMessage = "이메일과 비밀번호를 모두 입력해주세요."
-//                        showAlert = true
-//                    } else if !isValidEmail(email) {
-//                        alertMessage = "이메일 형식이 올바르지 않습니다."
-//                        showAlert = true
-//                    } else {
-//                        // 로그인 진행
-//                        appState.flow = .main
-//                    }
-                    
-                    viewModel.email = email
-                    viewModel.password = password
+                    if email.isEmpty || password.isEmpty {
+                        alertMessage = "이메일과 비밀번호를 모두 입력해주세요."
+                        showAlert = true
+                    } else if !isValidEmail(email) {
+                        alertMessage = "이메일 형식이 올바르지 않습니다."
+                        showAlert = true
+                    } else {
+                        viewModel.email = email
+                        viewModel.password = password
+                        
+                        Task {
+                            let isLoggedIn = await viewModel.login()
+                            
+                            if isLoggedIn {
+                                appState.flow = .main
+                            } else {
+                                // 401 -> 이메일이나 비번이 바르지 않을 경우
+                                // 400 -> 이메일 제대로, 비밀번호 틀렸을 경우
+                                // APIErrorResponse(message: Optional(["비밀번호는 영문, 숫자, 특수문자 중 2가지 이상 조합으로 8~16자여야 합니다."]), error: "Bad Request", statusCode: 400)
+                                // 그 외 이메일 형식 검사 및 빈 필드는 프론트에서 처리
+                                showAlert = true
+                                alertMessage = viewModel.errorMessage ?? "알 수 없는 에러 발생"
+                            }
+                        }
+                    }
                     
                     print("loginView: \(viewModel.email)")
                     print("loginView: \(viewModel.password)")
                     
-                    Task {
-                        await viewModel.login()
-                        
-                        appState.flow = .main
-                    }
                 } label: {
                     ZStack {
                         RoundedRectangle(cornerRadius: 16)
@@ -87,10 +95,8 @@ struct LoginView: View {
                             .fontWeight(.semibold)
                     }
                 }
-                .alert("오류", isPresented: $showAlert) {
+                .alert(alertMessage, isPresented: $showAlert) {
                     Button("확인", role: .cancel) { }
-                } message: {
-                    Text(alertMessage)
                 }
                 .disabled(!isFilled)
                 .padding(.bottom, 40)

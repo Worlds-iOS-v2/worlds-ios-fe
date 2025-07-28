@@ -110,21 +110,16 @@ class UserAPIManager {
         case .failure:
             if let rawData = dataResponse.data,
                let rawString = String(data: rawData, encoding: .utf8) {
-                print("서버 원본 응답: \(rawString)")
+                // print("회원가입 서버 원본 응답: \(rawString)")
                 
-                do {
-                    let errorResponse = try JSONDecoder().decode(APIErrorResponse.self, from: rawData)
-                    print("파싱된 에러 응답: \(errorResponse)")
-                    
-                    var errorMessage = errorResponse.error
-                    
-                    throw UserAPIError.serverError(message: errorMessage)
-                } catch {
-                    print("에러 응답 파싱 실패: \(error)")
-                    throw UserAPIError.serverError(message: "signUp 서버 응답 파싱 실패")
-                }
+                // 서버 에러 응답 파싱 시도
+                let errorResponse = try JSONDecoder().decode(APIErrorResponse.self, from: rawData)
+                print("회원가입 파싱된 에러 응답: \(errorResponse)")
+                
+                let errorMessage = errorResponse.message[0]
+                throw UserAPIError.serverError(message: errorMessage)
             } else {
-                throw UserAPIError.serverError(message: "signUp 서버 응답 파싱 실패")
+                throw UserAPIError.serverError(message: "signup 서버 응답 파싱 실패")
             }
         }
     }
@@ -166,20 +161,14 @@ class UserAPIManager {
         case .failure:
             if let rawData = dataResponse.data,
                let rawString = String(data: rawData, encoding: .utf8) {
-                print("로그인 서버 원본 응답: \(rawString)")
+                // print("로그인 서버 원본 응답: \(rawString)")
                 
                 // 서버 에러 응답 파싱 시도
-                do {
-                    let errorResponse = try JSONDecoder().decode(APIErrorResponse.self, from: rawData)
-                    print("로그인 파싱된 에러 응답: \(errorResponse)")
-                    
-                    var errorMessage = errorResponse.error
-                    
-                    throw UserAPIError.serverError(message: errorMessage)
-                } catch {
-                    print("로그인 에러 응답 파싱 실패: \(error)")
-                    throw UserAPIError.serverError(message: "login 서버 응답 파싱 실패")
-                }
+                let errorResponse = try JSONDecoder().decode(APIErrorResponse.self, from: rawData)
+                print("로그인 파싱된 에러 응답: \(errorResponse)")
+                
+                let errorMessage = errorResponse.message[0]
+                throw UserAPIError.serverError(message: errorMessage)
             } else {
                 throw UserAPIError.serverError(message: "login 서버 응답 파싱 실패")
             }
