@@ -11,24 +11,31 @@ import UIKit
 
 class APIService {
     static let shared = APIService()
-    let baseURL = "http://localhost:3000"
+    
     enum APIError: Error {
         case missingToken
+        case invalidEndPoint
     }
-    //JWT 토큰 가져오기
+    
+    // baseURL은 Info.plist에서 가져옴
+    private var baseURL: String {
+        guard let url = Bundle.main.object(forInfoDictionaryKey: "APIBaseURL") as? String else {
+            fatalError("APIBaseURL is not set in Info.plist")
+        }
+            return url
+    }
+    
+    // JWT 토큰 가져오기
     func getToken() -> String? {
-            guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
-                return "getToken 토큰 옵셔널 언래핑 실패"
-            }
-            return token
-        
+        UserDefaults.standard.string(forKey: "accessToken")
     }
+
     //토큰이 필요한 API 호출을 위한 HTTP헤더 생성
     private func getAuthHeaders() throws -> HTTPHeaders {
         guard let token = getToken() else {
             throw APIError.missingToken
         }
-        return ["Authorization": "Bearer \(token)"] //이걸 헤더에 실어보내는 것
+        return ["Authorization": "Bearer \(token)"]
     }
 
     //질문 목록 조회
@@ -156,26 +163,31 @@ class APIService {
         return response.error == nil
     }
     
-    // 댓글 또는 대댓글 작성
+    // 댓글, 대댓글 작성
     func postComment(content: String, questionId: Int, parentId: Int? = nil) async throws -> Bool {
         let headers = try getAuthHeaders()
-        
-        // parentId가 있을 경우만 포함되도록 params 구성
         var params: [String: Any] = ["content": content]
+        
+        let url: String
+        
         if let parentId = parentId {
-            params["parentId"] = parentId
+            // 대댓글인 경우
+            url = "\(baseURL)/comment/\(parentId)/reply"
+        } else {
+            // 일반 댓글인 경우
+            url = "\(baseURL)/comment/question/\(questionId)"
         }
         
         let response = try await AF.request(
-            "\(baseURL)/comment/question/\(questionId)",
+            url,
             method: .post,
             parameters: params,
             encoding: JSONEncoding.default,
             headers: headers
         )
-            .validate()
-            .serializingData()
-            .response
+        .validate()
+        .serializingData()
+        .response
         
         return response.error == nil
     }

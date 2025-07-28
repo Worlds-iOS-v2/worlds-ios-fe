@@ -21,6 +21,8 @@ struct QuestionDetailView: View {
     @ObservedObject var viewModel: QuestionViewModel
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.dismiss) var dismiss
+    
+    @FocusState private var isTextFieldFocused: Bool
 
     let reportReasons: [(label: String, value: ReportReason)] = [
         ("비속어", .offensive),
@@ -161,24 +163,37 @@ struct QuestionDetailView: View {
                     }
                     .padding(.top, 10)
                 }
-
+                .padding(.top, 10)
+            }
+            // 키보드 내리기 위한 탭 제스처
+            .simultaneousGesture(
+                TapGesture().onEnded {
+                    isTextFieldFocused = false
+                }
+            )
                 Divider()
 
+            // 댓글 입력창 (항상 하단 고정)
+            .safeAreaInset(edge: .bottom) {
                 HStack {
-                    TextField("댓글을 입력하세요", text: $commentVM.replyContent)
-                        .padding(12)
-                        .background(Color.white)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.brown, lineWidth: 1)
-                        )
-
+                    TextField("댓글을 입력하세요",
+                              text: commentVM.replyingTo == nil ? $commentVM.newComment : $commentVM.replyContent)
+                    .padding(12)
+                    .background(Color.white)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.brown, lineWidth: 1)
+                    )
+                    .focused($isTextFieldFocused)
+                    
                     Button(action: {
                         Task {
                             await commentVM.submitComment(
                                 for: question.id,
-                                parentId: commentVM.replyingTo
+                                parentId: commentVM.replyingTo // nil이면 일반 댓글
                             )
+                            isTextFieldFocused = false
+
                         }
                     }) {
                         Text("등록")
@@ -196,7 +211,6 @@ struct QuestionDetailView: View {
                 ProgressView()
             }
         }
-        .ignoresSafeArea(.keyboard, edges: .bottom)
         .onAppear {
             Task {
                 await viewModel.fetchQuestionDetail(questionId: questionId)
