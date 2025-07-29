@@ -32,7 +32,7 @@ struct QuestionDetailView: View {
     ]
     
     let badgeColorMap: [String: Color] = [
-        "학습": .blue,
+        "학습": .mainws,
         "자유": .purple,
         "전체": .gray
     ]
@@ -181,7 +181,7 @@ struct QuestionDetailView: View {
                             .background(Color.white)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 10)
-                                    .stroke(Color.brown, lineWidth: 1)
+                                    .stroke(Color.mainws, lineWidth: 1)
                             )
                             .focused($isTextFieldFocused)
                             
@@ -198,7 +198,7 @@ struct QuestionDetailView: View {
                                 Text("등록")
                                     .frame(minWidth: 60)
                                     .padding(.vertical, 12)
-                                    .background(Color.brown)
+                                    .background(Color.mainws)
                                     .foregroundColor(.white)
                                     .clipShape(RoundedRectangle(cornerRadius: 10))
                             }
@@ -260,7 +260,7 @@ struct QuestionDetailView: View {
             Button("취소", role: .cancel) {}
         }
     }
-
+    
     // 날짜 포맷터
     func formatDate(_ dateStr: String) -> String {
         let inputFormatter = ISO8601DateFormatter()

@@ -71,41 +71,46 @@ struct QuestionView: View {
                     .padding(.top, 14)
                     
                     // 카테고리 선택
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 16) {
-                            ForEach(categories, id: \.self) { category in
-                                Button(action: {
-                                    selectedCategory = category
-                                }) {
-                                    Text(category.displayName)
-                                        .font(.system(size: 18, weight: .bold))
-                                        .foregroundColor(selectedCategory == category ? .white : .gray)
-                                        .frame(width: 66, height: 36)
-                                        .background(selectedCategory == category ? Color.blue : Color(.systemGray5))
-                                        .cornerRadius(16)
-                                        .shadow(color: selectedCategory == category ? Color.blue.opacity(0.1) : .clear, radius: 2, y: 2)
+                    HStack(spacing: 16) {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack() {
+                                ForEach(categories, id: \.self) { category in
+                                    Button(action: {
+                                        selectedCategory = category
+                                    }) {
+                                        Text(category.displayName)
+                                            .font(.system(size: 18, weight: .bold))
+                                            .foregroundColor(selectedCategory == category ? .white : .gray)
+                                            .frame(width: 66, height: 36)
+                                            .background(selectedCategory == category ? Color.mainws : Color(.systemGray5))
+                                            .cornerRadius(16)
+                                            .shadow(color: selectedCategory == category ? Color.blue.opacity(0.1) : .clear, radius: 2, y: 2)
+                                    }
                                 }
-                            }
-                            
-                            Menu {
-                                Button("최신순", action: {})
-                                Button("조회순", action: {})
-                            } label: {
-                                HStack {
-                                    Text("정렬 기준")
-                                        .font(.system(size: 16))
-                                    Image(systemName: "chevron.down")
-                                }
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 6)
-                                .background(Color.white)
-                                .cornerRadius(12)
-                                .shadow(color: .black.opacity(0.07), radius: 1, y: 1)
                             }
                         }
-                        .padding(.leading, 20)
-                        .padding(.vertical, 8)
+                        
+                        Menu {
+                            Button("최신순", action: {})
+                            Button("조회순", action: {})
+                        } label: {
+                            HStack {
+                                Text("정렬 기준")
+                                    .font(.system(size: 16))
+                                    .foregroundStyle(Color.mainws)
+                                
+                                Image(systemName: "chevron.down")
+                                    .foregroundColor(.mainws)
+                            }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(Color.white)
+                            .cornerRadius(12)
+                            .shadow(color: .black.opacity(0.07), radius: 1, y: 1)
+                        }
                     }
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 20)
                     
                     // 게시물 목록
                     ScrollView {
@@ -120,6 +125,7 @@ struct QuestionView: View {
                             }
                         }
                         .padding(.top, 8)
+                        .padding(.horizontal, 20)
                     }
                     
                     Spacer()
@@ -191,7 +197,7 @@ struct QuestionCard: View {
                         .foregroundColor(.white)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 2)
-                        .background(Color.blue)
+                        .background(Color.mainws)
                         .cornerRadius(14)
                 }
                 Spacer()
