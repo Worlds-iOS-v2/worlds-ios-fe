@@ -61,7 +61,7 @@ struct CreateQuestionView: View {
                     .background(Color.white)
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color(red: 105/255, green: 131/255, blue: 255/255), lineWidth: 1)
+                            .stroke(Color.mainws, lineWidth: 1)
                     )
                     .font(.system(size: 17))
                     .padding(.horizontal, 4)
@@ -79,7 +79,7 @@ struct CreateQuestionView: View {
                         .background(Color.white)
                         .overlay(
                             RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color(red: 105/255, green: 131/255, blue: 255/255), lineWidth: 1)
+                                .stroke(Color.mainws, lineWidth: 1)
                         )
                         .font(.system(size: 17))
                         .frame(height: 370)
@@ -105,7 +105,7 @@ struct CreateQuestionView: View {
                         .background(Color.white)
                         .overlay(
                             RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color(red: 105/255, green: 131/255, blue: 255/255), lineWidth: 1.2)
+                                .stroke(Color.mainws, lineWidth: 1.2)
                         )
                     }
 
@@ -147,7 +147,7 @@ struct CreateQuestionView: View {
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity, minHeight: 48)
-                        .background(Color(red: 105/255, green: 131/255, blue: 255/255))
+                        .background(Color.mainws)
                         .cornerRadius(13)
                         .shadow(color: Color(.systemGray3), radius: 3, x: 0, y: 3)
                 }
