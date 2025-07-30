@@ -111,7 +111,7 @@ struct OCRCameraView: View {
                         // dismiss()
                     } label: {
                         Image(systemName: "chevron.left")
-                            .foregroundColor(.black)
+                            .foregroundColor(.mainws)
                             .font(.system(size: 18, weight: .semibold))
                     }
                 }
