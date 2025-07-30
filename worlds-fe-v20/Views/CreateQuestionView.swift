@@ -19,6 +19,10 @@ struct CreateQuestionView: View {
     @State private var imagePickerSourceType: UIImagePickerController.SourceType = .photoLibrary
 
     @State private var selectedCategory: Category? = nil
+    
+    // 초기값 설정을 위한 파라미터
+    var initialImages: [UIImage] = []
+    var initialCategory: Category? = nil
 
     var onSubmit: (_ images: [UIImage], _ category: String) -> Void
 
@@ -179,6 +183,14 @@ struct CreateQuestionView: View {
                     CameraPickerView(selectedImages: $selectedImages)
                 } else {
                     ImagePickerView(selectedImages: $selectedImages)
+                }
+            }
+            .onAppear {
+                if !initialImages.isEmpty {
+                    selectedImages = initialImages
+                }
+                if let initialCategory = initialCategory {
+                    selectedCategory = initialCategory
                 }
             }
             .onDisappear {
