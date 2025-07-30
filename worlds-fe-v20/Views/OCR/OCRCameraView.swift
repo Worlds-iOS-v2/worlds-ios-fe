@@ -30,7 +30,6 @@ struct OCRCameraView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // 카메라 미리보기 뷰
                 CameraPreview(
                     cameraPosition: $cameraPosition,
                     cameraController: $cameraController,
@@ -41,7 +40,9 @@ struct OCRCameraView: View {
                         }
                     }
                 )
-                .ignoresSafeArea()
+                .cornerRadius(32)
+                .padding(.horizontal)
+                .padding(.top, 10)
                 
                 VStack {
                     
