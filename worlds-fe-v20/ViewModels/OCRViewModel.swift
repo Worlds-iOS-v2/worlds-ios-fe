@@ -99,4 +99,24 @@ final class OCRViewModel: ObservableObject {
         solution = ""
         summary = ""
     }
+    
+    // 질문 작성
+    func createQuestion(title: String, content: String, category: String, images: [UIImage]? = nil) async throws {
+        let imageData = images?.compactMap { $0.jpegData(compressionQuality: 0.7) } ?? []
+        
+        do {
+            let result = try await APIService.shared.createQuestion(title: title, content: content, category: category, images: imageData)
+            print("OCRSummary 정보: \(result)")
+
+            self.errorMessage = nil
+            
+        } catch UserAPIError.serverError(let message) {
+            self.errorMessage = message
+            print("서버 에러: \(message)")
+            
+        } catch {
+            self.errorMessage = "로그인 실패: \(error.localizedDescription)"
+            print("기타 에러: \(errorMessage)")
+        }
+    }
 }
