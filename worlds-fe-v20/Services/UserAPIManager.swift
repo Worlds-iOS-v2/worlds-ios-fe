@@ -408,6 +408,114 @@ class UserAPIManager {
             throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
         }
     }
+    
+    // OCR 번역
+    func OCRTranslation(file: Data) async throws -> OCR {
+        guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
+            print("토큰 값이 유효하지 않습니다.")
+            throw UserAPIError.invalidToken
+        }
+        
+        guard let endPoint = Bundle.main.object(forInfoDictionaryKey: "APIOCR") as? String else {
+            throw UserAPIError.invalidEndPoint
+        }
+        
+        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
+        
+        let parameters: [String: Any] = [
+            "files": file
+        ]
+        
+        let dataResponse = await AF.upload(multipartFormData: { multipartFormData in multipartFormData.append(file, withName: "files", fileName: "ocr_image.jpg", mimeType: "image/jpeg")}, to: endPoint, method: .post, headers: headers)
+            .validate()
+            .serializingData()
+            .response
+        
+        switch dataResponse.result {
+        case .success(let data):
+            do {
+                let response = try JSONDecoder().decode(OCR.self, from: data)
+                
+                print("OCR 정보: \(response)")
+                
+                return response
+            } catch {
+                throw UserAPIError.decodingError(description: "OCR 디코딩 실패: \(error)")
+            }
+            
+        case .failure:
+            if let rawData = dataResponse.data,
+               let rawString = String(data: rawData, encoding: .utf8) {
+                print("OCR 체크 서버 원본 응답: \(rawString)")
+                
+                do {
+                    let errorResponse = try JSONDecoder().decode(APIErrorResponse.self, from: rawData)
+                    print("OCR 체크 파싱된 에러 응답: \(errorResponse)")
+                    
+                    var errorMessage = errorResponse.error
+                    
+                    throw UserAPIError.serverError(message: errorMessage)
+                } catch {
+                    print("OCR 체크 에러 응답 파싱 실패: \(error)")
+                    throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
+                }
+            } else {
+                throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
+            }
+        }
+    }
+    
+    // OCR 핵심 개념
+    func OCRSummary() async throws -> OCRSolution {
+        guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
+            print("토큰 값이 유효하지 않습니다.")
+            throw UserAPIError.invalidToken
+        }
+        
+        guard let endPoint = Bundle.main.object(forInfoDictionaryKey: "APIOCRSolution") as? String else {
+            throw UserAPIError.invalidEndPoint
+        }
+        
+        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
+        
+        let dataResponse = await AF.request(endPoint, method: .get, headers: headers)
+            .validate()
+            .serializingData()
+            .response
+        
+        switch dataResponse.result {
+        case .success(let data):
+            do {
+                let response = try JSONDecoder().decode(OCRSolution.self, from: data)
+                
+                print("OCRSummary 정보: \(response)")
+                
+                return response
+            } catch {
+                throw UserAPIError.decodingError(description: "OCRSummary 디코딩 실패: \(error)")
+            }
+            
+        case .failure:
+            if let rawData = dataResponse.data,
+               let rawString = String(data: rawData, encoding: .utf8) {
+                print("OCR 체크 서버 원본 응답: \(rawString)")
+                
+                do {
+                    let errorResponse = try JSONDecoder().decode(APIErrorResponse.self, from: rawData)
+                    print("OCR 체크 파싱된 에러 응답: \(errorResponse)")
+                    
+                    var errorMessage = errorResponse.error
+                    
+                    throw UserAPIError.serverError(message: errorMessage)
+                } catch {
+                    print("OCR 체크 에러 응답 파싱 실패: \(error)")
+                    throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
+                }
+            } else {
+                throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
+            }
+        }
+    }
 }
 
 extension UserAPIManager {
