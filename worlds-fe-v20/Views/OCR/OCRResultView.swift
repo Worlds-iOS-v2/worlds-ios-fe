@@ -13,6 +13,13 @@ struct OCRResultView: View {
     // 선택된(크롭된) 이미지
     let selectedImage: UIImage
     @State private var showingSummaryView = false
+    @State private var showingCreateQuestionView = false
+    
+    @State private var newQuestionTitle = ""
+    @State private var newQuestionContent = ""
+    @State private var isCreatingQuestion = false
+    @State private var createQuestionError: String?
+    @State private var searchText: String = ""
 
     @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) var dismiss
@@ -114,7 +121,7 @@ struct OCRResultView: View {
                     .disabled(viewModel.isOCRLoading)
                     
                     Button {
-                        dismiss()
+                        showingCreateQuestionView = true
                     } label: {
                         Text("질문하기")
                             .font(.system(size: 16, weight: .semibold))
@@ -168,6 +175,23 @@ struct OCRResultView: View {
             .sheet(isPresented: $showingSummaryView) {
                 OCRSummaryView()
                     .environmentObject(viewModel)
+            }
+            .fullScreenCover(isPresented: $showingCreateQuestionView) {
+                CreateQuestionView(
+                    title: $newQuestionTitle,
+                    content: $newQuestionContent,
+                    isPresented: $showingCreateQuestionView,
+                    isCreating: $isCreatingQuestion,
+                    errorMessage: $createQuestionError,
+                    initialImages: [selectedImage],
+                    initialCategory: .study,
+                    onSubmit: { images, category in
+                        Task {
+                            try await viewModel.createQuestion(title: newQuestionTitle, content: newQuestionContent, category: category, images: images)
+                        }
+                        showingCreateQuestionView = false
+                    }
+                )
             }
             .onAppear {
                 Task {
