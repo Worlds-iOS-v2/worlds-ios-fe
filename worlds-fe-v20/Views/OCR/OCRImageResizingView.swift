@@ -16,8 +16,8 @@ struct OCRImageResizingView: View {
     // 크롭 완료 시 호출되는 콜백
     var onCrop: (UIImage) -> Void
     @Environment(\.dismiss) private var dismiss
-    // 크롭 영역(0~1 비율)
-    @State private var cropRect: CGRect = CGRect(x: 0.2, y: 0.2, width: 0.6, height: 0.6)
+    // 크롭 영역(0~1 비율) - 전체 이미지 영역으로 초기화
+    @State private var cropRect: CGRect = CGRect(x: 0, y: 0, width: 1, height: 1)
     // 드래그 변화량 누적값
     @State private var dragOffset: CGSize = .zero
     // 현재 드래그 중인 코너
@@ -33,7 +33,6 @@ struct OCRImageResizingView: View {
 
     var body: some View {
         NavigationStack {
-            
             VStack {
                 GeometryReader { geo in
                     ZStack {
@@ -43,6 +42,8 @@ struct OCRImageResizingView: View {
                             .scaledToFit()
                             .frame(width: geo.size.width, height: geo.size.height)
                             .clipped()
+                            .cornerRadius(32)
+                        
                         // 크롭 사각형 표시
                         Rectangle()
                             .path(in: cropRectFor(geo: geo))
@@ -69,6 +70,7 @@ struct OCRImageResizingView: View {
                                         lastDragValue = .zero
                                     }
                             )
+                        
                         // 네 모서리(코너) 핸들
                         cornerHandle(.topLeft, geo: geo)
                         cornerHandle(.topRight, geo: geo)
@@ -111,11 +113,28 @@ struct OCRImageResizingView: View {
 extension OCRImageResizingView {
     // cropRect를 실제 뷰 좌표계로 변환
     private func cropRectFor(geo: GeometryProxy) -> CGRect {
-        CGRect(
-            x: cropRect.origin.x * geo.size.width,
-            y: cropRect.origin.y * geo.size.height,
-            width: cropRect.size.width * geo.size.width,
-            height: cropRect.size.height * geo.size.height
+        let imageSize = geo.size
+        let imageAspectRatio = originalImage.size.width / originalImage.size.height
+        let viewAspectRatio = imageSize.width / imageSize.height
+        
+        var actualImageSize: CGSize
+        var imageOffset: CGPoint
+        
+        if imageAspectRatio > viewAspectRatio {
+            // 이미지가 뷰보다 가로가 길 때
+            actualImageSize = CGSize(width: imageSize.width, height: imageSize.width / imageAspectRatio)
+            imageOffset = CGPoint(x: 0, y: (imageSize.height - actualImageSize.height) / 2)
+        } else {
+            // 이미지가 뷰보다 세로가 길 때
+            actualImageSize = CGSize(width: imageSize.height * imageAspectRatio, height: imageSize.height)
+            imageOffset = CGPoint(x: (imageSize.width - actualImageSize.width) / 2, y: 0)
+        }
+        
+        return CGRect(
+            x: imageOffset.x + cropRect.origin.x * actualImageSize.width,
+            y: imageOffset.y + cropRect.origin.y * actualImageSize.height,
+            width: cropRect.size.width * actualImageSize.width,
+            height: cropRect.size.height * actualImageSize.height
         )
     }
 
@@ -149,142 +168,57 @@ extension OCRImageResizingView {
                         if abs(dx) < minDragThreshold && abs(dy) < minDragThreshold {
                             return
                         }
-                        let isDiagonal = abs(dx) > minDragThreshold && abs(dy) > minDragThreshold
+                        
+                        // 경계 체크를 위한 최대값 계산
+                        let maxX = 1.0 - minWidth
+                        let maxY = 1.0 - minHeight
+                        
                         switch corner {
                         case .topLeft:
-                            if isDiagonal {
-                                let delta = abs(dx) > abs(dy) ? dx : dy
-                                let newX = max(0, cropRect.origin.x + delta)
-                                let newY = max(0, cropRect.origin.y + delta)
-                                let maxX = cropRect.origin.x + cropRect.size.width - minWidth
-                                let maxY = cropRect.origin.y + cropRect.size.height - minHeight
-                                let finalX = min(newX, maxX)
-                                let finalY = min(newY, maxY)
-                                let appliedDeltaX = finalX - cropRect.origin.x
-                                let appliedDeltaY = finalY - cropRect.origin.y
-                                let appliedDelta = min(appliedDeltaX, appliedDeltaY)
-                                newRect.origin.x += appliedDelta
-                                newRect.origin.y += appliedDelta
-                                newRect.size.width -= appliedDelta
-                                newRect.size.height -= appliedDelta
-                            } else {
-                                if abs(dx) > minDragThreshold {
-                                    let newX = max(0, cropRect.origin.x + dx)
-                                    let maxX = cropRect.origin.x + cropRect.size.width - minWidth
-                                    let finalX = min(newX, maxX)
-                                    let appliedDelta = finalX - cropRect.origin.x
-                                    newRect.origin.x += appliedDelta
-                                    newRect.size.width -= appliedDelta
-                                }
-                                if abs(dy) > minDragThreshold {
-                                    let newY = max(0, cropRect.origin.y + dy)
-                                    let maxY = cropRect.origin.y + cropRect.size.height - minHeight
-                                    let finalY = min(newY, maxY)
-                                    let appliedDelta = finalY - cropRect.origin.y
-                                    newRect.origin.y += appliedDelta
-                                    newRect.size.height -= appliedDelta
-                                }
-                            }
+                            let newX = max(0, min(cropRect.origin.x + dx, cropRect.origin.x + cropRect.size.width - minWidth))
+                            let newY = max(0, min(cropRect.origin.y + dy, cropRect.origin.y + cropRect.size.height - minHeight))
+                            let deltaX = newX - cropRect.origin.x
+                            let deltaY = newY - cropRect.origin.y
+                            newRect.origin.x = newX
+                            newRect.origin.y = newY
+                            newRect.size.width = max(minWidth, cropRect.size.width - deltaX)
+                            newRect.size.height = max(minHeight, cropRect.size.height - deltaY)
+                            
                         case .topRight:
-                            if isDiagonal {
-                                let delta = abs(dx) > abs(dy) ? -dx : dy
-                                let newMaxX = min(1, cropRect.origin.x + cropRect.size.width - delta)
-                                let newY = max(0, cropRect.origin.y + delta)
-                                let minX = cropRect.origin.x + minWidth
-                                let maxY = cropRect.origin.y + cropRect.size.height - minHeight
-                                let finalMaxX = max(newMaxX, minX)
-                                let finalY = min(newY, maxY)
-                                let appliedDeltaX = (cropRect.origin.x + cropRect.size.width) - finalMaxX
-                                let appliedDeltaY = cropRect.origin.y - finalY
-                                let appliedDelta = min(appliedDeltaX, appliedDeltaY)
-                                newRect.size.width -= appliedDelta
-                                newRect.origin.y += appliedDelta
-                                newRect.size.height -= appliedDelta
-                            } else {
-                                if abs(dx) > minDragThreshold {
-                                    let newMaxX = min(1, cropRect.origin.x + cropRect.size.width - dx)
-                                    let minX = cropRect.origin.x + minWidth
-                                    let finalMaxX = max(newMaxX, minX)
-                                    let appliedDelta = (cropRect.origin.x + cropRect.size.width) - finalMaxX
-                                    newRect.size.width -= appliedDelta
-                                }
-                                if abs(dy) > minDragThreshold {
-                                    let newY = max(0, cropRect.origin.y + dy)
-                                    let maxY = cropRect.origin.y + cropRect.size.height - minHeight
-                                    let finalY = min(newY, maxY)
-                                    let appliedDelta = finalY - cropRect.origin.y
-                                    newRect.origin.y += appliedDelta
-                                    newRect.size.height -= appliedDelta
-                                }
-                            }
+                            let newMaxX = min(1.0, max(cropRect.origin.x + minWidth, cropRect.origin.x + cropRect.size.width + dx))
+                            let newY = max(0, min(cropRect.origin.y + dy, cropRect.origin.y + cropRect.size.height - minHeight))
+                            let deltaX = newMaxX - (cropRect.origin.x + cropRect.size.width)
+                            let deltaY = newY - cropRect.origin.y
+                            newRect.size.width = max(minWidth, cropRect.size.width + deltaX)
+                            newRect.origin.y = newY
+                            newRect.size.height = max(minHeight, cropRect.size.height - deltaY)
+                            
                         case .bottomLeft:
-                            if isDiagonal {
-                                let delta = abs(dx) > abs(dy) ? dx : -dy
-                                let newX = max(0, cropRect.origin.x + delta)
-                                let newMaxY = min(1, cropRect.origin.y + cropRect.size.height - delta)
-                                let maxX = cropRect.origin.x + cropRect.size.width - minWidth
-                                let minY = cropRect.origin.y + minHeight
-                                let finalX = min(newX, maxX)
-                                let finalMaxY = max(newMaxY, minY)
-                                let appliedDeltaX = cropRect.origin.x - finalX
-                                let appliedDeltaY = (cropRect.origin.y + cropRect.size.height) - finalMaxY
-                                let appliedDelta = min(appliedDeltaX, appliedDeltaY)
-                                newRect.origin.x += appliedDelta
-                                newRect.size.width -= appliedDelta
-                                newRect.size.height -= appliedDelta
-                            } else {
-                                if abs(dx) > minDragThreshold {
-                                    let newX = max(0, cropRect.origin.x + dx)
-                                    let maxX = cropRect.origin.x + cropRect.size.width - minWidth
-                                    let finalX = min(newX, maxX)
-                                    let appliedDelta = finalX - cropRect.origin.x
-                                    newRect.origin.x += appliedDelta
-                                    newRect.size.width -= appliedDelta
-                                }
-                                if abs(dy) > minDragThreshold {
-                                    let newMaxY = min(1, cropRect.origin.y + cropRect.size.height - dy)
-                                    let minY = cropRect.origin.y + minHeight
-                                    let finalMaxY = max(newMaxY, minY)
-                                    let appliedDelta = (cropRect.origin.y + cropRect.size.height) - finalMaxY
-                                    newRect.size.height -= appliedDelta
-                                }
-                            }
+                            let newX = max(0, min(cropRect.origin.x + dx, cropRect.origin.x + cropRect.size.width - minWidth))
+                            let newMaxY = min(1.0, max(cropRect.origin.y + minHeight, cropRect.origin.y + cropRect.size.height + dy))
+                            let deltaX = newX - cropRect.origin.x
+                            let deltaY = newMaxY - (cropRect.origin.y + cropRect.size.height)
+                            newRect.origin.x = newX
+                            newRect.size.width = max(minWidth, cropRect.size.width - deltaX)
+                            newRect.size.height = max(minHeight, cropRect.size.height + deltaY)
+                            
                         case .bottomRight:
-                            if isDiagonal {
-                                let delta = abs(dx) > abs(dy) ? dx : dy
-                                let newMaxX = min(1, cropRect.origin.x + cropRect.size.width + delta)
-                                let newMaxY = min(1, cropRect.origin.y + cropRect.size.height + delta)
-                                let minX = cropRect.origin.x + minWidth
-                                let minY = cropRect.origin.y + minHeight
-                                let finalMaxX = max(newMaxX, minX)
-                                let finalMaxY = max(newMaxY, minY)
-                                let appliedDeltaX = finalMaxX - (cropRect.origin.x + cropRect.size.width)
-                                let appliedDeltaY = finalMaxY - (cropRect.origin.y + cropRect.size.height)
-                                let appliedDelta = min(appliedDeltaX, appliedDeltaY)
-                                newRect.size.width += appliedDelta
-                                newRect.size.height += appliedDelta
-                            } else {
-                                if abs(dx) > minDragThreshold {
-                                    let newMaxX = min(1, cropRect.origin.x + cropRect.size.width + dx)
-                                    let minX = cropRect.origin.x + minWidth
-                                    let finalMaxX = max(newMaxX, minX)
-                                    let appliedDelta = finalMaxX - (cropRect.origin.x + cropRect.size.width)
-                                    newRect.size.width += appliedDelta
-                                }
-                                if abs(dy) > minDragThreshold {
-                                    let newMaxY = min(1, cropRect.origin.y + cropRect.size.height + dy)
-                                    let minY = cropRect.origin.y + minHeight
-                                    let finalMaxY = max(newMaxY, minY)
-                                    let appliedDelta = finalMaxY - (cropRect.origin.y + cropRect.size.height)
-                                    newRect.size.height += appliedDelta
-                                }
-                            }
+                            let newMaxX = min(1.0, max(cropRect.origin.x + minWidth, cropRect.origin.x + cropRect.size.width + dx))
+                            let newMaxY = min(1.0, max(cropRect.origin.y + minHeight, cropRect.origin.y + cropRect.size.height + dy))
+                            let deltaX = newMaxX - (cropRect.origin.x + cropRect.size.width)
+                            let deltaY = newMaxY - (cropRect.origin.y + cropRect.size.height)
+                            newRect.size.width = max(minWidth, cropRect.size.width + deltaX)
+                            newRect.size.height = max(minHeight, cropRect.size.height + deltaY)
+                            
                         case .none: break
                         }
-                        newRect.size.width = max(newRect.size.width, minWidth)
-                        newRect.size.height = max(newRect.size.height, minHeight)
-                        newRect.origin.x = min(max(0, newRect.origin.x), 1 - newRect.size.width)
-                        newRect.origin.y = min(max(0, newRect.origin.y), 1 - newRect.size.height)
+                        
+                        // 최종 경계 체크
+                        newRect.origin.x = max(0, min(newRect.origin.x, maxX))
+                        newRect.origin.y = max(0, min(newRect.origin.y, maxY))
+                        newRect.size.width = max(minWidth, min(newRect.size.width, 1 - newRect.origin.x))
+                        newRect.size.height = max(minHeight, min(newRect.size.height, 1 - newRect.origin.y))
+                        
                         cropRect = newRect
                     }
                     .onEnded { _ in
