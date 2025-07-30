@@ -14,7 +14,8 @@ struct OCRResultView: View {
     let selectedImage: UIImage
     @State private var showingSummaryView = false
 
-    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var appState: AppState
+    @Environment(\.dismiss) var dismiss
     
     // 공유 OCRViewModel 사용
     @EnvironmentObject private var viewModel: OCRViewModel
@@ -142,11 +143,25 @@ struct OCRResultView: View {
             .padding()
             .navigationTitle("OCR 결과")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarBackButtonHidden(false)
+            .navigationBarBackButtonHidden(true)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("닫기") {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
                         dismiss()
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(.mainws)
+                            .font(.system(size: 18, weight: .semibold))
+                    }
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        appState.flow = .main
+                    } label: {
+                        Image(systemName: "house")
+                            .foregroundColor(.mainws)
+                            .font(.system(size: 18, weight: .semibold))
                     }
                 }
             }

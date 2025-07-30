@@ -10,12 +10,14 @@ import SwiftUI
 // 이미지 크롭 뷰: 사용자가 이미지를 원하는 영역만큼 잘라낼 수 있는 뷰
 struct OCRImageResizingView: View {
     @StateObject var viewModel = OCRViewModel()
+    
+    @EnvironmentObject var appState: AppState
+    @Environment(\.dismiss) var dismiss
 
     // 원본 이미지
     let originalImage: UIImage
     // 크롭 완료 시 호출되는 콜백
     var onCrop: (UIImage) -> Void
-    @Environment(\.dismiss) private var dismiss
     // 크롭 영역(0~1 비율) - 전체 이미지 영역으로 초기화
     @State private var cropRect: CGRect = CGRect(x: 0, y: 0, width: 1, height: 1)
     // 드래그 변화량 누적값
@@ -32,79 +34,98 @@ struct OCRImageResizingView: View {
     enum Corner { case topLeft, topRight, bottomLeft, bottomRight, none }
 
     var body: some View {
-        NavigationStack {
-            VStack {
-                GeometryReader { geo in
-                    ZStack {
-                        // 원본 이미지 표시
-                        Image(uiImage: originalImage)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: geo.size.width, height: geo.size.height)
-                            .clipped()
-                            .cornerRadius(32)
-                        
-                        // 크롭 사각형 표시
-                        Rectangle()
-                            .path(in: cropRectFor(geo: geo))
-                            .stroke(.sub1Ws, lineWidth: 2)
-                            .background(
-                                Rectangle()
-                                    .fill(Color.black.opacity(0.3))
-                                    .frame(width: cropRectFor(geo: geo).width, height: cropRectFor(geo: geo).height)
-                                    .position(x: cropRectFor(geo: geo).midX, y: cropRectFor(geo: geo).midY)
-                            )
-                        // 사각형 전체 이동 제스처
-                            .gesture(
-                                DragGesture()
-                                    .onChanged { value in
-                                        let dx = (value.translation.width - lastDragValue.width) / geo.size.width
-                                        let dy = (value.translation.height - lastDragValue.height) / geo.size.height
-                                        lastDragValue = value.translation
-                                        var newRect = cropRect
-                                        newRect.origin.x = min(max(0, cropRect.origin.x + dx), 1 - cropRect.size.width)
-                                        newRect.origin.y = min(max(0, cropRect.origin.y + dy), 1 - cropRect.size.height)
-                                        cropRect = newRect
-                                    }
-                                    .onEnded { _ in
-                                        lastDragValue = .zero
-                                    }
-                            )
-                        
-                        // 네 모서리(코너) 핸들
-                        cornerHandle(.topLeft, geo: geo)
-                        cornerHandle(.topRight, geo: geo)
-                        cornerHandle(.bottomLeft, geo: geo)
-                        cornerHandle(.bottomRight, geo: geo)
-                    }
+        VStack {
+            GeometryReader { geo in
+                ZStack {
+                    // 원본 이미지 표시
+                    Image(uiImage: originalImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: geo.size.width, height: geo.size.height)
+                        .clipped()
+                        .cornerRadius(32)
+                    
+                    // 크롭 사각형 표시
+                    Rectangle()
+                        .path(in: cropRectFor(geo: geo))
+                        .stroke(.sub1Ws, lineWidth: 2)
+                        .background(
+                            Rectangle()
+                                .fill(Color.black.opacity(0.3))
+                                .frame(width: cropRectFor(geo: geo).width, height: cropRectFor(geo: geo).height)
+                                .position(x: cropRectFor(geo: geo).midX, y: cropRectFor(geo: geo).midY)
+                        )
+                    // 사각형 전체 이동 제스처
+                        .gesture(
+                            DragGesture()
+                                .onChanged { value in
+                                    let dx = (value.translation.width - lastDragValue.width) / geo.size.width
+                                    let dy = (value.translation.height - lastDragValue.height) / geo.size.height
+                                    lastDragValue = value.translation
+                                    var newRect = cropRect
+                                    newRect.origin.x = min(max(0, cropRect.origin.x + dx), 1 - cropRect.size.width)
+                                    newRect.origin.y = min(max(0, cropRect.origin.y + dy), 1 - cropRect.size.height)
+                                    cropRect = newRect
+                                }
+                                .onEnded { _ in
+                                    lastDragValue = .zero
+                                }
+                        )
+                    
+                    // 네 모서리(코너) 핸들
+                    cornerHandle(.topLeft, geo: geo)
+                    cornerHandle(.topRight, geo: geo)
+                    cornerHandle(.bottomLeft, geo: geo)
+                    cornerHandle(.bottomRight, geo: geo)
                 }
-                .aspectRatio(originalImage.size, contentMode: .fit)
-                .padding()
-                
-                Button {
-                    if let cropped = cropImage() {
-                        onCrop(cropped)
-                    }
-                } label: {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color.mainws)
-                            .frame(height: 60)
-                            .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
-                        
-                        HStack {
-                            Image(systemName: "text.viewfinder")
-                            Text("OCR 실행")
-                        }
-                        .font(.system(size: 20, weight: .bold))
-                        .foregroundStyle(.white)
-                    }
-                }
-                .padding()
             }
-            .navigationTitle("이미지 크롭")
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarBackButtonHidden(false)
+            .aspectRatio(originalImage.size, contentMode: .fit)
+            .padding()
+            
+            Button {
+                if let cropped = cropImage() {
+                    onCrop(cropped)
+                }
+            } label: {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color.mainws)
+                        .frame(height: 60)
+                        .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
+                    
+                    HStack {
+                        Image(systemName: "text.viewfinder")
+                        Text("OCR 실행")
+                    }
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundStyle(.white)
+                }
+            }
+            .padding()
+        }
+        .navigationTitle("이미지 크롭")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.mainws)
+                        .font(.system(size: 18, weight: .semibold))
+                }
+            }
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    appState.flow = .main
+                } label: {
+                    Image(systemName: "house")
+                        .foregroundColor(.mainws)
+                        .font(.system(size: 18, weight: .semibold))
+                }
+            }
         }
     }
 }
