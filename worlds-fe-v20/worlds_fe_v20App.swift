@@ -14,7 +14,6 @@ struct worlds_fe_v20App: App {
 
     var body: some Scene {
         WindowGroup {
-            // OCRCameraView()
             switch appState.flow {
                 // 로그인 화면
             case .login:
@@ -29,7 +28,7 @@ struct worlds_fe_v20App: App {
                 
                 // 추후 메인 화면으로 변경
             case .main:
-                QuestionView(viewModel: QuestionViewModel())
+                TabbarView()
                     .environmentObject(appState)
             }
         }
