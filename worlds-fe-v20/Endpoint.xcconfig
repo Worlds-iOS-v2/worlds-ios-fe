@@ -1,0 +1,24 @@
+//
+//  Endpoint.xcconfig
+//  worlds-fe-v20
+//
+//  Created by seohuibaek on 7/20/25.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+// API_BASE_URL = http:/$()/192.168.100.91:3000/
+API_BASE_URL = https:/$()/worldstudy.azurewebsites.net
+
+API_SIGNUP_URL = $(API_BASE_URL)/auth/signup
+API_LOGIN_URL = $(API_BASE_URL)/auth/signin
+API_LOGOUT_URL = $(API_BASE_URL)/auth/signout
+
+API_CHECK_EMAIL_URL = $(API_BASE_URL)/auth/check-email
+API_ACCESS_TOKEN_URL = $(API_BASE_URL)/auth/refresh
+API_USER_INFO_URL = $(API_BASE_URL)/auth/userinfo
+API_CHANGE_PASSWORD_URL = $(API_BASE_URL)/auth/change-password
+API_FIND_EMAIL_URL = $(API_BASE_URL)/auth/find-email
+
+SOCKET_URL = http:/$()/192.168.100.91:3000/
