@@ -153,6 +153,9 @@ class UserAPIManager {
                 UserDefaults.standard.set(response.accessToken, forKey: "accessToken")
                 UserDefaults.standard.set(response.refreshToken, forKey: "refreshToken")
                 
+                // 유저 이름 저장
+                UserDefaults.standard.set(response.username, forKey: "username")
+                
                 return response
             } catch {
                 throw UserAPIError.decodingError(description: "Login 디코딩 실패: \(error)")
