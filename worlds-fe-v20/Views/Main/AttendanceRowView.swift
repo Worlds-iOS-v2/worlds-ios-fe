@@ -37,7 +37,7 @@ struct AttendanceRowView: View {
             }
         }
         .onAppear {
-            print("Weekday: \(weekday), isToday: \(isToday), Current weekday: \(Calendar.current.component(.weekday, from: Date()))")
+          //  print("Weekday: \(weekday), isToday: \(isToday), Current weekday: \(Calendar.current.component(.weekday, from: Date()))")
         }
     }
     
