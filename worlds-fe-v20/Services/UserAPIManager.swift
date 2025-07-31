@@ -416,7 +416,7 @@ class UserAPIManager {
             throw UserAPIError.invalidToken
         }
         
-        guard let endPoint = Bundle.main.object(forInfoDictionaryKey: "APIOCR") as? String else {
+        guard let endPoint = Bundle.main.object(forInfoDictionaryKey: "APIOCRURL") as? String else {
             throw UserAPIError.invalidEndPoint
         }
         
@@ -472,7 +472,7 @@ class UserAPIManager {
             throw UserAPIError.invalidToken
         }
         
-        guard let endPoint = Bundle.main.object(forInfoDictionaryKey: "APIOCRSolution") as? String else {
+        guard let endPoint = Bundle.main.object(forInfoDictionaryKey: "APIOCRSolutionURL") as? String else {
             throw UserAPIError.invalidEndPoint
         }
         
