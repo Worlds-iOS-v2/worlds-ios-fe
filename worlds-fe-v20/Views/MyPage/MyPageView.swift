@@ -9,7 +9,12 @@ import SwiftUI
 
 struct MyPageView: View {
     @Environment(\.openURL) var openURL
+    @StateObject var viewModel: MyPageViewModel = MyPageViewModel()
     
+    @State private var showAlert = false
+    @State private var alertMessage = ""
+    @EnvironmentObject var appState: AppState
+
     var body: some View {
         ZStack {
             Color.sub2Ws
@@ -22,7 +27,7 @@ struct MyPageView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 24)
                     
-                    UserInfoCardView()
+                    UserInfoCardView(userInfo: viewModel.userInfo)
                         .cornerRadius(20)
                         .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
                         .padding(.horizontal, 16)
@@ -30,24 +35,41 @@ struct MyPageView: View {
                 .padding(.vertical, 40)
                 
                 VStack(spacing: 16) {
-                    NavigationLink(destination: MyQuestionView()) {
+                    NavigationLink(destination: MyQuestionView(questions: viewModel.questions)) {
                         Text("내가 쓴 글")
                             .font(.system(size: 18))
                             .foregroundStyle(Color.black)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .padding(.horizontal, 32)
+                    .onAppear{
+                        Task {
+                            // await viewModel.fetchMyQuestions()
+                        }
+                    }
                     
                     Divider()
                         .padding(.horizontal, 32)
                     
-                    NavigationLink(destination: UserInfoCardView()) {
+                    Button {
+                        alertMessage = "로그아웃 하시겠습니까?"
+                        showAlert = true
+                    } label: {
                         Text("로그아웃")
                             .font(.system(size: 18))
                             .foregroundStyle(Color.black)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .padding(.horizontal, 32)
+                    .alert(alertMessage, isPresented: $showAlert) {
+                        Button("확인", role: .cancel) {
+                            Task {
+                                await viewModel.logout()
+                                appState.flow = .login
+                            }
+                        }
+                        Button("취소", role: .destructive) { }
+                    }
                     
                     Divider()
                         .padding(.horizontal, 32)
@@ -97,6 +119,12 @@ struct MyPageView: View {
             }
             .padding(.bottom, 100)
         }
+        .onAppear {
+            // 정보 불러오기
+            Task {
+                await viewModel.fetchMyInformation()
+            }
+        }
     }
 }
 
@@ -110,6 +138,6 @@ extension MyPageView {
     }
 }
 
-#Preview {
-    MyPageView()
-}
+//#Preview {
+//    MyPageView()
+//}
