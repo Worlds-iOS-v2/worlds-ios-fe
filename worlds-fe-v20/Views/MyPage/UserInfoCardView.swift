@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct UserInfoCardView: View {
+    var userInfo: User?
+    
     var body: some View {
         VStack {
             ZStack(alignment: .top) {
@@ -35,7 +37,11 @@ struct UserInfoCardView: View {
                     
                     Spacer()
                     
-                    Text("김멘티")
+                    if let userInfo = userInfo {
+                        Text("\(userInfo.userName)")
+                    } else {
+                        Text("알 수 없음")
+                    }
                 }
                 .padding(.bottom, 8)
                 
@@ -44,7 +50,11 @@ struct UserInfoCardView: View {
                     
                     Spacer()
                     
-                    Text("nnnn@n.com")
+                    if let userInfo = userInfo {
+                        Text("\(userInfo.userEmail)")
+                    } else {
+                        Text("알 수 없음")
+                    }
                 }
                 .padding(.bottom, 8)
                 
@@ -68,6 +78,6 @@ struct UserInfoCardView: View {
     }
 }
 
-#Preview {
-    UserInfoCardView()
-}
+//#Preview {
+//    UserInfoCardView()
+//}
