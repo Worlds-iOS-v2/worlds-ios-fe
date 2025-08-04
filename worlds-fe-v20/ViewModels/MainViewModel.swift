@@ -25,7 +25,7 @@ final class MainViewModel: ObservableObject {
             self.posts = posts
             self.errorMessage = nil
         } catch {
-            print("❌ 에러 발생:", error)
+            print("❌ fetchLatestPosts 에러 발생:", error)
             self.errorMessage = "질문 최신 목록을 불러오는데 실패했습니다: \(error.localizedDescription)"
         }
     }
