@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct DeleteAccountView: View {
-    
+    @StateObject var viewModel: MyPageViewModel = MyPageViewModel()
+    @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
@@ -28,7 +29,10 @@ struct DeleteAccountView: View {
             Spacer()
             
             Button {
-                
+                Task {
+                    await viewModel.deleteAccount()
+                    appState.flow = .login
+                }
             } label: {
                 ZStack {
                     RoundedRectangle(cornerRadius: 10)
