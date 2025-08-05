@@ -6,7 +6,9 @@
 //
 
 import SwiftUI
+import Translation
 
+@available(iOS 18.0, *)
 struct CommentRow: View {
     let comment: Comment
     let depth: Int
@@ -20,6 +22,10 @@ struct CommentRow: View {
     @State private var etcReasonText = ""
     @State private var showReportResultAlert = false
     @State private var reportResultMessage = ""
+    
+    @State private var translationConfiguration: TranslationSession.Configuration?
+    @State private var translatedText: String?
+    @State private var isTranslating = false
 
     @EnvironmentObject var commentVM: CommentViewModel
 
@@ -48,6 +54,9 @@ struct CommentRow: View {
                                 .font(.caption)
                                 .foregroundColor(.blue)
                         }
+                        Text("|  \(formatDate(comment.createdAt))")
+                            .font(.caption2)
+                            .foregroundColor(.gray)
 
                         Spacer()
 
@@ -61,14 +70,13 @@ struct CommentRow: View {
                                 } label: {
                                     Label("삭제", systemImage: "trash")
                                 }
+                            } else {
+                                Button {
+                                    showReportSheet = true
+                                } label: {
+                                    Label("신고하기", systemImage: "exclamationmark.bubble")
+                                }
                             }
-
-                            Button {
-                                showReportSheet = true
-                            } label: {
-                                Label("신고하기", systemImage: "exclamationmark.bubble")
-                            }
-
                         } label: {
                             Image(systemName: "ellipsis")
                                 .foregroundColor(.gray)
@@ -77,15 +85,22 @@ struct CommentRow: View {
                     }
 
                     // 본문
-                    HStack(alignment: .top, spacing: 4) {
-                        if depth > 0 {
-                            Image(systemName: "arrow.turn.down.right")
-                                .foregroundColor(.gray)
+                    VStack(alignment: .leading){
+                        HStack(alignment: .top, spacing: 4) {
+                            if depth > 0 {
+                                Image(systemName: "arrow.turn.down.right")
+                                    .foregroundColor(.gray)
+                            }
+                            
+                            Text(comment.content)
+                                .font(.body)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
-
-                        Text(comment.content)
-                            .font(.body)
-                            .fixedSize(horizontal: false, vertical: true)
+                        if let translated = translatedText {
+                            Text(translated)
+                                .font(.caption)
+                                .foregroundColor(.blue)
+                        }
                     }
 
                     // 좋아요 + 답글 달기
@@ -103,14 +118,44 @@ struct CommentRow: View {
                                 .foregroundColor(.gray)
                         }
 
-                        // 답글 달기 버튼
-                        Button(action: {
-                            commentVM.replyingTo = (commentVM.replyingTo == comment.id) ? nil : comment.id
-                            commentVM.replyContent = ""
-                        }) {
-                            Text(commentVM.replyingTo == comment.id ? "답글 취소" : "답글 달기")
-                                .font(.caption)
-                                .foregroundColor(.gray)
+                        HStack{
+                            // 답글 달기 버튼
+                            Button(action: {
+                                commentVM.replyingTo = (commentVM.replyingTo == comment.id) ? nil : comment.id
+                                commentVM.replyContent = ""
+                            }) {
+                                Text(commentVM.replyingTo == comment.id ? "답글 취소" : "답글 달기")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            }
+                            // 번역 버튼 토글 로직
+                            if isTranslating {
+                                Button(action: {}) {
+                                    Text("번역 중...")
+                                        .font(.caption)
+                                        .foregroundColor(.gray)
+                                }
+                                .disabled(true)
+                            } else if translatedText != nil {
+                                Button(action: {
+                                    // 번역 취소: 번역문 및 관련 상태 리셋
+                                    translatedText = nil
+                                    isTranslating = false
+                                    translationConfiguration = nil
+                                }) {
+                                    Text("번역취소")
+                                        .font(.caption)
+                                        .foregroundColor(.gray)
+                                }
+                            } else {
+                                Button(action: {
+                                    if !isTranslating { startTranslation() }
+                                }) {
+                                    Text("번역하기")
+                                        .font(.caption)
+                                        .foregroundColor(.gray)
+                                }
+                            }
                         }
                     }
                 }
@@ -125,6 +170,7 @@ struct CommentRow: View {
                     .environmentObject(commentVM)
             }
         }
+        
         // 신고 사유 선택 다이얼로그
         .confirmationDialog("신고 사유를 선택하세요", isPresented: $showReportSheet, titleVisibility: .visible) {
             ForEach(ReportReason.allCases, id: \.self) { reason in
@@ -158,6 +204,33 @@ struct CommentRow: View {
         .alert(reportResultMessage, isPresented: $showReportResultAlert) {
             Button("확인", role: .cancel) {}
         }
+        .translationTask(translationConfiguration) { session in
+            await performTranslation(using: session)
+                    }
+    }
+    
+    // 번역 시작 함수
+    func startTranslation() {
+        let targetLang = Locale.current.language.languageCode?.identifier ?? "en"
+        translationConfiguration = TranslationSession.Configuration(
+            source: nil, // 원문 언어 자동 감지
+            target: Locale.Language(identifier: targetLang)
+        )
+        isTranslating = true
+        translatedText = nil
+    }
+    
+    // 번역 실행 함수
+    func performTranslation(using session: TranslationSession) async {
+        guard let config = translationConfiguration else { return }
+        do {
+            let response = try await session.translate(comment.content)
+            translatedText = response.targetText
+        } catch {
+            translatedText = "번역 실패: \(error.localizedDescription)"
+        }
+        isTranslating = false
+        translationConfiguration = nil // 다시 버튼 누를 때만 번역
     }
 
     // 신고 전송 함수
@@ -175,5 +248,16 @@ struct CommentRow: View {
         }
         etcReasonText = ""
         showReportResultAlert = true
+    }
+    
+    // 날짜 포맷터
+    func formatDate(_ dateStr: String) -> String {
+        let inputFormatter = ISO8601DateFormatter()
+        if let date = inputFormatter.date(from: dateStr) {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy/MM/dd HH:mm"
+            return formatter.string(from: date)
+        }
+        return dateStr.prefix(10) + " " + dateStr.dropFirst(11).prefix(5)
     }
 }
