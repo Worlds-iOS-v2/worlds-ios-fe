@@ -25,6 +25,17 @@ final class MyPageViewModel: ObservableObject {
     }
     
     @MainActor
+    func resetPassword(oldPassword: String, newPassword: String) async {
+        do {
+            let response = try await UserAPIManager.shared.resetPassword(oldPassword: oldPassword, newPassword: newPassword)
+            self.errorMessage = nil
+        } catch {
+            print("❌ resetPassword 에러 발생:", error)
+            self.errorMessage = "resetPassword에 실패했습니다: \(error.localizedDescription)"
+        }
+    }
+    
+    @MainActor
     func fetchMyQuestions() async {
         do {
             let questions = try await UserAPIManager.shared.getMyQuestions()
