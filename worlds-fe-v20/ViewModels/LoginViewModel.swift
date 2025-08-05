@@ -27,7 +27,9 @@ final class LoginViewModel: ObservableObject {
             
             return false
         } catch {
-            self.errorMessage = "로그인 실패: \(error.localizedDescription)"
+            if error.localizedDescription == "The data couldn’t be read because it isn’t in the correct format." {
+                self.errorMessage = "접근이 제한되었습니다. 관리자에게 문의하세요."
+            }
             print("기타 에러: \(errorMessage)")
             
             return false
