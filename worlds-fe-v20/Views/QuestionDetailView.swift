@@ -24,6 +24,9 @@ struct QuestionDetailView: View {
     
     @FocusState private var isTextFieldFocused: Bool
     
+    @State private var translatedTitle: String?
+    @State private var translatedContent: String?
+    
     let reportReasons: [(label: String, value: ReportReason)] = [
         ("비속어", .offensive),
         ("음란", .sexual),
@@ -84,13 +87,13 @@ struct QuestionDetailView: View {
                         }
                         .padding(.horizontal)
                         
-                        Text(question.title)
+                        Text(translatedTitle ?? question.title)
                             .font(.title)
                             .fontWeight(.bold)
                             .padding(.top, 24)
                             .padding(.horizontal)
-                        
-                        Text(question.content)
+
+                        Text(translatedContent ?? question.content)
                             .font(.body)
                             .foregroundColor(.black)
                             .padding(.top, 18)
@@ -128,11 +131,33 @@ struct QuestionDetailView: View {
                             }
                         }
                         
-                        Button("번역하기") {}
-                            .font(.callout)
-                            .foregroundColor(.blue)
-                            .padding(.horizontal)
-                            .padding(.top, 14)
+                        Button("번역하기") {
+                            guard let question = questionDetail else { return }
+                            
+                            let targetLang = Locale.preferredLanguages.first?.components(separatedBy: "-").first ?? "en"
+                            
+                            if targetLang == "ko" {
+                                self.translatedTitle = question.title
+                                self.translatedContent = question.content
+                                return
+                            }
+                            
+                            APIService().translateText(text: question.title, target: targetLang) { translated in
+                                DispatchQueue.main.async {
+                                    self.translatedTitle = translated
+                                }
+                            }
+                            
+                            APIService().translateText(text: question.content, target: targetLang) { translated in
+                                DispatchQueue.main.async {
+                                    self.translatedContent = translated
+                                }
+                            }
+                        }
+                        .font(.callout)
+                        .foregroundColor(.blue)
+                        .padding(.horizontal)
+                        .padding(.top, 14)
                         
                         Color.gray.opacity(0.1)
                             .frame(height: 13)
@@ -247,7 +272,8 @@ struct QuestionDetailView: View {
                 Task {
                     try await viewModel.deleteQuestion(id: questionId)
                     await MainActor.run {
-                        dismiss()
+                        viewModel.questions.removeAll { $0.id == questionId }
+                        presentationMode.wrappedValue.dismiss()
                     }
                 }
             }

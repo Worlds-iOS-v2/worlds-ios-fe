@@ -13,10 +13,12 @@ struct APIResponse: Codable {
     var error: String?
     var userInfo: User?
     var userEmail: String?
+    var username: String?
+    var withdrawalReason: String?
     
     enum CodingKeys: String, CodingKey {
         case accessToken = "access_token"
         case refreshToken = "refresh_token"
-        case error, statusCode, message, userInfo, userEmail
+        case error, statusCode, message, userInfo, userEmail, username, withdrawalReason
     }
 }

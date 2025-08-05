@@ -69,7 +69,7 @@ struct QuestionUser: Codable, Hashable {
     let id: Int
     let name: String
     let email: String
-    let role: Bool
+    let role: Bool?
     
     enum CodingKeys: String, CodingKey {
         case id

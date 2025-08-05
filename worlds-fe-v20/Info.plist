@@ -24,6 +24,14 @@
 	<string>$(API_SIGNUP_URL)</string>
 	<key>APIUserInfoURL</key>
 	<string>$(API_USER_INFO_URL)</string>
+	<key>APIOCRURL</key>
+	<string>$(API_OCR_URL)</string>
+	<key>APIOCRSolutionURL</key>
+	<string>$(API_OCR_SOLUTION_URL)</string>
+	<key>APIMyQuestionURL</key>
+	<string>$(API_MY_QUESTION_URL)</string>
+	<key>APIDeleteAccountURL</key>
+	<string>$(API_DELETE_ACCOUNT_URL)</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

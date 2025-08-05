@@ -17,7 +17,7 @@ struct MainView: View {
         ScrollView {
             VStack {
                 VStack {
-                    Text("안녕하세요! \(viewModel.name)님")
+                    Text("안녕하세요! \(viewModel.getUsername())님")
                         .font(.system(size: 27))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 24)
@@ -48,44 +48,57 @@ struct MainView: View {
                         .padding(.top, -120)
                 )
                 .padding(.vertical, 40)
-
-                Text("이번주 소식")
-                    .font(.system(size: 27))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 20)
+                
+                HStack() {
+                    Text("이번주 소식")
+                        .font(.system(size: 27))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 24)
+                        .padding(.bottom, 20)
+                    
+                    NavigationLink(destination: CultureDetailView()) {
+                        Text("더보기 >")
+                            .font(.system(size: 16))
+                            .foregroundStyle(Color.mainws)
+                            .padding(.horizontal, 24)
+                            .padding(.bottom, 20)
+                    }
+                }
                 
                 AutoSlideViewWithTimer()
                     .frame(height: 300)
                     .padding(.horizontal, 24)
                 
-                Text("인기글")
+                Text("최신글")
                     .font(.system(size: 27))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 24)
                     .padding(.bottom, 20)
-
-                VStack(spacing: 12) {
+                
+                VStack(spacing: 16) {
                     Spacer()
-
-                    ForEach(0..<5, id: \.self) { _ in
-                        Button {
-                            // 해당 게시물로 화면 이동
-                        } label: {
+                    
+                    ForEach(viewModel.posts.prefix(5), id: \.self) { post in
+                        NavigationLink(destination: QuestionDetailView(questionId: post.id, viewModel: QuestionViewModel())) {
+                            
                             HStack(spacing: 40){
-                                Text("학습")
-                                    .font(.system(size: 20))
+                                Text("\(post.category.displayName)")
+                                    .font(.system(size: 18))
                                     .foregroundStyle(Color.black)
+                                    .frame(width: 40, alignment: .leading)
                                 
-                                Text("제목")
-                                    .font(.system(size: 20))
+                                Text("\(post.title)")
+                                    .font(.system(size: 18))
                                     .foregroundStyle(Color.black)
-                                
-                                Spacer()
+                                    .lineLimit(1)
+                                    .truncationMode(.tail)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                             }
                             .padding(.horizontal, 48)
+                            
                         }
                     }
+                    
                     Spacer()
                 }
                 .background(
@@ -99,6 +112,11 @@ struct MainView: View {
             .background(Color.white)
         }
         .scrollIndicators(.hidden)
+        .onAppear {
+            Task {
+                await viewModel.fetchLatestPosts()
+            }
+        }
     }
 }
 
