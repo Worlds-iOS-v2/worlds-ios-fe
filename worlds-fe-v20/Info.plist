@@ -2,10 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
-	<key>CFBundleIconName</key>
-	<string>AppIcon</string>
 	<key>APIAccessTokenURL</key>
 	<string>$(API_ACCESS_TOKEN_URL)</string>
 	<key>APIBaseURL</key>
@@ -24,6 +20,8 @@
 	<string>$(API_SIGNUP_URL)</string>
 	<key>APIUserInfoURL</key>
 	<string>$(API_USER_INFO_URL)</string>
+	<key>CFBundleIconName</key>
+	<string>AppIcon</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
