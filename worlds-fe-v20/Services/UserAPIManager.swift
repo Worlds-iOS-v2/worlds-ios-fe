@@ -307,7 +307,6 @@ class UserAPIManager {
     }
     
     // 회원탈퇴
-    // 스웨거에서는 되는데 여기선 안댐..
     func deleteAccount(withdrawalReason: String = "personal") async throws -> APIResponse {
         guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
             print("토큰 값이 유효하지 않습니다.")
@@ -589,21 +588,21 @@ class UserAPIManager {
     }
     
     //내가 한 질문 목록 조회 -> 추후 API Service로 이동
-    func getMyQuestions() async throws -> QuestionResponse {
+    func getMyQuestions() async throws -> [QuestionList] {
         
         guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
             print("토큰 값이 유효하지 않습니다.")
             throw UserAPIError.invalidToken
         }
         
-        guard let endPoint = Bundle.main.object(forInfoDictionaryKey: "APIMYQUESTIONS") as? String else {
+        guard let endPoint = Bundle.main.object(forInfoDictionaryKey: "APIMyQuestionURL") as? String else {
             throw UserAPIError.invalidEndPoint
         }
                 
         let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
               
         let response = try await AF.request(endPoint, method: .get, headers: headers)
-            .serializingDecodable(QuestionResponse.self)
+            .serializingDecodable([QuestionList].self)
             .value
         
         return response
