@@ -101,6 +101,7 @@ final class OCRViewModel: ObservableObject {
     }
     
     // 질문 작성
+    @MainActor
     func createQuestion(title: String, content: String, category: String, images: [UIImage]? = nil) async throws {
         let imageData = images?.compactMap { $0.jpegData(compressionQuality: 0.7) } ?? []
         
