@@ -10,7 +10,6 @@ import SwiftUI
 final class LoginViewModel: ObservableObject {
     @Published var email: String = ""
     @Published var password: String = ""
-    
     @Published var errorMessage: String?
     
     // 로그인 함수

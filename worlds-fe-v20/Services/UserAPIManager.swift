@@ -101,7 +101,7 @@ class UserAPIManager {
                 print("디코딩 에러: \(error.localizedDescription)")
 
                 if let rawJSON = String(data: data, encoding: .utf8) {
-                    print("원본 JSON 응답:\n\(rawJSON)")
+                    // print("원본 JSON 응답:\n\(rawJSON)")
                 }
                 
                 throw UserAPIError.decodingError(description: "디코딩 실패: \(error)")
@@ -164,6 +164,9 @@ class UserAPIManager {
                 } catch {
                     print("userId 저장용 getUserInfo 실패:", error)
                 }
+
+                // 유저 이름 저장
+                UserDefaults.standard.set(response.username, forKey: "username")
                 
                 return response
             } catch {
@@ -303,6 +306,7 @@ class UserAPIManager {
                 
                 UserDefaults.standard.removeObject(forKey: "accessToken")
                 UserDefaults.standard.removeObject(forKey: "refreshToken")
+                UserDefaults.standard.removeObject(forKey: "username")
                 
                 return response
             } catch {
@@ -311,6 +315,72 @@ class UserAPIManager {
             
         case .failure:
             throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
+        }
+    }
+    
+    // 회원탈퇴
+    func deleteAccount(withdrawalReason: String = "personal") async throws -> APIResponse {
+        guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
+            print("토큰 값이 유효하지 않습니다.")
+            throw UserAPIError.invalidToken
+        }
+        
+        print("현재 토큰: \(token)")
+        
+        guard let endPoint = Bundle.main.object(forInfoDictionaryKey: "APIDeleteAccountURL") as? String else {
+            throw UserAPIError.invalidEndPoint
+        }
+                
+        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
+        
+        print("요청 헤더: \(headers)")
+        
+        let parameters: [String: Any] = [
+            "withdrawalReason": withdrawalReason
+        ]
+        
+        print("요청 파라미터: \(parameters)")
+        
+        let dataResponse = await AF.request(endPoint, method: .delete, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+            .validate()
+            .serializingData()
+            .response
+                
+        switch dataResponse.result {
+        case .success(let data):
+            do {
+                let response = try JSONDecoder().decode(APIResponse.self, from: data)
+                print("회원탈퇴 정보: \(response)")
+                
+                UserDefaults.standard.removeObject(forKey: "accessToken")
+                UserDefaults.standard.removeObject(forKey: "refreshToken")
+                UserDefaults.standard.removeObject(forKey: "username")
+                
+                return response
+            } catch {
+                print("디코딩 에러: \(error.localizedDescription)")
+                
+                if let rawJSON = String(data: data, encoding: .utf8) {
+                     print("회원탈퇴 원본 JSON 응답:\n\(rawJSON)")
+                }
+                
+                throw UserAPIError.decodingError(description: "디코딩 실패: \(error)")
+            }
+            
+        case .failure:
+            if let rawData = dataResponse.data,
+               let rawString = String(data: rawData, encoding: .utf8) {
+                print("회원탈퇴 서버 원본 응답: \(rawString)")
+                
+                // 서버 에러 응답 파싱 시도
+                let errorResponse = try JSONDecoder().decode(APIErrorResponse.self, from: rawData)
+                print("회원탈퇴 파싱된 에러 응답: \(errorResponse)")
+                
+                let errorMessage = errorResponse.message[0]
+                throw UserAPIError.serverError(message: errorMessage)
+            } else {
+                throw UserAPIError.serverError(message: "회원탈퇴 서버 응답 파싱 실패")
+            }
         }
     }
     
@@ -337,7 +407,7 @@ class UserAPIManager {
             do {
                 let response = try JSONDecoder().decode(APIResponse.self, from: data)
                 
-                print("사용자 정보: \(response)")
+                // print("사용자 정보: \(response)")
                 
                 return response
             } catch {
@@ -419,6 +489,135 @@ class UserAPIManager {
         case .failure:
             throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
         }
+    }
+    
+    // OCR 번역
+    func OCRTranslation(file: Data) async throws -> OCR {
+        guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
+            print("토큰 값이 유효하지 않습니다.")
+            throw UserAPIError.invalidToken
+        }
+        
+        guard let endPoint = Bundle.main.object(forInfoDictionaryKey: "APIOCRURL") as? String else {
+            throw UserAPIError.invalidEndPoint
+        }
+        
+        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
+        
+        let parameters: [String: Any] = [
+            "files": file
+        ]
+        
+        let dataResponse = await AF.upload(multipartFormData: { multipartFormData in multipartFormData.append(file, withName: "files", fileName: "ocr_image.jpg", mimeType: "image/jpeg")}, to: endPoint, method: .post, headers: headers)
+            .validate()
+            .serializingData()
+            .response
+        
+        switch dataResponse.result {
+        case .success(let data):
+            do {
+                let response = try JSONDecoder().decode(OCR.self, from: data)
+                
+                print("OCR 정보: \(response)")
+                
+                return response
+            } catch {
+                throw UserAPIError.decodingError(description: "OCR 디코딩 실패: \(error)")
+            }
+            
+        case .failure:
+            if let rawData = dataResponse.data,
+               let rawString = String(data: rawData, encoding: .utf8) {
+                print("OCR 체크 서버 원본 응답: \(rawString)")
+                
+                do {
+                    let errorResponse = try JSONDecoder().decode(APIErrorResponse.self, from: rawData)
+                    print("OCR 체크 파싱된 에러 응답: \(errorResponse)")
+                    
+                    var errorMessage = errorResponse.error
+                    
+                    throw UserAPIError.serverError(message: errorMessage)
+                } catch {
+                    print("OCR 체크 에러 응답 파싱 실패: \(error)")
+                    throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
+                }
+            } else {
+                throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
+            }
+        }
+    }
+    
+    // OCR 핵심 개념
+    func OCRSummary() async throws -> OCRSolution {
+        guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
+            print("토큰 값이 유효하지 않습니다.")
+            throw UserAPIError.invalidToken
+        }
+        
+        guard let endPoint = Bundle.main.object(forInfoDictionaryKey: "APIOCRSolutionURL") as? String else {
+            throw UserAPIError.invalidEndPoint
+        }
+        
+        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
+        
+        let dataResponse = await AF.request(endPoint, method: .get, headers: headers)
+            .validate()
+            .serializingData()
+            .response
+        
+        switch dataResponse.result {
+        case .success(let data):
+            do {
+                let response = try JSONDecoder().decode(OCRSolution.self, from: data)
+                
+                print("OCRSummary 정보: \(response)")
+                
+                return response
+            } catch {
+                throw UserAPIError.decodingError(description: "OCRSummary 디코딩 실패: \(error)")
+            }
+            
+        case .failure:
+            if let rawData = dataResponse.data,
+               let rawString = String(data: rawData, encoding: .utf8) {
+                print("OCR 체크 서버 원본 응답: \(rawString)")
+                
+                do {
+                    let errorResponse = try JSONDecoder().decode(APIErrorResponse.self, from: rawData)
+                    print("OCR 체크 파싱된 에러 응답: \(errorResponse)")
+                    
+                    var errorMessage = errorResponse.error
+                    
+                    throw UserAPIError.serverError(message: errorMessage)
+                } catch {
+                    print("OCR 체크 에러 응답 파싱 실패: \(error)")
+                    throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
+                }
+            } else {
+                throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
+            }
+        }
+    }
+    
+    //내가 한 질문 목록 조회 -> 추후 API Service로 이동
+    func getMyQuestions() async throws -> [QuestionList] {
+        
+        guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
+            print("토큰 값이 유효하지 않습니다.")
+            throw UserAPIError.invalidToken
+        }
+        
+        guard let endPoint = Bundle.main.object(forInfoDictionaryKey: "APIMyQuestionURL") as? String else {
+            throw UserAPIError.invalidEndPoint
+        }
+                
+        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
+              
+        let response = try await AF.request(endPoint, method: .get, headers: headers)
+            .serializingDecodable([QuestionList].self)
+            .value
+        
+        return response
     }
 }
 
