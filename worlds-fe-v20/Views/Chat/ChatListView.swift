@@ -35,9 +35,10 @@ struct ChatListView: View {
                 // Top Bar
                 HStack(alignment: .firstTextBaseline) {
                     Text("채팅")
-                        .font(.system(size: 22, weight: .semibold))
+                        .font(.system(size: 26, weight: .semibold))
                     Spacer()
                     Image(systemName: "plus")
+                        .font(.system(size: 22, weight: .bold))
                         .alignmentGuide(.firstTextBaseline) { d in d[.bottom] }
                 }
                 .padding(.horizontal, 24)
@@ -56,34 +57,8 @@ struct ChatListView: View {
                     }
                     .padding(.top, 8)
                 }
-
-                // 탭바 바꾸기!
-                HStack {
-                    Spacer()
-                    Image(systemName: "house")
-                    Spacer()
-                    Image(systemName: "square.and.pencil")
-                    Spacer()
-                    ZStack {
-                        Circle()
-                            .stroke(Color.blue, lineWidth: 1.5)
-                            .frame(width: 44, height: 44)
-                        Image(systemName: "doc.text")
-                            .font(.system(size: 20))
-                    }
-                    Spacer()
-                    Image(systemName: "bubble.right")
-                        .foregroundColor(.blue)
-                    Spacer()
-                    Image(systemName: "person")
-                    Spacer()
-                }
-                .padding(.vertical, 8)
-                .padding(.bottom, 12)
-                .font(.system(size: 22))
-                .foregroundColor(.black)
             }
-            .background(Color(red: 241/255, green: 243/255, blue: 255/255))
+            .background(Color(red: 0.94, green: 0.96, blue: 1.0))
             .ignoresSafeArea(edges: .bottom)
         }
     }

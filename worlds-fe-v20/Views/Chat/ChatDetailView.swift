@@ -74,9 +74,9 @@ struct ChatDetailView: View {
                 }
             }
             .padding()
-            .background(Color(red: 241/255, green: 243/255, blue: 255/255))
+            .background(Color(red: 0.94, green: 0.96, blue: 1.0))
         }
-        .background(Color(red: 241/255, green: 243/255, blue: 255/255))
+        .background(Color(red: 0.94, green: 0.96, blue: 1.0))
         .onAppear {
             viewModel.connectAndJoin(chatId: chat.id)
             viewModel.listenForMessageRead()
