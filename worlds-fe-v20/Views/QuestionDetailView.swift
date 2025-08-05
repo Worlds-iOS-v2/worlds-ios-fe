@@ -178,8 +178,12 @@ struct QuestionDetailView: View {
                                     .padding(.top, 10)
                             } else {
                                 ForEach(commentVM.replies(for: nil)) { comment in
-                                    CommentRow(comment: comment, depth: 0, allComments: commentVM.comments)
-                                        .environmentObject(commentVM)
+                                    if #available(iOS 18.0, *) {
+                                        CommentRow(comment: comment, depth: 0, allComments: commentVM.comments)
+                                            .environmentObject(commentVM)
+                                    } else {
+                                        // Fallback on earlier versions
+                                    }
                                 }
                             }
                         }

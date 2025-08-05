@@ -153,6 +153,18 @@ class UserAPIManager {
                 UserDefaults.standard.set(response.accessToken, forKey: "accessToken")
                 UserDefaults.standard.set(response.refreshToken, forKey: "refreshToken")
                 
+                do {
+                    let userInfoResponse = try await self.getUserInfo()
+                    if let userId = userInfoResponse.userInfo?.id {
+                        UserDefaults.standard.set(userId, forKey: "userId")
+                        print("getUserInfo로 userId 저장:", userId)
+                    } else {
+                        print("getUserInfo 응답에 userId 없음!")
+                    }
+                } catch {
+                    print("userId 저장용 getUserInfo 실패:", error)
+                }
+
                 // 유저 이름 저장
                 UserDefaults.standard.set(response.username, forKey: "username")
                 
