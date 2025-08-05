@@ -44,7 +44,7 @@ struct MyPageView: View {
                     .padding(.horizontal, 32)
                     .onAppear{
                         Task {
-                            // await viewModel.fetchMyQuestions()
+                            await viewModel.fetchMyQuestions()
                         }
                     }
                     
