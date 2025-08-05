@@ -63,12 +63,9 @@ struct UserInfoCardView: View {
                     
                     Spacer()
                     
-                    Button {
-                        
-                    } label: {
+                    NavigationLink(destination: ResetPasswordView()) {
                         Text("비밀번호 재설정")
                     }
-
                 }
                 .padding(.bottom, 16)
             }
