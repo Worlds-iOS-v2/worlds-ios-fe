@@ -34,8 +34,9 @@ final class SignUpViewModel: ObservableObject {
             
             return false
         } catch {
-            self.errorMessage = "회원가입 실패: \(error.localizedDescription)"
-            print(errorMessage)
+            if error.localizedDescription == "The data couldn’t be read because it isn’t in the correct format." {
+                self.errorMessage = "접근이 제한되었습니다. 관리자에게 문의하세요."
+            }
             
             return false
         }
