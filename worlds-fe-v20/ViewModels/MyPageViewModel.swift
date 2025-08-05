@@ -27,10 +27,7 @@ final class MyPageViewModel: ObservableObject {
     @MainActor
     func fetchMyQuestions() async {
         do {
-            let response = try await UserAPIManager.shared.getMyQuestions()
-            guard let questions = response.data as? [QuestionList] else {
-                fatalError("Unexpected response format")
-            }
+            let questions = try await UserAPIManager.shared.getMyQuestions()
             self.questions = questions
             print("\(questions)")
             self.errorMessage = nil
