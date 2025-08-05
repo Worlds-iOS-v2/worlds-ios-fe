@@ -154,7 +154,7 @@ struct UserAPITestView: View {
     
     func changePassword() async {
         do {
-            let user = try await UserAPIManager.shared.changePassword(oldPassword: old, newPassword: new)
+            let user = try await UserAPIManager.shared.resetPassword(oldPassword: old, newPassword: new)
             print("비번변경: \(user)")
         } catch {
             errorMessage = error.localizedDescription
