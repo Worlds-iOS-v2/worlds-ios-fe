@@ -420,7 +420,7 @@ class UserAPIManager {
     }
     
     // 비밀번호 변경
-    func changePassword(oldPassword: String, newPassword: String) async throws -> APIResponse {
+    func resetPassword(oldPassword: String, newPassword: String) async throws -> APIResponse {
         guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
             print("토큰 값이 유효하지 않습니다.")
             throw UserAPIError.invalidToken
