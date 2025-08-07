@@ -8,26 +8,8 @@
 import SwiftUI
 
 struct ChatListView: View {
-    let mockChats: [ChatRoom] = [
-        ChatRoom(
-            id: 1,
-            userAId: 1,
-            userBId: 2,
-            createdAt: "2025-08-01T12:00:00Z",
-            userA: ChatUser(id: 1, userName: "나"),
-            userB: ChatUser(id: 2, userName: "김도영 선생님"),
-            messages: [
-                Message(
-                    id: 1,
-                    roomId: 1,
-                    senderId: 2,
-                    content: "안녕하세요!",
-                    isRead: true,
-                    createdAt: "2025-08-01T12:05:00Z"
-                )
-            ]
-        )
-    ]
+    @State private var chatRooms: [ChatRoom] = []
+    @State private var isPresentingAddChatView = false
 
     var body: some View {
         NavigationStack {
@@ -40,6 +22,9 @@ struct ChatListView: View {
                     Image(systemName: "plus")
                         .font(.system(size: 22, weight: .bold))
                         .alignmentGuide(.firstTextBaseline) { d in d[.bottom] }
+                        .onTapGesture {
+                                isPresentingAddChatView = true
+                        }
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 20)
@@ -49,7 +34,7 @@ struct ChatListView: View {
                 // 채팅방 리스트
                 ScrollView {
                     VStack(spacing: 12) {
-                        ForEach(mockChats) { chat in
+                        ForEach(chatRooms) { chat in
                             NavigationLink(destination: ChatDetailView(chat: chat)) {
                                 ChatRow(chat: chat)
                             }
@@ -58,19 +43,43 @@ struct ChatListView: View {
                     .padding(.top, 8)
                 }
             }
+            .onAppear {
+                SocketService.shared.fetchChatRooms { rooms in
+                    guard let rooms = rooms else {
+                        print("❌ rooms가 nil임")
+                        return
+                    }
+                    DispatchQueue.main.async {
+                        print("✅ rooms.count: \(rooms.count)")
+                        self.chatRooms = rooms
+                    }
+                }
+            }
             .background(Color(red: 0.94, green: 0.96, blue: 1.0))
             .ignoresSafeArea(edges: .bottom)
+            .sheet(isPresented: $isPresentingAddChatView) {
+                AddChatView()
+            }
         }
     }
 }
 
 struct ChatRow: View {
     var chat: ChatRoom
+    
+    var currentUserId = UserDefaults.standard.integer(forKey: "userId")
+    let partnerName: String
+
+    init(chat: ChatRoom) {
+        self.chat = chat
+        self.currentUserId = UserDefaults.standard.integer(forKey: "userId")
+        self.partnerName = (chat.userA.id == currentUserId) ? chat.userB.userName : chat.userA.userName
+    }
 
     var body: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 6) {
-                Text(chat.userB.userName)
+                Text(partnerName)
                     .font(.headline)
                     .fontWeight(.bold)
                     .foregroundColor(.black)
@@ -79,9 +88,11 @@ struct ChatRow: View {
                     .foregroundColor(.gray)
             }
             Spacer()
-            Text(chat.messages.last?.formattedDate ?? "")
-                .font(.footnote)
-                .foregroundColor(.gray)
+            if let lastMessage = chat.messages.last {
+                Text(lastMessage.formattedDate)
+                    .font(.footnote)
+                    .foregroundColor(.gray)
+            }
         }
         .padding(.vertical, 20)
         .padding(.horizontal)
@@ -100,7 +111,9 @@ extension Message {
         formatter.locale = Locale(identifier: "ko_KR")
         formatter.dateFormat = "M월 d일"
 
-        let isoFormatter = ISO8601DateFormatter()
+        let isoFormatter = DateFormatter()
+        isoFormatter.locale = Locale(identifier: "en_US_POSIX")
+        isoFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
         if let date = isoFormatter.date(from: createdAt) {
             return formatter.string(from: date)
         }

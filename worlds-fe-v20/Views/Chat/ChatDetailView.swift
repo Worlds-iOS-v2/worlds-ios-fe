@@ -13,6 +13,12 @@ struct ChatDetailView: View {
     @State private var messageText: String = ""
     @StateObject private var viewModel = ChatViewModel()
     @Environment(\.dismiss) private var dismiss
+    @FocusState private var isTextFieldFocused: Bool
+
+    var targetUserName: String {
+        let currentUserId = UserDefaults.standard.integer(forKey: "userId")
+        return (chat.userA.id == currentUserId) ? chat.userB.userName : chat.userA.userName
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -25,7 +31,7 @@ struct ChatDetailView: View {
                         .foregroundColor(.black)
                 }
                 Spacer()
-                Text(chat.name)
+                Text(targetUserName)
                     .font(.headline)
                     .bold()
                 Spacer()
@@ -37,13 +43,25 @@ struct ChatDetailView: View {
             // 메시지 목록
             ScrollViewReader { proxy in
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 10) {
-                        ForEach(viewModel.messages) { message in
-                            ChatBubble(message: message)
-                                .id(message.id)
+                    VStack(alignment: .leading, spacing: 4) {
+                        ForEach(viewModel.groupedMessages.keys.sorted(), id: \.self) { date in
+                            VStack(alignment: .leading, spacing: 4) {
+                                DateHeader(dateString: date)
+                                ForEach(viewModel.groupedMessages[date] ?? []) { message in
+                                    ChatBubble(message: message)
+                                        .id(message.id)
+                                }
+                            }
                         }
                     }
                     .padding()
+                }
+                .onChange(of: viewModel.messages.count) { _ in
+                    if let lastId = viewModel.messages.last?.id {
+                        withAnimation {
+                            proxy.scrollTo(lastId, anchor: .bottom)
+                        }
+                    }
                 }
             }
 
@@ -62,11 +80,15 @@ struct ChatDetailView: View {
                         RoundedRectangle(cornerRadius: 20)
                             .stroke(Color.blue, lineWidth: 1)
                     )
+                    .focused($isTextFieldFocused)
 
                 Button(action: {
                     guard !messageText.trimmingCharacters(in: .whitespaces).isEmpty else { return }
-                    viewModel.sendMessage(chatId: chat.id, userId: "your-user-id", content: messageText) // 실제 사용자 id로 교체
+                    if let currentUserId = UserDefaults.standard.integer(forKey: "userId") as Int? {
+                        viewModel.sendMessage(chatId: chat.id, userId: currentUserId, content: messageText)
+                    }
                     messageText = ""
+                    isTextFieldFocused = false
                 }) {
                     Image(systemName: "arrow.up.circle.fill")
                         .font(.title2)
@@ -78,8 +100,10 @@ struct ChatDetailView: View {
         }
         .background(Color(red: 0.94, green: 0.96, blue: 1.0))
         .onAppear {
+            viewModel.fetchMessages(for: chat.id)
             viewModel.connectAndJoin(chatId: chat.id)
             viewModel.listenForMessageRead()
+            viewModel.onReceiveMessage()
         }
         .onDisappear {
             viewModel.disconnect()
@@ -89,69 +113,91 @@ struct ChatDetailView: View {
     }
 }
 
+// 날짜 헤더 뷰
+struct DateHeader: View {
+    let dateString: String
+    var body: some View {
+        Text(dateString)
+            .font(.caption)
+            .foregroundColor(.gray)
+            .padding(.vertical, 6)
+            .frame(maxWidth: .infinity)
+            .background(Color.gray.opacity(0.1))
+            .cornerRadius(10)
+            .padding(.bottom, 4)
+    }
+}
+
 // 말풍선
 struct ChatBubble: View {
     var message: Message
 
     var body: some View {
-        VStack(alignment: message.isSender ? .trailing : .leading, spacing: 2) {
-            HStack {
-                if message.isSender {
-                    Spacer()
-                    Text(message.content)
-                        .padding(10)
-                        .foregroundColor(.white)
-                        .background(Color.blue)
-                        .cornerRadius(15)
-                } else {
-                    Text(message.content)
-                        .padding(10)
-                        .background(Color.white)
-                        .cornerRadius(15)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 15)
-                                .stroke(Color.gray.opacity(0.2), lineWidth: 0.5)
-                        )
-                    Spacer()
-                }
-            }
-
+        HStack(alignment: .bottom, spacing: 4) {
             if message.isSender {
-                HStack(spacing: 4) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        if message.isRead {
-                            Text("읽음")
-                                .font(.caption2)
-                                .foregroundColor(.gray)
-                        }
-                        Text(timeString(from: message.createdAt))
+                Spacer()
+
+                // 시간 + 읽음
+                VStack(alignment: .trailing, spacing: 2) {
+                    if message.isRead {
+                        Text("읽음")
                             .font(.caption2)
                             .foregroundColor(.gray)
                     }
-                    .padding(.bottom, 4)
-                    Spacer().frame(width: 50)
-                }
-                .padding(.trailing, 10)
-            } else {
-                HStack {
-                    Spacer()
                     Text(timeString(from: message.createdAt))
                         .font(.caption2)
                         .foregroundColor(.gray)
                 }
-                .padding(.leading, 10)
+
+                // 말풍선
+                Text(message.content)
+                    .padding(10)
+                    .foregroundColor(.white)
+                    .background(Color.blue)
+                    .cornerRadius(15)
+
+            } else {
+                // 말풍선
+                Text(message.content)
+                    .padding(10)
+                    .background(Color.white)
+                    .cornerRadius(15)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 15)
+                            .stroke(Color.gray.opacity(0.2), lineWidth: 0.5)
+                    )
+
+                // 시간
+                Text(timeString(from: message.createdAt))
+                    .font(.caption2)
+                    .foregroundColor(.gray)
+
+                Spacer()
             }
         }
         .padding(.horizontal, 10)
     }
 
-    func timeString(from isoDate: String) -> String {
-        let formatter = ISO8601DateFormatter()
-        if let date = formatter.date(from: isoDate) {
+    func timeString(from dateString: String) -> String {
+        // 1. ISO 형식 시도
+        let isoFormatter = ISO8601DateFormatter()
+        isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let isoDate = isoFormatter.date(from: dateString) {
             let displayFormatter = DateFormatter()
             displayFormatter.dateFormat = "HH:mm"
-            return displayFormatter.string(from: date)
+            return displayFormatter.string(from: isoDate)
         }
-        return ""
+
+        // 2. 일반적인 날짜 형식 시도 (예비 처리)
+        let fallbackFormatter = DateFormatter()
+        fallbackFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        fallbackFormatter.locale = Locale(identifier: "en_US_POSIX")
+        if let fallbackDate = fallbackFormatter.date(from: dateString) {
+            let displayFormatter = DateFormatter()
+            displayFormatter.dateFormat = "HH:mm"
+            return displayFormatter.string(from: fallbackDate)
+        }
+
+        return "(시간 오류)"
     }
 }

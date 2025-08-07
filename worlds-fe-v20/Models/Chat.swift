@@ -36,7 +36,7 @@ struct ChatUser: Codable {
 }
 
 struct Message: Identifiable, Codable {
-    let id: Int // 백 확인 필요~~
+    let id: Int
     let roomId: Int
     let senderId: Int
     let content: String
@@ -44,7 +44,7 @@ struct Message: Identifiable, Codable {
     let createdAt: String
 
     var isSender: Bool {
-        // 나중에 ViewModel에서 현재 로그인 유저 ID와 비교 필요
-        return false
+        let currentUserId = UserDefaults.standard.integer(forKey: "userId")
+        return senderId == currentUserId
     }
 }
