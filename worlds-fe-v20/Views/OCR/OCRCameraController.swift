@@ -24,12 +24,17 @@ class OCRCameraController: UIViewController, AVCapturePhotoCaptureDelegate {
     private var currentInput: AVCaptureDeviceInput?
     private var previewLayer: AVCaptureVideoPreviewLayer?
     var cameraPosition: AVCaptureDevice.Position = .back
+    
+    private var initialZoom: CGFloat = 1.0
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .backgroundws
         setupPreviewLayer()
         configureCaptureSession(position: cameraPosition)
+        
+        let pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(handlePinch(_:)))
+        view.addGestureRecognizer(pinchGesture)
     }
 
     override func viewDidLayoutSubviews() {
@@ -145,6 +150,25 @@ class OCRCameraController: UIViewController, AVCapturePhotoCaptureDelegate {
         }
         print("이미지 생성 성공: \(image.size)")
         delegate?.didCapturePhoto(image)
+    }
+    
+    @objc func handlePinch(_ gesture: UIPinchGestureRecognizer) {
+        guard let device = currentInput?.device else { return }
+        
+        if gesture.state == .began {
+            initialZoom = device.videoZoomFactor
+        }
+        
+        var zoomFactor = initialZoom * gesture.scale
+        zoomFactor = max(1.0, min(device.activeFormat.videoMaxZoomFactor, zoomFactor))
+        
+        do {
+            try device.lockForConfiguration()
+            device.videoZoomFactor = zoomFactor
+            device.unlockForConfiguration()
+        } catch {
+            print("줌 설정 실패: \(error)")
+        }
     }
 }
 
