@@ -26,7 +26,8 @@ class OCRCameraController: UIViewController, AVCapturePhotoCaptureDelegate {
     var cameraPosition: AVCaptureDevice.Position = .back
     
     private var initialZoom: CGFloat = 1.0
-
+    private var focusIndicatorView: UIView?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .backgroundws
@@ -35,13 +36,16 @@ class OCRCameraController: UIViewController, AVCapturePhotoCaptureDelegate {
         
         let pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(handlePinch(_:)))
         view.addGestureRecognizer(pinchGesture)
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
+        view.addGestureRecognizer(tapGesture)
     }
-
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         previewLayer?.frame = view.bounds
     }
-
+    
     // 미리보기 레이어 설정
     private func setupPreviewLayer() {
         let previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
@@ -50,7 +54,7 @@ class OCRCameraController: UIViewController, AVCapturePhotoCaptureDelegate {
         view.layer.addSublayer(previewLayer)
         self.previewLayer = previewLayer
     }
-
+    
     // 카메라 권한 요청
     func requestCameraPermission() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
@@ -73,7 +77,7 @@ class OCRCameraController: UIViewController, AVCapturePhotoCaptureDelegate {
             print("알 수 없는 권한 상태입니다.")
         }
     }
-
+    
     // 캡처 세션 구성 및 카메라 전환
     func configureCaptureSession(position: AVCaptureDevice.Position) {
         cameraPosition = position
@@ -118,13 +122,13 @@ class OCRCameraController: UIViewController, AVCapturePhotoCaptureDelegate {
             self.captureSession.startRunning()
         }
     }
-
+    
     // 카메라 전환
     func switchCamera() {
         let newPosition: AVCaptureDevice.Position = (cameraPosition == .back) ? .front : .back
         configureCaptureSession(position: newPosition)
     }
-
+    
     // 사진 촬영
     func capturePhoto() {
         guard let photoOutput = photoOutput, captureSession.isRunning else {
@@ -134,7 +138,7 @@ class OCRCameraController: UIViewController, AVCapturePhotoCaptureDelegate {
         let settings = AVCapturePhotoSettings()
         photoOutput.capturePhoto(with: settings, delegate: self)
     }
-
+    
     // MARK: - AVCapturePhotoCaptureDelegate
     // 사진 촬영 결과 콜백
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
@@ -152,6 +156,7 @@ class OCRCameraController: UIViewController, AVCapturePhotoCaptureDelegate {
         delegate?.didCapturePhoto(image)
     }
     
+    // 줌 기능
     @objc func handlePinch(_ gesture: UIPinchGestureRecognizer) {
         guard let device = currentInput?.device else { return }
         
@@ -168,6 +173,66 @@ class OCRCameraController: UIViewController, AVCapturePhotoCaptureDelegate {
             device.unlockForConfiguration()
         } catch {
             print("줌 설정 실패: \(error)")
+        }
+    }
+    
+    // 초점 설정
+    @objc func handleTap(_ gesture: UITapGestureRecognizer) {
+        let location = gesture.location(in: view)
+        focus(at: location)
+        showFocusIndicator(at: location)
+    }
+    
+    // 초점 표시 UI 표시
+    private func showFocusIndicator(at point: CGPoint) {
+        // 기존 표시 제거
+        focusIndicatorView?.removeFromSuperview()
+        
+        // 새로운 초점 표시 생성
+        let indicatorSize: CGFloat = 80
+        let indicator = UIView(frame: CGRect(x: point.x - indicatorSize/2, y: point.y - indicatorSize/2, width: indicatorSize, height: indicatorSize))
+        indicator.backgroundColor = UIColor.clear
+        indicator.layer.borderWidth = 2.0
+        indicator.layer.borderColor = UIColor.white.cgColor
+        indicator.layer.cornerRadius = indicatorSize/2
+        
+        view.addSubview(indicator)
+        focusIndicatorView = indicator
+        
+        // 애니메이션 효과
+        indicator.transform = CGAffineTransform(scaleX: 1.5, y: 1.5)
+        UIView.animate(withDuration: 0.2, animations: {
+            indicator.transform = CGAffineTransform.identity
+        }) { _ in
+            // 1초 후 제거
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                UIView.animate(withDuration: 0.3, animations: {
+                    indicator.alpha = 0
+                }) { _ in
+                    indicator.removeFromSuperview()
+                    if self.focusIndicatorView == indicator {
+                        self.focusIndicatorView = nil
+                    }
+                }
+            }
+        }
+    }
+    
+    // 화면상 좌표를 카메라 좌표로 변환하여 포커스 적용
+    private func focus(at point: CGPoint) {
+        guard let device = currentInput?.device, device.isFocusPointOfInterestSupported, device.isExposurePointOfInterestSupported else { return }
+        let viewSize = view.bounds.size
+        // 미리보기 레이어의 좌표계를 사용: (0,0) ~ (1,1)
+        let focusPoint = CGPoint(x: point.y/viewSize.height, y: 1.0 - point.x/viewSize.width)
+        do {
+            try device.lockForConfiguration()
+            device.focusPointOfInterest = focusPoint
+            device.focusMode = .autoFocus
+            device.exposurePointOfInterest = focusPoint
+            device.exposureMode = .continuousAutoExposure
+            device.unlockForConfiguration()
+        } catch {
+            print("포커스/노출 설정 실패: \(error)")
         }
     }
 }
