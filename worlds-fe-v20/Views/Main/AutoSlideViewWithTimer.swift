@@ -10,7 +10,9 @@ import SwiftUI
 struct AutoSlideViewWithTimer: View {
     // MARK: - properties
     /// 무한으로 순환할 배열
-    var colors: [Color] = [.red, .orange, .yellow, .blue, .green]
+    // var thumbnails: [Color] = [.red, .orange, .yellow, .blue, .green]
+    let datas: [EventProgram]
+
     /// 애니메이션 타이머
     @State private var timer: Timer?
     /// 현재 인덱스 저장
@@ -23,15 +25,50 @@ struct AutoSlideViewWithTimer: View {
             // MARK: - Image Slide
             InfinitePageBaseView(
                 selection: $currentIndex,
-                before: { $0 == 0 ? colors.count - 1 : $0 - 1 },
-                after: { $0 == colors.count - 1 ? 0 : $0 + 1 },
+                before: { $0 == 0 ? datas.count - 1 : $0 - 1 },
+                after: { $0 == datas.count - 1 ? 0 : $0 + 1 },
                 view: { index in
                     ZStack {
-                        Rectangle()
-                            .fill(colors[index])
-                            .tag(index)
-                    } // Z
+                        VStack(spacing: 0) {
+                            Rectangle()
+                                .fill(.black)
+                                .tag(index)
+                            
+                            Link(destination: URL(string: "https://www.notion.so/World-Study-_2-0-0-1fc800c9877b80d6a86ce296013ec7d7?source=copy_link")!) {
+                                VStack(alignment: .leading) {
+                                    HStack {
+                                        Text(datas[index].title)
+                                            .font(.headline)
+                                            .foregroundColor(.black)
+                                        
+                                        Spacer()
+                                        
+                                        Text(datas[index].location)
+                                            .font(.caption)
+                                            .foregroundColor(.black)
+                                    }
+                                    .padding(.bottom, 12)
+                                    
+                                    Text("신청 기간: \(datas[index].applicationPeriod)")
+                                        .font(.caption)
+                                        .foregroundColor(.gray)
+                                        .padding(.bottom, 4)
+                                    
+                                    Text("활동 기간: \(datas[index].programPeriod)")
+                                        .font(.caption)
+                                        .foregroundColor(.gray)
+                                }
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background{
+                                    Rectangle()
+                                        .fill(Color.backgroundws)
+                                }
+                            }
+                        }
+                    }
                     .ignoresSafeArea()
+                    .cornerRadius(16)
                 })
             // 인덱스 변화
             .onChange(of: currentIndex) { newIndex in  // iOS 16 방식
@@ -50,7 +87,6 @@ struct AutoSlideViewWithTimer: View {
             .onDisappear {
                 stopTimer()
             }
-            .cornerRadius(16)
             .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
             
             // 인디케이터
@@ -63,7 +99,7 @@ extension AutoSlideViewWithTimer {
     // MARK: - Slides
     /// 다음 아이템으로 이동
     private func moveToNextIndex() {
-        let nextIndex = (currentIndex + 1) % colors.count
+        let nextIndex = (currentIndex + 1) % datas.count
         withAnimation() {
             currentIndex = nextIndex
         }
@@ -117,9 +153,9 @@ extension AutoSlideViewWithTimer {
     /// 이미지 커스텀 인디케이터
     private func imageCustomIndicator() -> some View {
         ZStack {
-            if colors.count > 1 {
+            if datas.count > 1 {
                 HStack(spacing: 4) {
-                    ForEach(colors.indices, id: \.self) { index in
+                    ForEach(datas.indices, id: \.self) { index in
                         Capsule()
                             .stroke(.sub1Ws, lineWidth: 1)
                             .frame(width: currentIndex == index ? 16 : 6, height: 6)
@@ -135,6 +171,6 @@ extension AutoSlideViewWithTimer {
 }
 
 
-#Preview {
-    AutoSlideViewWithTimer()
-}
+//#Preview {
+//    AutoSlideViewWithTimer()
+//}
