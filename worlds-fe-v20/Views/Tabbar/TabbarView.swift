@@ -30,11 +30,11 @@ struct TabbarView: View {
                     }
                 
                 // 채팅
-                //ChatView()
-//                    .tabItem {
-//                        Image(systemName: "message")
-//                        Text("Chat")
-//                    }
+                ChatListView()
+                    .tabItem {
+                        Image(systemName: "message")
+                        Text("Chat")
+                    }
                 
                 // 마이페이지
                 MyPageView()

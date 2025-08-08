@@ -33,7 +33,7 @@ class OCRCameraController: UIViewController, AVCapturePhotoCaptureDelegate {
         view.backgroundColor = .backgroundws
         setupPreviewLayer()
         configureCaptureSession(position: cameraPosition)
-        
+
         let pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(handlePinch(_:)))
         view.addGestureRecognizer(pinchGesture)
         
@@ -45,7 +45,7 @@ class OCRCameraController: UIViewController, AVCapturePhotoCaptureDelegate {
         super.viewDidLayoutSubviews()
         previewLayer?.frame = view.bounds
     }
-    
+
     // 미리보기 레이어 설정
     private func setupPreviewLayer() {
         let previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
@@ -54,7 +54,7 @@ class OCRCameraController: UIViewController, AVCapturePhotoCaptureDelegate {
         view.layer.addSublayer(previewLayer)
         self.previewLayer = previewLayer
     }
-    
+
     // 카메라 권한 요청
     func requestCameraPermission() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
@@ -77,7 +77,7 @@ class OCRCameraController: UIViewController, AVCapturePhotoCaptureDelegate {
             print("알 수 없는 권한 상태입니다.")
         }
     }
-    
+
     // 캡처 세션 구성 및 카메라 전환
     func configureCaptureSession(position: AVCaptureDevice.Position) {
         cameraPosition = position
@@ -122,13 +122,13 @@ class OCRCameraController: UIViewController, AVCapturePhotoCaptureDelegate {
             self.captureSession.startRunning()
         }
     }
-    
+
     // 카메라 전환
     func switchCamera() {
         let newPosition: AVCaptureDevice.Position = (cameraPosition == .back) ? .front : .back
         configureCaptureSession(position: newPosition)
     }
-    
+
     // 사진 촬영
     func capturePhoto() {
         guard let photoOutput = photoOutput, captureSession.isRunning else {
@@ -138,7 +138,7 @@ class OCRCameraController: UIViewController, AVCapturePhotoCaptureDelegate {
         let settings = AVCapturePhotoSettings()
         photoOutput.capturePhoto(with: settings, delegate: self)
     }
-    
+
     // MARK: - AVCapturePhotoCaptureDelegate
     // 사진 촬영 결과 콜백
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
