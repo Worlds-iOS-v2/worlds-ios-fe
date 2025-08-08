@@ -65,7 +65,7 @@ struct MainView: View {
                     }
                 }
                 
-                AutoSlideViewWithTimer()
+                AutoSlideViewWithTimer(datas: CultureDetailViewModel().dummyEventData)
                     .frame(height: 300)
                     .padding(.horizontal, 24)
                 
