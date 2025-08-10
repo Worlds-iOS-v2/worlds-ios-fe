@@ -115,13 +115,15 @@ class SocketService {
         task.resume()
     }
 
-    /// 주어진 roomId에 해당하는 메시지 목록을 REST API로 요청
+    /// 주어진 roomId에 해당하는 메시지 목록을 REST API로 요청 (take/skip 지원)
     /// - Parameters:
     ///   - roomId: 채팅방 ID
+    ///   - take: 가져올 개수
+    ///   - skip: 건너뛸 개수
     ///   - completion: 응답으로 받은 메시지 배열(JSON)을 반환하는 클로저
-    func fetchMessages(roomId: Int, completion: @escaping ([[String: Any]]?) -> Void) {
+    func fetchMessages(roomId: Int, take: Int, skip: Int, completion: @escaping ([[String: Any]]?) -> Void) {
         guard let baseUrl = Bundle.main.object(forInfoDictionaryKey: "APIBaseURL") as? String,
-              let url = URL(string: "\(baseUrl)/chat/messages/\(roomId)") else {
+              let url = URL(string: "\(baseUrl)/chat/messages/\(roomId)?take=\(take)&skip=\(skip)") else {
             print("❌ Invalid APIBaseURL or URL format")
             completion(nil)
             return
@@ -133,11 +135,12 @@ class SocketService {
         request.httpMethod = "GET"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
-        if let accessToken = UserDefaults.standard.string(forKey: "accessToken") {
-            request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-        } else {
-            print("❌ accessToken 없음")
+        guard let accessToken = UserDefaults.standard.string(forKey: "accessToken") else {
+            print("❌ accessToken 없음. 메시지 불러오기 중단")
+            completion(nil)
+            return
         }
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
 
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
@@ -148,6 +151,11 @@ class SocketService {
 
             if let httpResponse = response as? HTTPURLResponse {
                 print("📥 Status code:", httpResponse.statusCode)
+                if !(200...299).contains(httpResponse.statusCode) {
+                    print("❌ 서버 비정상 응답. body:", String(data: data ?? Data(), encoding: .utf8) ?? "nil")
+                    completion(nil)
+                    return
+                }
             }
 
             guard let data = data else {
@@ -173,6 +181,13 @@ class SocketService {
         }
 
         task.resume()
+    }
+
+    /// (레거시) 기본값으로 호출할 수 있는 편의 메서드. 추후 제거 예정.
+    func fetchMessages(roomId: Int, completion: @escaping ([[String: Any]]?) -> Void) {
+        let defaultTake = 20
+        let defaultSkip = 0
+        fetchMessages(roomId: roomId, take: defaultTake, skip: defaultSkip, completion: completion)
     }
     
     /// 메시지를 서버로 전송

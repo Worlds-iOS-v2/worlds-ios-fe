@@ -44,10 +44,15 @@ struct ChatDetailView: View {
             ScrollViewReader { proxy in
                 ScrollView {
                     VStack(alignment: .leading, spacing: 4) {
-                        ForEach(viewModel.groupedMessages.keys.sorted(), id: \.self) { date in
+                        Color.clear
+                            .frame(height: 1)
+                            .onAppear {
+                                viewModel.loadOlder(roomId: chat.id)
+                            }
+                        ForEach(viewModel.groupedMessages.keys.sorted(by: { headerDate(from: $0) < headerDate(from: $1) }), id: \.self) { date in
                             VStack(alignment: .leading, spacing: 4) {
                                 DateHeader(dateString: date)
-                                ForEach(viewModel.groupedMessages[date] ?? []) { message in
+                                ForEach(viewModel.groupedMessages[date] ?? [], id: \.id) { message in
                                     ChatBubble(message: message)
                                         .id(message.id)
                                 }
@@ -100,10 +105,12 @@ struct ChatDetailView: View {
         }
         .background(Color(red: 0.94, green: 0.96, blue: 1.0))
         .onAppear {
-            viewModel.fetchMessages(for: chat.id)
+            if !chat.messages.isEmpty {
+                viewModel.seed(initialMessages: chat.messages)
+            }
             viewModel.connectAndJoin(chatId: chat.id)
+            viewModel.loadLatestFirst(roomId: chat.id)
             viewModel.listenForMessageRead()
-            viewModel.onReceiveMessage()
         }
         .onDisappear {
             viewModel.disconnect()
@@ -200,4 +207,22 @@ struct ChatBubble: View {
 
         return "(시간 오류)"
     }
+}
+
+// MARK: - Local helper for header sorting (View-only)
+fileprivate func headerDate(from header: String) -> Date {
+    // Expected header like: "2025년 8월 10일 일요일"
+    let fmt = DateFormatter()
+    fmt.locale = Locale(identifier: "ko_KR")
+    fmt.calendar = Calendar(identifier: .gregorian)
+    fmt.dateFormat = "yyyy년 M월 d일 EEEE"
+    if let d = fmt.date(from: header) {
+        return d
+    }
+    // Fallback
+    let alt = DateFormatter()
+    alt.locale = Locale(identifier: "en_US_POSIX")
+    alt.calendar = Calendar(identifier: .gregorian)
+    alt.dateFormat = "yyyy-MM-dd"
+    return alt.date(from: header) ?? Date.distantPast
 }
