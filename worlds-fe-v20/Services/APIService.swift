@@ -60,6 +60,17 @@ func fetchQuestionDetail(questionId: Int) async throws -> QuestionDetail {
     return response
 }
 
+// 질문 상세의 첨부(썸네일)만 최소 디코딩해서 가져오기
+func fetchQuestionAttachments(questionId: Int) async throws -> [String]? {
+    struct QuestionDetailMinimal: Decodable { let attachments: [String]? }
+    let headers = try getAuthHeaders()
+    let response = try await AF.request("\(baseURL)/questions/\(questionId)", headers: headers)
+        .validate()
+        .serializingDecodable(QuestionDetailMinimal.self)
+        .value
+    return response.attachments
+}
+
 //질문 생성
 func createQuestion(title: String, content: String, category: String, images: [Data]? = nil) async throws -> Bool {
     let headers = try getAuthHeaders()
