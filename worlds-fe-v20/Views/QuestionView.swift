@@ -18,6 +18,7 @@ struct QuestionView: View {
     @State private var selectedCategory: Category = .all
     
     @ObservedObject var viewModel: QuestionViewModel
+    @Environment(\.scenePhase) private var scenePhase
     
     let categories: [Category] = [.all, .study, .free]
     
@@ -128,6 +129,9 @@ struct QuestionView: View {
                         .padding(.top, 8)
                         .padding(.horizontal, 20)
                     }
+                    .refreshable {
+                        await viewModel.fetchQuestions()
+                    }
                     
                     Spacer()
                 }
@@ -173,6 +177,11 @@ struct QuestionView: View {
                 }
             }
             .navigationBarHidden(true)
+            .onChange(of: scenePhase) { newPhase in
+                if newPhase == .active {
+                    Task { await viewModel.fetchQuestions() }
+                }
+            }
         }
     }
 }
