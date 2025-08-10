@@ -267,20 +267,24 @@ func reportComment(commentId: Int, reason: String, etcReason: String? = nil, que
 }
 
 // 댓글 삭제
-func deleteComment(commentId: Int) async throws -> Bool {
-    let headers = try getAuthHeaders()
-    
-    let response = try await AF.request(
-        "\(baseURL)/comment/\(commentId)",
-        method: .delete,
-        headers: headers
-    )
+    func deleteComment(commentId: Int) async throws -> Bool {
+        let headers = try getAuthHeaders()
+
+        let dataResponse = try await AF.request(
+            "\(baseURL)/comment/\(commentId)",
+            method: .delete,
+            headers: headers
+        )
         .validate()
         .serializingData()
         .response
-    
-    return response.error == nil
-}
+
+        let status = dataResponse.response?.statusCode ?? -1
+        let bodyString = String(data: dataResponse.data ?? Data(), encoding: .utf8) ?? "<no body>"
+        print("🗑️ DELETE /comment/\(commentId) status=\(status) body=\(bodyString)")
+
+        return (200...299).contains(status)
+    }
 
 // 댓글 좋아요 토글
 func toggleCommentLike(commentId: Int) async throws -> CommentLike {
