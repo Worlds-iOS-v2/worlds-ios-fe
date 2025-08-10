@@ -101,6 +101,8 @@ struct ChatDetailView: View {
                             proxy.scrollTo(lastId, anchor: .bottom)
                         }
                     }
+                    // 새로 로드/도착한 받은 메시지들을 읽음 처리
+                    viewModel.markUnreadFromOthersAsRead(roomId: chat.id)
                 }
             }
 
@@ -144,6 +146,12 @@ struct ChatDetailView: View {
             }
             viewModel.connectAndJoin(chatId: chat.id)
             viewModel.loadLatestFirst(roomId: chat.id)
+
+            // 초기 로드가 끝난 뒤 읽음 처리
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                viewModel.markUnreadFromOthersAsRead(roomId: chat.id)
+            }
+
             viewModel.listenForMessageRead()
         }
         .onDisappear {

@@ -25,6 +25,7 @@ class SocketService {
         static let sendMessage = "send_message"
         static let receiveMessage = "receive_message"
         static let messageRead = "message_read"
+        static let markRead = "message_read" // emit용 (서버와 동일 이벤트명 사용)
     }
     
     private var manager: SocketManager!
@@ -291,5 +292,41 @@ class SocketService {
                 completion(nil)
             }
         }.resume()
+    }
+    /// 단일 메시지 읽음 처리(소켓 emit)
+    /// - Parameters:
+    ///   - roomId: 채팅방 ID
+    ///   - messageId: 읽음 처리할 메시지 ID
+    func emitMessageRead(roomId: Int, messageId: Int) {
+        guard let userId = currentUserId else {
+            print("❌ emitMessageRead 실패: currentUserId 없음")
+            return
+        }
+        let payload: [String: Any] = [
+            "roomId": roomId,
+            "userId": userId,
+            "messageId": messageId
+        ]
+        print("📤 emit message_read:", payload)
+        socket.emit(Event.markRead, payload)
+    }
+
+    /// 여러 메시지 일괄 읽음 처리(소켓 emit)
+    /// 서버가 단건만 받는다면 내부에서 순차 호출
+    /// - Parameters:
+    ///   - roomId: 채팅방 ID
+    ///   - messageIds: 읽음 처리할 메시지 ID 배열
+    func emitMessagesRead(roomId: Int, messageIds: [Int]) {
+        guard !messageIds.isEmpty else { return }
+        // 서버가 배열 payload를 받도록 구현되어 있다면 아래 주석을 사용하고,
+        // 단건만 받는다면 forEach로 단건 emit
+        // let payload: [String: Any] = [
+        //     "roomId": roomId,
+        //     "userId": currentUserId ?? 0,
+        //     "messageIds": messageIds
+        // ]
+        // socket.emit(Event.markRead, payload)
+
+        messageIds.forEach { emitMessageRead(roomId: roomId, messageId: $0) }
     }
 }

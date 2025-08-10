@@ -216,4 +216,14 @@ class ChatViewModel: ObservableObject {
             }
         }
     }
+    /// 현재 로드된 메시지 중 내가 받은(unread) 것들을 읽음 처리
+    func markUnreadFromOthersAsRead(roomId: Int) {
+        let myId = UserDefaults.standard.integer(forKey: "userId")
+        let unreadIds = messages
+            .filter { $0.senderId != myId && $0.isRead == false }
+            .map { $0.id }
+        if !unreadIds.isEmpty {
+            SocketService.shared.emitMessagesRead(roomId: roomId, messageIds: unreadIds)
+        }
+    }
 }
