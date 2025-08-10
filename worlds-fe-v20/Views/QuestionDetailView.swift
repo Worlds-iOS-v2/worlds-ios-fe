@@ -29,6 +29,10 @@ struct QuestionDetailView: View {
     
     @State private var isImageViewerPresented: Bool = false
     @State private var selectedImageURL: URL? = nil
+    @State private var zoomScale: CGFloat = 1.0
+    @State private var lastZoomScale: CGFloat = 1.0
+    @State private var dragOffset: CGSize = .zero
+    @State private var accumulatedOffset: CGSize = .zero
     
     let reportReasons: [(label: String, value: ReportReason)] = [
         ("비속어", .offensive),
@@ -252,11 +256,52 @@ struct QuestionDetailView: View {
                                 case .empty:
                                     ProgressView()
                                 case .success(let image):
-                                    image
-                                        .resizable()
-                                        .scaledToFit()
-                                        .ignoresSafeArea()
-                                        .onTapGesture { isImageViewerPresented = false }
+                                    GeometryReader { proxy in
+                                        let magnify = MagnificationGesture()
+                                            .onChanged { value in
+                                                // value is relative to the start of this gesture
+                                                let relative = value / lastZoomScale
+                                                var newScale = zoomScale * relative
+                                                newScale = min(max(newScale, 1.0), 4.0) // clamp 1x ~ 4x
+                                                zoomScale = newScale
+                                                lastZoomScale = value
+                                            }
+                                            .onEnded { _ in
+                                                lastZoomScale = 1.0
+                                            }
+                                        let drag = DragGesture()
+                                            .onChanged { gesture in
+                                                guard zoomScale > 1.0 else { return }
+                                                dragOffset = CGSize(
+                                                    width: accumulatedOffset.width + gesture.translation.width,
+                                                    height: accumulatedOffset.height + gesture.translation.height
+                                                )
+                                            }
+                                            .onEnded { _ in
+                                                accumulatedOffset = dragOffset
+                                            }
+
+                                        image
+                                            .resizable()
+                                            .scaledToFit()
+                                            .scaleEffect(zoomScale)
+                                            .offset(dragOffset)
+                                            .frame(width: proxy.size.width, height: proxy.size.height)
+                                            .background(Color.black)
+                                            .ignoresSafeArea()
+                                            .gesture(drag)
+                                            .gesture(magnify)
+                                            .onTapGesture(count: 2) {
+                                                if zoomScale > 1.0 {
+                                                    // reset
+                                                    zoomScale = 1.0
+                                                    dragOffset = .zero
+                                                    accumulatedOffset = .zero
+                                                } else {
+                                                    zoomScale = 2.0
+                                                }
+                                            }
+                                    }
                                 case .failure:
                                     VStack(spacing: 12) {
                                         Image(systemName: "xmark.octagon")
@@ -264,7 +309,6 @@ struct QuestionDetailView: View {
                                         Text("이미지를 불러오지 못했습니다")
                                             .foregroundColor(.white)
                                     }
-                                    .onTapGesture { isImageViewerPresented = false }
                                 @unknown default:
                                     EmptyView()
                                 }
@@ -274,7 +318,12 @@ struct QuestionDetailView: View {
                         VStack {
                             HStack {
                                 Spacer()
-                                Button(action: { isImageViewerPresented = false }) {
+                                Button(action: {
+                                    isImageViewerPresented = false
+                                    zoomScale = 1.0
+                                    dragOffset = .zero
+                                    accumulatedOffset = .zero
+                                }) {
                                     Image(systemName: "xmark.circle.fill")
                                         .font(.system(size: 28, weight: .bold))
                                         .foregroundColor(.white.opacity(0.9))
