@@ -27,6 +27,9 @@ struct QuestionDetailView: View {
     @State private var translatedTitle: String?
     @State private var translatedContent: String?
     
+    @State private var isImageViewerPresented: Bool = false
+    @State private var selectedImageURL: URL? = nil
+    
     let reportReasons: [(label: String, value: ReportReason)] = [
         ("비속어", .offensive),
         ("음란", .sexual),
@@ -122,6 +125,10 @@ struct QuestionDetailView: View {
                                                 @unknown default:
                                                     EmptyView()
                                                 }
+                                            }
+                                            .onTapGesture {
+                                                selectedImageURL = url
+                                                isImageViewerPresented = true
                                             }
                                         }
                                     }
@@ -236,6 +243,48 @@ struct QuestionDetailView: View {
                         .padding()
                         .background(Color.white)
                     }
+                .fullScreenCover(isPresented: $isImageViewerPresented) {
+                    ZStack {
+                        Color.black.ignoresSafeArea()
+                        if let url = selectedImageURL {
+                            AsyncImage(url: url) { phase in
+                                switch phase {
+                                case .empty:
+                                    ProgressView()
+                                case .success(let image):
+                                    image
+                                        .resizable()
+                                        .scaledToFit()
+                                        .ignoresSafeArea()
+                                        .onTapGesture { isImageViewerPresented = false }
+                                case .failure:
+                                    VStack(spacing: 12) {
+                                        Image(systemName: "xmark.octagon")
+                                            .foregroundColor(.red)
+                                        Text("이미지를 불러오지 못했습니다")
+                                            .foregroundColor(.white)
+                                    }
+                                    .onTapGesture { isImageViewerPresented = false }
+                                @unknown default:
+                                    EmptyView()
+                                }
+                            }
+                        }
+                        // 닫기 버튼
+                        VStack {
+                            HStack {
+                                Spacer()
+                                Button(action: { isImageViewerPresented = false }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .font(.system(size: 28, weight: .bold))
+                                        .foregroundColor(.white.opacity(0.9))
+                                        .padding(12)
+                                }
+                            }
+                            Spacer()
+                        }
+                    }
+                }
             } else {
                 ProgressView()
             }
@@ -268,12 +317,15 @@ struct QuestionDetailView: View {
             Button("신고") {
                 showReportReasons = true
             }
-            Button("삭제", role: .destructive) {
-                Task {
-                    try await viewModel.deleteQuestion(id: questionId)
-                    await MainActor.run {
-                        viewModel.questions.removeAll { $0.id == questionId }
-                        presentationMode.wrappedValue.dismiss()
+            let currentUserId = UserDefaults.standard.integer(forKey: "userId")
+            if (questionDetail?.user.id ?? -1) == currentUserId {
+                Button("삭제", role: .destructive) {
+                    Task {
+                        try await viewModel.deleteQuestion(id: questionId)
+                        await MainActor.run {
+                            viewModel.questions.removeAll { $0.id == questionId }
+                            presentationMode.wrappedValue.dismiss()
+                        }
                     }
                 }
             }
