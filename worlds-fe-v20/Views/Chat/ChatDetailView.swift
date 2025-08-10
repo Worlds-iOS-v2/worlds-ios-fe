@@ -7,6 +7,13 @@
 
 import SwiftUI
 import SocketIO
+import Translation
+import UIKit
+
+private extension Notification.Name {
+    static let pasteIntoComposer = Notification.Name("PasteIntoComposer")
+    static let reportChatMessage = Notification.Name("ReportChatMessage")
+}
 
 struct ChatDetailView: View {
     let chat: ChatRoom
@@ -14,6 +21,9 @@ struct ChatDetailView: View {
     @StateObject private var viewModel = ChatViewModel()
     @Environment(\.dismiss) private var dismiss
     @FocusState private var isTextFieldFocused: Bool
+    @State private var showReportSheet: Bool = false
+    @State private var reportTargetMessage: Message? = nil
+    @State private var showLeaveRoomConfirm: Bool = false
 
     var targetUserName: String {
         let currentUserId = UserDefaults.standard.integer(forKey: "userId")
@@ -35,8 +45,32 @@ struct ChatDetailView: View {
                     .font(.headline)
                     .bold()
                 Spacer()
-                Image(systemName: "chevron.left") // Invisible spacer to keep center alignment
-                    .foregroundColor(.clear)
+                Menu {
+                    // 액션: 필요 시 실제 구현 연결
+                    Button {
+                        // TODO: 상대 프로필로 이동
+                    } label: {
+                        Label("상대 프로필", systemImage: "person.crop.circle")
+                    }
+
+                    Button {
+                        // TODO: OCR 기록 보기
+                    } label: {
+                        Label("OCR 기록", systemImage: "folder")
+                    }
+
+                    Divider()
+
+                    Button(role: .destructive) {
+                        showLeaveRoomConfirm = true
+                    } label: {
+                        Label("채팅방 나가기", systemImage: "rectangle.portrait.and.arrow.right")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                        .font(.title3)
+                        .foregroundColor(.black)
+                }
             }
             .padding()
 
@@ -115,6 +149,33 @@ struct ChatDetailView: View {
         .onDisappear {
             viewModel.disconnect()
         }
+        .onReceive(NotificationCenter.default.publisher(for: .pasteIntoComposer)) { note in
+            if let text = note.object as? String, !text.isEmpty {
+                self.messageText = text
+                self.isTextFieldFocused = true
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .reportChatMessage)) { note in
+            if let msg = note.object as? Message {
+                self.reportTargetMessage = msg
+                self.showReportSheet = true
+            }
+        }
+        .confirmationDialog("이 메시지를 신고하시겠어요?", isPresented: $showReportSheet) {
+            Button("스팸/광고", role: .destructive) { /* TODO: call report API for message */ }
+            Button("욕설/혐오", role: .destructive) { /* TODO */ }
+            Button("기타", role: .destructive) { /* TODO */ }
+            Button("취소", role: .cancel) {}
+        } message: {
+            Text(reportTargetMessage?.content ?? "")
+        }
+        .confirmationDialog("채팅방을 나가시겠어요?", isPresented: $showLeaveRoomConfirm) {
+            Button("나가기", role: .destructive) {
+                // TODO: 채팅방 나가기 API 연동 후 화면 닫기
+                dismiss()
+            }
+            Button("취소", role: .cancel) {}
+        }
         .navigationBarBackButtonHidden(true)
         .navigationBarHidden(true)
     }
@@ -139,50 +200,166 @@ struct DateHeader: View {
 struct ChatBubble: View {
     var message: Message
 
+    @State private var showTranslated: Bool = false
+    @State private var isTranslating: Bool = false
+    @State private var translatedText: String? = nil
+    @State private var translationConfigurationAny: Any? = nil
+
+    @available(iOS 18.0, *)
+    private func handleTranslation(session: TranslationSession) async {
+        do {
+            let response = try await session.translate(message.content)
+            await MainActor.run {
+                self.translatedText = response.targetText
+                self.showTranslated = true
+                self.isTranslating = false
+                self.translationConfigurationAny = nil
+            }
+        } catch {
+            await MainActor.run {
+                print("❌ 번역 실패(iOS18):", error.localizedDescription)
+                self.isTranslating = false
+                self.translationConfigurationAny = nil
+            }
+        }
+    }
+
+    private func toggleTranslateAction() {
+        if showTranslated {
+            showTranslated = false
+        } else if let _ = translatedText {
+            showTranslated = true
+        } else {
+            isTranslating = true
+            if #available(iOS 18.0, *) {
+                let targetCode = Locale.current.language.languageCode?.identifier ?? "en"
+                translationConfigurationAny = TranslationSession.Configuration(source: nil, target: Locale.Language(identifier: targetCode))
+            } else {
+                self.isTranslating = false
+            }
+        }
+    }
+
+    private var displayText: String {
+        if showTranslated, let t = translatedText, !t.isEmpty {
+            return t
+        }
+        return message.content
+    }
+
     var body: some View {
         HStack(alignment: .bottom, spacing: 4) {
             if message.isSender {
+                // 보낸 말풍선: 오른쪽 정렬
                 Spacer()
+                VStack(alignment: .trailing, spacing: 4) {
+                    // 1) 버블 + 시간(읽음) 같은 줄
+                    HStack(alignment: .bottom, spacing: 6) {
+                        // 시간 + 읽음 (버블의 왼쪽)
+                        VStack(alignment: .trailing, spacing: 2) {
+                            if message.isRead {
+                                Text("읽음")
+                                    .font(.caption2)
+                                    .foregroundColor(.gray)
+                            }
+                            Text(timeString(from: message.createdAt))
+                                .font(.caption2)
+                                .foregroundColor(.gray)
+                        }
 
-                // 시간 + 읽음
-                VStack(alignment: .trailing, spacing: 2) {
-                    if message.isRead {
-                        Text("읽음")
+                        // 말풍선
+                        Text(displayText)
+                            .padding(10)
+                            .foregroundColor(.white)
+                            .background(Color.blue)
+                            .cornerRadius(15)
+                            .contentShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+                            .contextMenu {
+                                Button("복사하기", systemImage: "doc.on.doc") {
+                                    UIPasteboard.general.string = message.content
+                                }
+                                Button("붙여넣기", systemImage: "doc.on.clipboard") {
+                                    let text = UIPasteboard.general.string ?? ""
+                                    NotificationCenter.default.post(name: .pasteIntoComposer, object: text)
+                                }
+                                Divider()
+                                Button("신고하기", systemImage: "exclamationmark.bubble", role: .destructive) {
+                                    NotificationCenter.default.post(name: .reportChatMessage, object: message)
+                                }
+                            }
+                    }
+
+                    // 2) 번역 토글 버튼 (버블 아래, 오른쪽 정렬)
+                    Button(action: {
+                        toggleTranslateAction()
+                    }) {
+                        Text(isTranslating ? "번역 중…" : (showTranslated ? "원문보기" : "번역하기"))
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    }
+                    .disabled(isTranslating)
+                }
+            } else {
+                // 받은 말풍선: 왼쪽 정렬
+                VStack(alignment: .leading, spacing: 4) {
+                    // 1) 버블 + 시간 같은 줄
+                    HStack(alignment: .bottom, spacing: 6) {
+                        // 말풍선
+                        Text(displayText)
+                            .padding(10)
+                            .background(Color.white)
+                            .cornerRadius(15)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 15)
+                                    .stroke(Color.gray.opacity(0.2), lineWidth: 0.5)
+                            )
+                            .contentShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+                            .contextMenu {
+                                Button("복사하기", systemImage: "doc.on.doc") {
+                                    UIPasteboard.general.string = message.content
+                                }
+                                Button("붙여넣기", systemImage: "doc.on.clipboard") {
+                                    let text = UIPasteboard.general.string ?? ""
+                                    NotificationCenter.default.post(name: .pasteIntoComposer, object: text)
+                                }
+                                Divider()
+                                Button("신고하기", systemImage: "exclamationmark.bubble", role: .destructive) {
+                                    NotificationCenter.default.post(name: .reportChatMessage, object: message)
+                                }
+                            }
+
+                        // 시간 (버블의 오른쪽)
+                        Text(timeString(from: message.createdAt))
                             .font(.caption2)
                             .foregroundColor(.gray)
                     }
-                    Text(timeString(from: message.createdAt))
-                        .font(.caption2)
-                        .foregroundColor(.gray)
+
+                    // 2) 번역 토글 버튼 (버블 아래, 왼쪽 정렬)
+                    Button(action: {
+                        toggleTranslateAction()
+                    }) {
+                        Text(isTranslating ? "번역 중…" : (showTranslated ? "원문보기" : "번역하기"))
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    }
+                    .disabled(isTranslating)
                 }
-
-                // 말풍선
-                Text(message.content)
-                    .padding(10)
-                    .foregroundColor(.white)
-                    .background(Color.blue)
-                    .cornerRadius(15)
-
-            } else {
-                // 말풍선
-                Text(message.content)
-                    .padding(10)
-                    .background(Color.white)
-                    .cornerRadius(15)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 15)
-                            .stroke(Color.gray.opacity(0.2), lineWidth: 0.5)
-                    )
-
-                // 시간
-                Text(timeString(from: message.createdAt))
-                    .font(.caption2)
-                    .foregroundColor(.gray)
-
                 Spacer()
             }
         }
         .padding(.horizontal, 10)
+        .background(
+            Group {
+                if #available(iOS 18.0, *), let any = translationConfigurationAny, let config = any as? TranslationSession.Configuration {
+                    Color.clear
+                        .translationTask(config) { session in
+                            await handleTranslation(session: session)
+                        }
+                } else {
+                    Color.clear
+                }
+            }
+        )
     }
 
     func timeString(from dateString: String) -> String {
