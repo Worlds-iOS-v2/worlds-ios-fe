@@ -22,7 +22,7 @@ struct MyQuestionView: View {
                     ForEach(questions) { question in
                         NavigationLink(destination: QuestionDetailView(questionId: question.id, viewModel: QuestionViewModel())
                             .environmentObject(CommentViewModel())) {
-                                QuestionCard(question: question)
+                                QuestionCard(question: question, thumbnailURLString: nil)
                             }
                             .buttonStyle(PlainButtonStyle())
                     }

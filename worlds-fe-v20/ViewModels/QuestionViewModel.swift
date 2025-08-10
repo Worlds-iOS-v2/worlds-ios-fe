@@ -14,6 +14,7 @@ class QuestionViewModel: ObservableObject {
     @Published var selectedQuestion: QuestionDetail?
     @Published var isLoading = false
     @Published var errorMessage: String?
+    @Published var thumbnails: [Int: String] = [:] // questionId : first attachment URL
 
     // 질문 목록 조회
     func fetchQuestions() async {
@@ -21,6 +22,9 @@ class QuestionViewModel: ObservableObject {
         do {
             let list = try await APIService.shared.fetchQuestions()
             self.questions = list
+            // 목록 첫 화면용 썸네일 프리패치 (상세에서 첫 이미지만 가져오기)
+            let ids = list.prefix(20).map { $0.id }
+            Task { await self.loadThumbnails(for: ids) }
             self.errorMessage = nil
         } catch {
 
@@ -106,4 +110,35 @@ class QuestionViewModel: ObservableObject {
                 throw error
             }
         }
+    
+    // 단건 썸네일 로드 (필요 시)
+    func loadThumbnailIfNeeded(for id: Int) async {
+        if thumbnails[id] != nil { return }
+        do {
+            if let urls = try await APIService.shared.fetchQuestionAttachments(questionId: id), let first = urls.first {
+                thumbnails[id] = first
+            }
+        } catch {
+            // 실패시 무시
+        }
+    }
+
+    // 여러 건 동시 로드
+    func loadThumbnails(for ids: [Int]) async {
+        await withTaskGroup(of: (Int, String?).self) { group in
+            for id in ids where thumbnails[id] == nil {
+                group.addTask {
+                    do {
+                        let urls = try await APIService.shared.fetchQuestionAttachments(questionId: id)
+                        return (id, urls?.first)
+                    } catch {
+                        return (id, nil)
+                    }
+                }
+            }
+            for await (id, url) in group {
+                if let url { thumbnails[id] = url }
+            }
+        }
+    }
 }
