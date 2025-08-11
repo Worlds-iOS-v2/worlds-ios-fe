@@ -18,6 +18,7 @@ struct QuestionView: View {
     @State private var selectedCategory: Category = .all
     
     @ObservedObject var viewModel: QuestionViewModel
+    @Environment(\.scenePhase) private var scenePhase
     
     let categories: [Category] = [.all, .study, .free]
     
@@ -119,13 +120,17 @@ struct QuestionView: View {
                                 
                                 NavigationLink(destination: QuestionDetailView(questionId: question.id, viewModel: viewModel)
                                     .environmentObject(CommentViewModel())) {
-                                        QuestionCard(question: question)
+                                        QuestionCard(question: question, thumbnailURLString: viewModel.thumbnails[question.id])
+                                            .task { await viewModel.loadThumbnailIfNeeded(for: question.id) }
                                     }
                                     .buttonStyle(PlainButtonStyle())
                             }
                         }
                         .padding(.top, 8)
                         .padding(.horizontal, 20)
+                    }
+                    .refreshable {
+                        await viewModel.fetchQuestions()
                     }
                     
                     Spacer()
@@ -172,46 +177,90 @@ struct QuestionView: View {
                 }
             }
             .navigationBarHidden(true)
+            .onChange(of: scenePhase) { newPhase in
+                if newPhase == .active {
+                    Task { await viewModel.fetchQuestions() }
+                }
+            }
         }
     }
 }
 
 struct QuestionCard: View {
     let question: QuestionList
+    let thumbnailURLString: String?
+    
+    private var thumbnailURL: URL? {
+        guard let s = thumbnailURLString, let url = URL(string: s) else { return nil }
+        return url
+    }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(question.category.displayName)
-                .font(.system(size: 14, weight: .medium))
-                .foregroundColor(Color(.systemGray))
-                .padding(.top, 8)
-            
-            HStack(alignment: .center, spacing: 8) {
-                Text(question.title)
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundColor(.black)
+        HStack(alignment: .top, spacing: 12) {
+            // Left: texts
+            VStack(alignment: .leading, spacing: 6) {
+                Text(question.category.displayName)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(Color(.systemGray))
+                    .padding(.top, 8)
                 
-                if question.answerCount > 0 {
-                    Text("답변 \(question.answerCount)개")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 2)
-                        .background(Color.mainws)
-                        .cornerRadius(14)
+                HStack(alignment: .center, spacing: 8) {
+                    Text(question.title)
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(.black)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+                    
+                    if question.answerCount > 0 {
+                        Text("답변 \(question.answerCount)개")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 2)
+                            .background(Color.mainws)
+                            .cornerRadius(14)
+                    }
+                    Spacer()
                 }
-                Spacer()
+                .padding(.top, 2)
+                
+                Text(question.content)
+                    .font(.system(size: 15))
+                    .foregroundColor(Color(.systemGray2))
+                    .lineLimit(2)
+                    .padding(.bottom, 6)
+                
+                Spacer(minLength: 0)
             }
-            .padding(.top, 2)
             
-            Text(question.content)
-                .font(.system(size: 15))
-                .foregroundColor(Color(.systemGray2))
-                .lineLimit(1)
-                .padding(.bottom, 6)
-            
-            HStack {
-                Spacer()
+            // Right: thumbnail
+            if let url = thumbnailURL {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .empty:
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color(.systemGray5))
+                            .frame(width: 72, height: 72)
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 72, height: 72)
+                            .clipped()
+                            .cornerRadius(12)
+                    case .failure:
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color(.systemGray3))
+                            .frame(width: 72, height: 72)
+                            .overlay(
+                                Image(systemName: "photo")
+                                    .font(.system(size: 20))
+                                    .foregroundColor(.gray)
+                            )
+                    @unknown default:
+                        EmptyView()
+                    }
+                }
             }
         }
         .padding(.horizontal, 14)

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MainView: View {
     @StateObject var viewModel: MainViewModel
+    @StateObject var cultureViewModel = CultureDetailViewModel()
     
     @State private var selectedDate = Date()
     @State private var attendanceData: [Int: Bool] = [:]
@@ -65,7 +66,7 @@ struct MainView: View {
                     }
                 }
                 
-                AutoSlideViewWithTimer()
+                AutoSlideViewWithTimer(datas: cultureViewModel.eventPrograms, isLoading: cultureViewModel.isLoading)
                     .frame(height: 300)
                     .padding(.horizontal, 24)
                 
@@ -115,6 +116,10 @@ struct MainView: View {
         .onAppear {
             Task {
                 await viewModel.fetchLatestPosts()
+            }
+            
+            Task {
+                await cultureViewModel.fetchCultureInfo()
             }
         }
     }
