@@ -340,7 +340,6 @@ class SocketService {
             }
         }.resume()
     }
-    
     /// 단일 메시지 읽음 처리(소켓 emit)
     /// - Parameters:
     ///   - roomId: 채팅방 ID
