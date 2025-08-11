@@ -42,6 +42,9 @@ struct Message: Identifiable, Codable {
     let content: String
     var isRead: Bool
     let createdAt: String
+    
+    let fileUrl: String?
+    let fileType: String?
 
     var isSender: Bool {
         let currentUserId = UserDefaults.standard.integer(forKey: "userId")

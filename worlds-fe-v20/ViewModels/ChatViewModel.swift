@@ -73,7 +73,9 @@ class ChatViewModel: ObservableObject {
             senderId: userId,
             content: content,
             isRead: false,
-            createdAt: nowString
+            createdAt: nowString,
+            fileUrl: "",
+            fileType: ""
         )
 
         // 서버로 전송
