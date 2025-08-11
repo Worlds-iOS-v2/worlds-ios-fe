@@ -15,6 +15,7 @@ struct CultureDetailView: View {
         ZStack {
             Color(.sub2Ws)
                 .ignoresSafeArea()
+            
             ScrollView {
                 VStack {
                     Text("이번주 소식")
@@ -23,7 +24,7 @@ struct CultureDetailView: View {
                         .padding(.horizontal, 24)
                         .padding(.vertical, 20)
                     
-                    AutoSlideViewWithTimer(datas: viewModel.dummyEventData)
+                    AutoSlideViewWithTimer(datas: viewModel.eventPrograms, isLoading: false)
                         .frame(height: 300)
                         .padding(.horizontal, 24)
                         .padding(.bottom, 20)
@@ -33,7 +34,7 @@ struct CultureDetailView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 24)
                     
-                    CultureSlideView<GovernmentProgram>(datas: viewModel.dummyGovernmentData)
+                    CultureSlideView<GovernmentProgram>(datas: viewModel.govermentPrograms, isLoading: viewModel.isLoading)
                         .frame(height: 150)
                         .padding(.horizontal, 24)
                     
@@ -42,7 +43,7 @@ struct CultureDetailView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 24)
                     
-                    CultureSlideView<KoreanProgram>(datas: viewModel.dummyKoreanData)
+                    CultureSlideView<KoreanProgram>(datas: viewModel.koreanPrograms, isLoading: viewModel.isLoading)
                         .frame(height: 150)
                         .padding(.horizontal, 24)
                 }
@@ -63,6 +64,11 @@ struct CultureDetailView: View {
                 }
             }
             .scrollIndicators(.hidden)
+        }
+        .onAppear {
+            Task {
+                await viewModel.fetchCultureInfo()
+            }
         }
     }
 }
