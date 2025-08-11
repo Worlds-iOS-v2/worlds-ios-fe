@@ -60,23 +60,24 @@ class APIService {
         return response
     }
 
-    // 질문 상세의 첨부(썸네일)만 최소 디코딩해서 가져오기
-    func fetchQuestionAttachments(questionId: Int) async throws -> [String]? {
-        struct QuestionDetailMinimal: Decodable { let attachments: [String]? }
-        let headers = try getAuthHeaders()
-        let response = try await AF.request("\(baseURL)/questions/\(questionId)", headers: headers)
-            .validate()
-            .serializingDecodable(QuestionDetailMinimal.self)
-            .value
-        return response.attachments
-    }
 
-    // 질문 생성
-    func createQuestion(title: String, content: String, category: String, images: [Data]? = nil) async throws -> Bool {
-        let headers = try getAuthHeaders()
+// 질문 상세의 첨부(썸네일)만 최소 디코딩해서 가져오기
+func fetchQuestionAttachments(questionId: Int) async throws -> [String]? {
+    struct QuestionDetailMinimal: Decodable { let attachments: [String]? }
+    let headers = try getAuthHeaders()
+    let response = try await AF.request("\(baseURL)/questions/\(questionId)", headers: headers)
+        .validate()
+        .serializingDecodable(QuestionDetailMinimal.self)
+        .value
+    return response.attachments
+}
 
-        // 이미지가 있으면 multipart/form-data 전송
-        if let imagesData = images, !imagesData.isEmpty {
+//질문 생성
+func createQuestion(title: String, content: String, category: String, images: [Data]? = nil) async throws -> Bool {
+    let headers = try getAuthHeaders()
+    
+    // 이미지가 있으면 multipart/form-data 전송
+    if let imagesData = images, !imagesData.isEmpty {
 //            print("multipart 업로드 시작")
             let url = "\(baseURL)/questions/with-image"
 
