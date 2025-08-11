@@ -619,6 +619,52 @@ class UserAPIManager {
         
         return response
     }
+    
+    func getCultureInfo() async throws -> CultureInfo {
+        guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
+            print("토큰 값이 유효하지 않습니다.")
+            throw UserAPIError.invalidToken
+        }
+        
+        guard let endPoint = Bundle.main.object(forInfoDictionaryKey: "APICrawlURL") as? String else {
+            throw UserAPIError.invalidEndPoint
+        }
+                
+        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
+        
+        let dataResponse = await AF.request(endPoint, method: .get, headers: headers)
+            .validate()
+            .serializingData()
+            .response
+        
+        switch dataResponse.result {
+        case .success(let data):
+            do {
+                let response = try JSONDecoder().decode(CultureInfo.self, from: data)
+                
+                print("문화정보: \(response)")
+                
+                return response
+            } catch {
+                throw UserAPIError.decodingError(description: "디코딩 실패: \(error)")
+            }
+            
+        case .failure:
+            if let rawData = dataResponse.data,
+               let rawString = String(data: rawData, encoding: .utf8) {
+                print("getCultureInfo 서버 원본 응답: \(rawString)")
+                
+                // 서버 에러 응답 파싱 시도
+                let errorResponse = try JSONDecoder().decode(APIErrorResponse.self, from: rawData)
+                print("getCultureInfo 파싱된 에러 응답: \(errorResponse)")
+                
+                let errorMessage = errorResponse.message[0]
+                throw UserAPIError.serverError(message: errorMessage)
+            } else {
+                throw UserAPIError.serverError(message: "getCultureInfo 서버 응답 파싱 실패")
+            }
+        }
+    }
 }
 
 extension UserAPIManager {
