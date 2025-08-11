@@ -34,7 +34,7 @@ class CommentViewModel: ObservableObject {
     
     // 계층 구조로 정리하는 함수
     func replies(for parentId: Int?) -> [Comment] {
-        return comments.filter { $0.parentId == parentId }
+        return comments.filter { $0.parentId == parentId && !($0.deleted ?? false) }
     }
 
     // 댓글 작성
@@ -95,12 +95,13 @@ class CommentViewModel: ObservableObject {
 
         do {
             let result = try await APIService.shared.fetchComments(for: questionId)
-            self.comments = result
+            // soft-delete 제외하고 세팅
+            self.comments = result.filter { !($0.deleted ?? false) }
             
-            print("서버에서 받아온 댓글: \(result.map { $0.content })")
+            print("서버에서 받아온 댓글(유효): \(self.comments.map { $0.content })")
             
-            // 댓글별 좋아요 정보 동기화
-            for comment in result {
+            // 댓글별 좋아요 정보 동기화 (유효 댓글만)
+            for comment in self.comments {
                 let count = try await APIService.shared.fetchCommentLike(commentId: comment.id)
                 DispatchQueue.main.async {
                     self.likes[comment.id] = count
@@ -114,20 +115,23 @@ class CommentViewModel: ObservableObject {
     
     // 댓글 삭제
     func deleteComment(_ commentId: Int, for questionId: Int) async {
+        if isLoading { return }
         isLoading = true
         defer { isLoading = false }
 
         do {
             let success = try await APIService.shared.deleteComment(commentId: commentId)
             if success {
+                // 낙관적 업데이트 + 서버 정합성 보정
                 self.comments.removeAll { $0.id == commentId }
                 await fetchComments(for: questionId)
             } else {
-                self.errorMessage = "댓글 삭제 실패"
+                self.errorMessage = "댓글 삭제 실패 (서버 응답 비정상)"
+                print("❌ 댓글 삭제 실패: 서버 비정상 응답")
             }
         } catch {
-            self.errorMessage = "댓글 삭제 중 오류 발생"
-            print("삭제 오류: \(error.localizedDescription)")
+            self.errorMessage = "댓글 삭제 중 오류 발생: \(error.localizedDescription)"
+            print("❌ 삭제 오류: \(error)")
         }
     }
     

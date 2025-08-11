@@ -13,6 +13,7 @@ struct Comment: Codable, Identifiable {
     let createdAt: String
     let questionId: Int
     let user: User
+    let deleted: Bool?
     let parentId: Int?
     
     struct User: Codable {
