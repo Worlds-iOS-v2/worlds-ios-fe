@@ -199,14 +199,61 @@ class SocketService {
             return
         }
 
-        let payload: [String: Any] = [
+        var payload: [String: Any] = [
             "roomId": message.roomId,
             "senderId": senderId,
             "content": message.content,
             "createdAt": message.createdAt,
             "isRead": message.isRead
         ]
+
+        if let fileUrl = message.fileUrl {
+            payload["fileUrl"] = fileUrl
+        }
+        if let fileType = message.fileType {
+            payload["fileType"] = fileType
+        }
+
         socket.emit(Event.sendMessage, payload)
+    }
+
+    // 파일 업로드 API
+    func uploadAttachment(data: Data, fileName: String, mimeType: String, completion: @escaping (String?) -> Void) {
+        guard let baseUrl = Bundle.main.object(forInfoDictionaryKey: "APIBaseURL") as? String,
+              let url = URL(string: "\(baseUrl)/chat/attachments/upload") else {
+            completion(nil)
+            return
+        }
+        guard let accessToken = UserDefaults.standard.string(forKey: "accessToken") else {
+            completion(nil)
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+
+        let boundary = UUID().uuidString
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+
+        var body = Data()
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(fileName)\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: \(mimeType)\r\n\r\n".data(using: .utf8)!)
+        body.append(data)
+        body.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
+
+        request.httpBody = body
+
+        URLSession.shared.dataTask(with: request) { data, _, _ in
+            guard let data = data,
+                  let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let fileUrl = json["fileUrl"] as? String else {
+                completion(nil)
+                return
+            }
+            completion(fileUrl)
+        }.resume()
     }
     
     /// 서버로부터 수신한 메시지를 처리하는 핸들러를 등록
@@ -293,6 +340,7 @@ class SocketService {
             }
         }.resume()
     }
+    
     /// 단일 메시지 읽음 처리(소켓 emit)
     /// - Parameters:
     ///   - roomId: 채팅방 ID
@@ -328,5 +376,110 @@ class SocketService {
         // socket.emit(Event.markRead, payload)
 
         messageIds.forEach { emitMessageRead(roomId: roomId, messageId: $0) }
+    }
+}
+
+// MARK: - QR API
+extension SocketService {
+    private struct PairingCreateResponse: Codable {
+        let token: String
+        let expiresAt: String
+    }
+
+    /// 1) QR 생성: POST /chat/pairings → { token, expiresAt }
+    func createPairingToken(completion: @escaping (_ token: String?, _ expiresAt: String?) -> Void) {
+        guard let baseUrl = Bundle.main.object(forInfoDictionaryKey: "APIBaseURL") as? String,
+              let url = URL(string: "\(baseUrl)/chat/pairings") else {
+            print("APIBaseURL 로딩 실패 또는 URL 생성 실패")
+            completion(nil, nil)
+            return
+        }
+        guard let accessToken = UserDefaults.standard.string(forKey: "accessToken") else {
+            print("accessToken 없음")
+            completion(nil, nil)
+            return
+        }
+
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        req.httpBody = try? JSONSerialization.data(withJSONObject: [:])
+
+        URLSession.shared.dataTask(with: req) { data, resp, err in
+            if let err = err {
+                print("❌ /chat/pairings 요청 실패:", err)
+                completion(nil, nil)
+                return
+            }
+            guard let http = resp as? HTTPURLResponse else {
+                print("❌ /chat/pairings 응답 형식 오류")
+                completion(nil, nil)
+                return
+            }
+            print("📥 /chat/pairings status=\(http.statusCode)")
+            guard (200...299).contains(http.statusCode), let data = data else {
+                let body = String(data: data ?? Data(), encoding: .utf8) ?? "<no body>"
+                print("❌ /chat/pairings 실패 body=\(body)")
+                completion(nil, nil)
+                return
+            }
+            do {
+                let decoded = try JSONDecoder().decode(PairingCreateResponse.self, from: data)
+                completion(decoded.token, decoded.expiresAt)
+            } catch {
+                print("❌ /chat/pairings 디코딩 실패:", error)
+                completion(nil, nil)
+            }
+        }.resume()
+    }
+
+    /// 2) QR 스캔(상대): POST /chat/pairings/claim { token } → ChatRoom
+    func claimPairing(token: String, completion: @escaping (ChatRoom?) -> Void) {
+        guard let baseUrl = Bundle.main.object(forInfoDictionaryKey: "APIBaseURL") as? String,
+              let url = URL(string: "\(baseUrl)/chat/pairings/claim") else {
+            print("❌ APIBaseURL 로딩 실패 또는 URL 생성 실패")
+            completion(nil)
+            return
+        }
+        guard let accessToken = UserDefaults.standard.string(forKey: "accessToken") else {
+            print("❌ accessToken 없음")
+            completion(nil)
+            return
+        }
+
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        let body = ["token": token]
+        req.httpBody = try? JSONSerialization.data(withJSONObject: body)
+
+        URLSession.shared.dataTask(with: req) { data, resp, err in
+            if let err = err {
+                print("❌ /chat/pairings/claim 요청 실패:", err)
+                completion(nil)
+                return
+            }
+            guard let http = resp as? HTTPURLResponse else {
+                print("❌ /chat/pairings/claim 응답 형식 오류")
+                completion(nil)
+                return
+            }
+            print("📥 /chat/pairings/claim status=\(http.statusCode)")
+            guard (200...299).contains(http.statusCode), let data = data else {
+                let body = String(data: data ?? Data(), encoding: .utf8) ?? "<no body>"
+                print("❌ /chat/pairings/claim 실패 body=\(body)")
+                completion(nil)
+                return
+            }
+            do {
+                let room = try JSONDecoder().decode(ChatRoom.self, from: data)
+                completion(room)
+            } catch {
+                print("❌ /chat/pairings/claim 디코딩 실패:", error)
+                completion(nil)
+            }
+        }.resume()
     }
 }

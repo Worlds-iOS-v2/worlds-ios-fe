@@ -9,6 +9,7 @@ import SwiftUI
 import SocketIO
 import Translation
 import UIKit
+import PhotosUI
 
 private extension Notification.Name {
     static let pasteIntoComposer = Notification.Name("PasteIntoComposer")
@@ -24,6 +25,7 @@ struct ChatDetailView: View {
     @State private var showReportSheet: Bool = false
     @State private var reportTargetMessage: Message? = nil
     @State private var showLeaveRoomConfirm: Bool = false
+    @State private var pickerItem: PhotosPickerItem? = nil
 
     var targetUserName: String {
         let currentUserId = UserDefaults.standard.integer(forKey: "userId")
@@ -108,9 +110,11 @@ struct ChatDetailView: View {
 
             // 입력창
             HStack {
-                Button(action: {
-                    // 이미지 전송 로직 (추후 구현)
-                }) {
+                PhotosPicker(
+                    selection: $pickerItem,
+                    matching: .images,
+                    photoLibrary: .shared()
+                ) {
                     Image(systemName: "photo.on.rectangle")
                         .font(.title2)
                 }
@@ -138,6 +142,42 @@ struct ChatDetailView: View {
             }
             .padding()
             .background(Color(red: 0.94, green: 0.96, blue: 1.0))
+            .onChange(of: pickerItem) { newItem in
+                guard let newItem else { return }
+                Task {
+                    if let data = try? await newItem.loadTransferable(type: Data.self) {
+                        let mimeType = detectMimeType(data: data)
+                        let fileName = suggestedFileName(for: newItem, mimeType: mimeType)
+                        if let currentUserId = UserDefaults.standard.integer(forKey: "userId") as Int? {
+                            SocketService.shared.uploadAttachment(data: data, fileName: fileName, mimeType: mimeType) { fileUrl in
+                                guard let fileUrl = fileUrl else { return }
+
+                                let formatter = ISO8601DateFormatter()
+                                formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+                                let nowString = formatter.string(from: Date())
+
+                                let message = Message(
+                                    id: UUID().hashValue,
+                                    roomId: chat.id,
+                                    senderId: currentUserId,
+                                    content: "", // 이미지 메시지는 텍스트 본문 없음
+                                    isRead: false,
+                                    createdAt: nowString,
+                                    fileUrl: fileUrl,
+                                    fileType: mimeType
+                                )
+
+                                // 소켓 전송 + 로컬 즉시 반영
+                                SocketService.shared.sendMessage(message)
+                                DispatchQueue.main.async {
+                                    self.viewModel.messages.append(message)
+                                }
+                            }
+                        }
+                    }
+                    pickerItem = nil
+                }
+            }
         }
         .background(Color(red: 0.94, green: 0.96, blue: 1.0))
         .onAppear {
@@ -410,4 +450,51 @@ fileprivate func headerDate(from header: String) -> Date {
     alt.calendar = Calendar(identifier: .gregorian)
     alt.dateFormat = "yyyy-MM-dd"
     return alt.date(from: header) ?? Date.distantPast
+}
+
+// MARK: - Image Picker Helpers
+fileprivate func detectMimeType(data: Data) -> String {
+    // JPEG
+    if data.starts(with: [0xFF, 0xD8, 0xFF]) {
+        return "image/jpeg"
+    }
+    // PNG
+    if data.starts(with: [0x89, 0x50, 0x4E, 0x47]) {
+        return "image/png"
+    }
+    // GIF
+    if data.starts(with: [0x47, 0x49, 0x46, 0x38]) {
+        return "image/gif"
+    }
+    // HEIC/HEIF
+    if data.count >= 12 {
+        let sub = data.subdata(in: 4..<12)
+        if let str = String(data: sub, encoding: .ascii), str == "ftypheic" || str == "ftypheif" {
+            return "image/heic"
+        }
+    }
+    return "application/octet-stream"
+}
+
+fileprivate func suggestedFileName(for pickerItem: PhotosPickerItem, mimeType: String) -> String {
+    // Try to use itemIdentifier if available
+    if let id = pickerItem.itemIdentifier {
+        if mimeType == "image/jpeg" {
+            return "\(id).jpg"
+        } else if mimeType == "image/png" {
+            return "\(id).png"
+        } else if mimeType == "image/gif" {
+            return "\(id).gif"
+        } else if mimeType == "image/heic" {
+            return "\(id).heic"
+        }
+    }
+    // Default fallback
+    switch mimeType {
+    case "image/jpeg": return "image.jpg"
+    case "image/png": return "image.png"
+    case "image/gif": return "image.gif"
+    case "image/heic": return "image.heic"
+    default: return "file"
+    }
 }
