@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		9F25395A2E17C57600B526A5 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 		B3A398032E308E9600FC2798 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = B3A398022E308E9600FC2798 /* Alamofire */; };
+		CCECCA652E49CA7F00E73684 /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = CCECCA642E49CA7F00E73684 /* SocketIO */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,6 +44,7 @@
 			files = (
 				9F25395A2E17C57600B526A5 /* (null) in Frameworks */,
 				B3A398032E308E9600FC2798 /* Alamofire in Frameworks */,
+				CCECCA652E49CA7F00E73684 /* SocketIO in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,6 +88,7 @@
 			name = "worlds-fe-v20";
 			packageProductDependencies = (
 				B3A398022E308E9600FC2798 /* Alamofire */,
+				CCECCA642E49CA7F00E73684 /* SocketIO */,
 			);
 			productName = "worlds-fe-v20";
 			productReference = 9F2539392E17C53900B526A5 /* worlds-fe-v20.app */;
@@ -117,6 +120,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				B3A398012E308E9600FC2798 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				CCECCA632E49CA7F00E73684 /* XCRemoteSwiftPackageReference "socket.io-client-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9F25393A2E17C53900B526A5 /* Products */;
@@ -378,6 +382,14 @@
 				minimumVersion = 5.10.2;
 			};
 		};
+		CCECCA632E49CA7F00E73684 /* XCRemoteSwiftPackageReference "socket.io-client-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/socketio/socket.io-client-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 16.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -385,6 +397,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B3A398012E308E9600FC2798 /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
+		};
+		CCECCA642E49CA7F00E73684 /* SocketIO */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CCECCA632E49CA7F00E73684 /* XCRemoteSwiftPackageReference "socket.io-client-swift" */;
+			productName = SocketIO;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

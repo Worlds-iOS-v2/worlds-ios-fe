@@ -385,16 +385,16 @@ extension SocketService {
         let expiresAt: String
     }
 
-    /// 1) QR 생성: POST /chat/pairings → { token, expiresAt }
+    /// 1) QR 생성: POST /pairings → { token, expiresAt }
     func createPairingToken(completion: @escaping (_ token: String?, _ expiresAt: String?) -> Void) {
-        guard let baseUrl = Bundle.main.object(forInfoDictionaryKey: "APIBaseURL") as? String,
-              let url = URL(string: "\(baseUrl)/chat/pairings") else {
-            print("APIBaseURL 로딩 실패 또는 URL 생성 실패")
+        guard let base = Bundle.main.object(forInfoDictionaryKey: "APIBaseURL") as? String,
+              let url = URL(string: base + "/pairings") else {
+            print("❌ APIBaseURL 로딩 실패 또는 URL 생성 실패")
             completion(nil, nil)
             return
         }
         guard let accessToken = UserDefaults.standard.string(forKey: "accessToken") else {
-            print("accessToken 없음")
+            print("❌ accessToken 없음")
             completion(nil, nil)
             return
         }
@@ -407,19 +407,19 @@ extension SocketService {
 
         URLSession.shared.dataTask(with: req) { data, resp, err in
             if let err = err {
-                print("❌ /chat/pairings 요청 실패:", err)
+                print("❌ 요청 실패 @ \(url.absoluteString):", err)
                 completion(nil, nil)
                 return
             }
             guard let http = resp as? HTTPURLResponse else {
-                print("❌ /chat/pairings 응답 형식 오류")
+                print("❌ 응답 형식 오류 @ \(url.absoluteString)")
                 completion(nil, nil)
                 return
             }
-            print("📥 /chat/pairings status=\(http.statusCode)")
+            print("📥 \(url.absoluteString) status=\(http.statusCode)")
             guard (200...299).contains(http.statusCode), let data = data else {
                 let body = String(data: data ?? Data(), encoding: .utf8) ?? "<no body>"
-                print("❌ /chat/pairings 실패 body=\(body)")
+                print("❌ 요청 실패 body=\(body) @ \(url.absoluteString)")
                 completion(nil, nil)
                 return
             }
@@ -427,16 +427,16 @@ extension SocketService {
                 let decoded = try JSONDecoder().decode(PairingCreateResponse.self, from: data)
                 completion(decoded.token, decoded.expiresAt)
             } catch {
-                print("❌ /chat/pairings 디코딩 실패:", error)
+                print("❌ 디코딩 실패 @ \(url.absoluteString):", error)
                 completion(nil, nil)
             }
         }.resume()
     }
 
-    /// 2) QR 스캔(상대): POST /chat/pairings/claim { token } → ChatRoom
+    /// 2) QR 스캔(상대): POST /pairings/claim { token } → ChatRoom
     func claimPairing(token: String, completion: @escaping (ChatRoom?) -> Void) {
-        guard let baseUrl = Bundle.main.object(forInfoDictionaryKey: "APIBaseURL") as? String,
-              let url = URL(string: "\(baseUrl)/chat/pairings/claim") else {
+        guard let base = Bundle.main.object(forInfoDictionaryKey: "APIBaseURL") as? String,
+              let url = URL(string: base + "/pairings/claim") else {
             print("❌ APIBaseURL 로딩 실패 또는 URL 생성 실패")
             completion(nil)
             return
@@ -456,19 +456,19 @@ extension SocketService {
 
         URLSession.shared.dataTask(with: req) { data, resp, err in
             if let err = err {
-                print("❌ /chat/pairings/claim 요청 실패:", err)
+                print("❌ 요청 실패 @ \(url.absoluteString):", err)
                 completion(nil)
                 return
             }
             guard let http = resp as? HTTPURLResponse else {
-                print("❌ /chat/pairings/claim 응답 형식 오류")
+                print("❌ 응답 형식 오류 @ \(url.absoluteString)")
                 completion(nil)
                 return
             }
-            print("📥 /chat/pairings/claim status=\(http.statusCode)")
+            print("📥 \(url.absoluteString) status=\(http.statusCode)")
             guard (200...299).contains(http.statusCode), let data = data else {
                 let body = String(data: data ?? Data(), encoding: .utf8) ?? "<no body>"
-                print("❌ /chat/pairings/claim 실패 body=\(body)")
+                print("❌ 요청 실패 body=\(body) @ \(url.absoluteString)")
                 completion(nil)
                 return
             }
@@ -476,7 +476,7 @@ extension SocketService {
                 let room = try JSONDecoder().decode(ChatRoom.self, from: data)
                 completion(room)
             } catch {
-                print("❌ /chat/pairings/claim 디코딩 실패:", error)
+                print("❌ 디코딩 실패 @ \(url.absoluteString):", error)
                 completion(nil)
             }
         }.resume()
