@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>APICrawlURL</key>
+	<string>$(API_CRAWL_URL)</string>
 	<key>APIAccessTokenURL</key>
 	<string>$(API_ACCESS_TOKEN_URL)</string>
 	<key>APIBaseURL</key>
@@ -28,14 +30,6 @@
 	<string>$(API_SIGNUP_URL)</string>
 	<key>APIUserInfoURL</key>
 	<string>$(API_USER_INFO_URL)</string>
-	<key>APIOCRURL</key>
-	<string>$(API_OCR_URL)</string>
-	<key>APIOCRSolutionURL</key>
-	<string>$(API_OCR_SOLUTION_URL)</string>
-	<key>APIMyQuestionURL</key>
-	<string>$(API_MY_QUESTION_URL)</string>
-	<key>APIDeleteAccountURL</key>
-	<string>$(API_DELETE_ACCOUNT_URL)</string>
 	<key>CFBundleIconName</key>
 	<string>AppIcon</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
