@@ -27,6 +27,13 @@ struct QuestionDetailView: View {
     @State private var translatedTitle: String?
     @State private var translatedContent: String?
     
+    @State private var isImageViewerPresented: Bool = false
+    @State private var selectedImageURL: URL? = nil
+    @State private var zoomScale: CGFloat = 1.0
+    @State private var lastZoomScale: CGFloat = 1.0
+    @State private var dragOffset: CGSize = .zero
+    @State private var accumulatedOffset: CGSize = .zero
+    
     let reportReasons: [(label: String, value: ReportReason)] = [
         ("비속어", .offensive),
         ("음란", .sexual),
@@ -122,6 +129,10 @@ struct QuestionDetailView: View {
                                                 @unknown default:
                                                     EmptyView()
                                                 }
+                                            }
+                                            .onTapGesture {
+                                                selectedImageURL = url
+                                                isImageViewerPresented = true
                                             }
                                         }
                                     }
@@ -236,6 +247,93 @@ struct QuestionDetailView: View {
                         .padding()
                         .background(Color.white)
                     }
+                .fullScreenCover(isPresented: $isImageViewerPresented) {
+                    ZStack {
+                        Color.black.ignoresSafeArea()
+                        if let url = selectedImageURL {
+                            AsyncImage(url: url) { phase in
+                                switch phase {
+                                case .empty:
+                                    ProgressView()
+                                case .success(let image):
+                                    GeometryReader { proxy in
+                                        let magnify = MagnificationGesture()
+                                            .onChanged { value in
+                                                // value is relative to the start of this gesture
+                                                let relative = value / lastZoomScale
+                                                var newScale = zoomScale * relative
+                                                newScale = min(max(newScale, 1.0), 4.0) // clamp 1x ~ 4x
+                                                zoomScale = newScale
+                                                lastZoomScale = value
+                                            }
+                                            .onEnded { _ in
+                                                lastZoomScale = 1.0
+                                            }
+                                        let drag = DragGesture()
+                                            .onChanged { gesture in
+                                                guard zoomScale > 1.0 else { return }
+                                                dragOffset = CGSize(
+                                                    width: accumulatedOffset.width + gesture.translation.width,
+                                                    height: accumulatedOffset.height + gesture.translation.height
+                                                )
+                                            }
+                                            .onEnded { _ in
+                                                accumulatedOffset = dragOffset
+                                            }
+
+                                        image
+                                            .resizable()
+                                            .scaledToFit()
+                                            .scaleEffect(zoomScale)
+                                            .offset(dragOffset)
+                                            .frame(width: proxy.size.width, height: proxy.size.height)
+                                            .background(Color.black)
+                                            .ignoresSafeArea()
+                                            .gesture(drag)
+                                            .gesture(magnify)
+                                            .onTapGesture(count: 2) {
+                                                if zoomScale > 1.0 {
+                                                    // reset
+                                                    zoomScale = 1.0
+                                                    dragOffset = .zero
+                                                    accumulatedOffset = .zero
+                                                } else {
+                                                    zoomScale = 2.0
+                                                }
+                                            }
+                                    }
+                                case .failure:
+                                    VStack(spacing: 12) {
+                                        Image(systemName: "xmark.octagon")
+                                            .foregroundColor(.red)
+                                        Text("이미지를 불러오지 못했습니다")
+                                            .foregroundColor(.white)
+                                    }
+                                @unknown default:
+                                    EmptyView()
+                                }
+                            }
+                        }
+                        // 닫기 버튼
+                        VStack {
+                            HStack {
+                                Spacer()
+                                Button(action: {
+                                    isImageViewerPresented = false
+                                    zoomScale = 1.0
+                                    dragOffset = .zero
+                                    accumulatedOffset = .zero
+                                }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .font(.system(size: 28, weight: .bold))
+                                        .foregroundColor(.white.opacity(0.9))
+                                        .padding(12)
+                                }
+                            }
+                            Spacer()
+                        }
+                    }
+                }
             } else {
                 ProgressView()
             }
@@ -268,12 +366,15 @@ struct QuestionDetailView: View {
             Button("신고") {
                 showReportReasons = true
             }
-            Button("삭제", role: .destructive) {
-                Task {
-                    try await viewModel.deleteQuestion(id: questionId)
-                    await MainActor.run {
-                        viewModel.questions.removeAll { $0.id == questionId }
-                        presentationMode.wrappedValue.dismiss()
+            let currentUserId = UserDefaults.standard.integer(forKey: "userId")
+            if (questionDetail?.user.id ?? -1) == currentUserId {
+                Button("삭제", role: .destructive) {
+                    Task {
+                        try await viewModel.deleteQuestion(id: questionId)
+                        await MainActor.run {
+                            viewModel.questions.removeAll { $0.id == questionId }
+                            presentationMode.wrappedValue.dismiss()
+                        }
                     }
                 }
             }
