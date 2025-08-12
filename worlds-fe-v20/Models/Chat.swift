@@ -16,9 +16,10 @@ struct ChatRoom: Identifiable, Codable {
     let userA: ChatUser
     let userB: ChatUser
     let messages: [Message]
+    var unreadCount: Int?
 
     var name: String {
-        return userB.userName // 예시. 본인이 userA이면 상대방 이름 반환
+        return userB.userName
     }
 
     var preview: String {
