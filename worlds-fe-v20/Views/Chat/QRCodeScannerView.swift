@@ -11,6 +11,8 @@ import AVFoundation
 struct QRCodeScannerView: UIViewControllerRepresentable {
     class Coordinator: NSObject, AVCaptureMetadataOutputObjectsDelegate {
         var parent: QRCodeScannerView
+        var session: AVCaptureSession?
+        private var isHandling = false
 
         init(parent: QRCodeScannerView) {
             self.parent = parent
@@ -21,7 +23,16 @@ struct QRCodeScannerView: UIViewControllerRepresentable {
                             from connection: AVCaptureConnection) {
             if let metadataObject = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
                let code = metadataObject.stringValue {
-                parent.foundCode(code)
+                guard !isHandling else { return }
+                isHandling = true
+                // 세션 중지는 백그라운드 스레드에서
+                DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+                    self?.session?.stopRunning()
+                }
+                // 콜백은 메인 스레드에서
+                DispatchQueue.main.async { [weak self] in
+                    self?.parent.foundCode(code.trimmingCharacters(in: .whitespacesAndNewlines))
+                }
             }
         }
     }
@@ -47,14 +58,18 @@ struct QRCodeScannerView: UIViewControllerRepresentable {
             session.addOutput(output)
             output.setMetadataObjectsDelegate(context.coordinator, queue: .main)
             output.metadataObjectTypes = [.qr]
+            context.coordinator.session = session
         }
 
         let previewLayer = AVCaptureVideoPreviewLayer(session: session)
-        previewLayer.frame = UIScreen.main.bounds
-        previewLayer.videoGravity = .resizeAspectFill
+        previewLayer.frame = controller.view.bounds
+        previewLayer.masksToBounds = true
         controller.view.layer.addSublayer(previewLayer)
+        previewLayer.frame = controller.view.layer.bounds
 
-        session.startRunning()
+        DispatchQueue.global(qos: .userInitiated).async {
+            session.startRunning()
+        }
         return controller
     }
 
