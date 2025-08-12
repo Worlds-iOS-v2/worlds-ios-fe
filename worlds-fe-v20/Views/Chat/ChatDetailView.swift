@@ -24,12 +24,27 @@ struct ChatDetailView: View {
     @FocusState private var isTextFieldFocused: Bool
     @State private var showReportSheet: Bool = false
     @State private var reportTargetMessage: Message? = nil
+    @State private var showReportResultAlert: Bool = false
+    @State private var reportResultMessage: String = ""
     @State private var showLeaveRoomConfirm: Bool = false
+    @State private var isLeavingRoom: Bool = false
+    @State private var showLeaveError: Bool = false
     @State private var pickerItem: PhotosPickerItem? = nil
 
     var targetUserName: String {
         let currentUserId = UserDefaults.standard.integer(forKey: "userId")
         return (chat.userA.id == currentUserId) ? chat.userB.userName : chat.userA.userName
+    }
+
+    // 신고 처리 헬퍼 (View 내부)
+    private func reportSelectedMessage(reason: String) {
+        guard let msg = reportTargetMessage else { return }
+        SocketService.shared.reportMessage(messageId: msg.id, reason: reason) { ok in
+            DispatchQueue.main.async {
+                self.reportResultMessage = ok ? "신고가 접수되었습니다." : "신고에 실패했어요. 잠시 후 다시 시도해주세요."
+                self.showReportResultAlert = true
+            }
+        }
     }
 
     var body: some View {
@@ -210,19 +225,36 @@ struct ChatDetailView: View {
             }
         }
         .confirmationDialog("이 메시지를 신고하시겠어요?", isPresented: $showReportSheet) {
-            Button("스팸/광고", role: .destructive) { /* TODO: call report API for message */ }
-            Button("욕설/혐오", role: .destructive) { /* TODO */ }
-            Button("기타", role: .destructive) { /* TODO */ }
+            Button("스팸/광고", role: .destructive) { reportSelectedMessage(reason: "spam") }
+            Button("욕설/혐오", role: .destructive) { reportSelectedMessage(reason: "abuse") }
+            Button("기타", role: .destructive) { reportSelectedMessage(reason: "etc") }
             Button("취소", role: .cancel) {}
         } message: {
             Text(reportTargetMessage?.content ?? "")
         }
         .confirmationDialog("채팅방을 나가시겠어요?", isPresented: $showLeaveRoomConfirm) {
             Button("나가기", role: .destructive) {
-                // TODO: 채팅방 나가기 API 연동 후 화면 닫기
-                dismiss()
+                guard !isLeavingRoom else { return }
+                isLeavingRoom = true
+                SocketService.shared.leaveRoom(roomId: chat.id) { ok in
+                    DispatchQueue.main.async {
+                        self.isLeavingRoom = false
+                        if ok {
+                            NotificationCenter.default.post(name: .init("ChatRoomDidLeave"), object: chat.id)
+                            dismiss()
+                        } else {
+                            self.showLeaveError = true
+                        }
+                    }
+                }
             }
             Button("취소", role: .cancel) {}
+        }
+        .alert("채팅방 나가기에 실패했어요. 잠시 후 다시 시도해주세요.", isPresented: $showLeaveError) {
+            Button("확인", role: .cancel) {}
+        }
+        .alert(reportResultMessage, isPresented: $showReportResultAlert) {
+            Button("확인", role: .cancel) {}
         }
         .navigationBarBackButtonHidden(true)
         .navigationBarHidden(true)
@@ -315,26 +347,47 @@ struct ChatBubble: View {
                                 .foregroundColor(.gray)
                         }
 
-                        // 말풍선
-                        Text(displayText)
-                            .padding(10)
-                            .foregroundColor(.white)
-                            .background(Color.blue)
-                            .cornerRadius(15)
-                            .contentShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
-                            .contextMenu {
-                                Button("복사하기", systemImage: "doc.on.doc") {
-                                    UIPasteboard.general.string = message.content
-                                }
-                                Button("붙여넣기", systemImage: "doc.on.clipboard") {
-                                    let text = UIPasteboard.general.string ?? ""
-                                    NotificationCenter.default.post(name: .pasteIntoComposer, object: text)
-                                }
-                                Divider()
-                                Button("신고하기", systemImage: "exclamationmark.bubble", role: .destructive) {
-                                    NotificationCenter.default.post(name: .reportChatMessage, object: message)
+                        // 말풍선 또는 이미지
+                        if let urlStr = message.fileUrl, let url = URL(string: urlStr) {
+                            AsyncImage(url: url) { phase in
+                                switch phase {
+                                case .empty:
+                                    ProgressView().frame(width: 180, height: 180)
+                                case .success(let image):
+                                    image.resizable().scaledToFill()
+                                        .frame(maxWidth: 220, maxHeight: 220)
+                                        .clipped()
+                                        .cornerRadius(15)
+                                case .failure:
+                                    RoundedRectangle(cornerRadius: 15)
+                                        .fill(Color.gray.opacity(0.2))
+                                        .frame(width: 180, height: 180)
+                                        .overlay(Image(systemName: "photo"))
+                                @unknown default:
+                                    EmptyView()
                                 }
                             }
+                        } else {
+                            Text(displayText)
+                                .padding(10)
+                                .foregroundColor(.white)
+                                .background(Color.blue)
+                                .cornerRadius(15)
+                                .contentShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+                                .contextMenu {
+                                    Button("복사하기", systemImage: "doc.on.doc") {
+                                        UIPasteboard.general.string = message.content
+                                    }
+                                    Button("붙여넣기", systemImage: "doc.on.clipboard") {
+                                        let text = UIPasteboard.general.string ?? ""
+                                        NotificationCenter.default.post(name: .pasteIntoComposer, object: text)
+                                    }
+                                    Divider()
+                                    Button("신고하기", systemImage: "exclamationmark.bubble", role: .destructive) {
+                                        NotificationCenter.default.post(name: .reportChatMessage, object: message)
+                                    }
+                                }
+                        }
                     }
 
                     // 2) 번역 토글 버튼 (버블 아래, 오른쪽 정렬)
@@ -352,29 +405,54 @@ struct ChatBubble: View {
                 VStack(alignment: .leading, spacing: 4) {
                     // 1) 버블 + 시간 같은 줄
                     HStack(alignment: .bottom, spacing: 6) {
-                        // 말풍선
-                        Text(displayText)
-                            .padding(10)
-                            .background(Color.white)
-                            .cornerRadius(15)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 15)
-                                    .stroke(Color.gray.opacity(0.2), lineWidth: 0.5)
-                            )
-                            .contentShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
-                            .contextMenu {
-                                Button("복사하기", systemImage: "doc.on.doc") {
-                                    UIPasteboard.general.string = message.content
-                                }
-                                Button("붙여넣기", systemImage: "doc.on.clipboard") {
-                                    let text = UIPasteboard.general.string ?? ""
-                                    NotificationCenter.default.post(name: .pasteIntoComposer, object: text)
-                                }
-                                Divider()
-                                Button("신고하기", systemImage: "exclamationmark.bubble", role: .destructive) {
-                                    NotificationCenter.default.post(name: .reportChatMessage, object: message)
+                        // 말풍선 또는 이미지
+                        if let urlStr = message.fileUrl, let url = URL(string: urlStr) {
+                            AsyncImage(url: url) { phase in
+                                switch phase {
+                                case .empty:
+                                    ProgressView().frame(width: 180, height: 180)
+                                case .success(let image):
+                                    image.resizable().scaledToFill()
+                                        .frame(maxWidth: 220, maxHeight: 220)
+                                        .clipped()
+                                        .cornerRadius(15)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 15)
+                                                .stroke(Color.gray.opacity(0.2), lineWidth: 0.5)
+                                        )
+                                case .failure:
+                                    RoundedRectangle(cornerRadius: 15)
+                                        .fill(Color.gray.opacity(0.2))
+                                        .frame(width: 180, height: 180)
+                                        .overlay(Image(systemName: "photo"))
+                                @unknown default:
+                                    EmptyView()
                                 }
                             }
+                        } else {
+                            Text(displayText)
+                                .padding(10)
+                                .background(Color.white)
+                                .cornerRadius(15)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 15)
+                                        .stroke(Color.gray.opacity(0.2), lineWidth: 0.5)
+                                )
+                                .contentShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+                                .contextMenu {
+                                    Button("복사하기", systemImage: "doc.on.doc") {
+                                        UIPasteboard.general.string = message.content
+                                    }
+                                    Button("붙여넣기", systemImage: "doc.on.clipboard") {
+                                        let text = UIPasteboard.general.string ?? ""
+                                        NotificationCenter.default.post(name: .pasteIntoComposer, object: text)
+                                    }
+                                    Divider()
+                                    Button("신고하기", systemImage: "exclamationmark.bubble", role: .destructive) {
+                                        NotificationCenter.default.post(name: .reportChatMessage, object: message)
+                                    }
+                                }
+                        }
 
                         // 시간 (버블의 오른쪽)
                         Text(timeString(from: message.createdAt))
@@ -498,3 +576,4 @@ fileprivate func suggestedFileName(for pickerItem: PhotosPickerItem, mimeType: S
     default: return "file"
     }
 }
+
