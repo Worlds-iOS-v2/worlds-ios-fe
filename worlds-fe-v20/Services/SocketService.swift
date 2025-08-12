@@ -67,18 +67,13 @@ class SocketService {
         socket.emit(Event.joinRoom, ["roomId": roomId, "userId": userId])
     }
 
-    /// 주어진 userId에 해당하는 채팅방 목록을 REST API로 요청
+    /// 채팅방 목록을 REST API로 요청 (JWT 기반)
     /// - Parameters:
     ///   - completion: 응답으로 받은 채팅방 목록 배열(JSON)을 반환하는 클로저
     func fetchChatRooms(completion: @escaping ([ChatRoom]?) -> Void) {
-        guard let userId = currentUserId else {
-            print("No CurrentUserId found in UserDefaults")
-            completion(nil)
-            return
-        }
-        print("🔍 fetchChatRooms with userId:", userId)
+        print("🔍 fetchChatRooms (JWT)")
         guard let baseUrl = Bundle.main.object(forInfoDictionaryKey: "APIBaseURL") as? String,
-              let url = URL(string: "\(baseUrl)/chat/chatrooms/\(userId)") else {
+              let url = URL(string: "\(baseUrl)/chat/chatrooms") else {
             print("Invalid APIBaseURL or URL format")
             completion(nil)
             return
@@ -451,7 +446,12 @@ extension SocketService {
         req.httpMethod = "POST"
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
         req.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-        let body = ["token": token]
+        let rawToken = token
+        let cleanedToken = rawToken.trimmingCharacters(in: .whitespacesAndNewlines)
+        print("🔎 claim raw token:", rawToken)
+        print("🔎 claim cleaned token:", cleanedToken)
+        print("🔎 raw == cleaned?", rawToken == cleanedToken)
+        let body = ["token": cleanedToken]
         req.httpBody = try? JSONSerialization.data(withJSONObject: body)
 
         URLSession.shared.dataTask(with: req) { data, resp, err in
