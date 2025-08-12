@@ -10,6 +10,7 @@ import SwiftUI
 struct ChatListView: View {
     @State private var chatRooms: [ChatRoom] = []
     @State private var isPresentingAddChatView = false
+    @State private var leftRoomIds: Set<Int> = UserDefaults.standard.object(forKey: "leftRoomIds") as? Set<Int> ?? []
 
     var body: some View {
         NavigationStack {
@@ -44,6 +45,10 @@ struct ChatListView: View {
                 }
             }
             .onAppear {
+                // Load leftRoomIds from UserDefaults
+                if let savedIds = UserDefaults.standard.object(forKey: "leftRoomIds") as? [Int] {
+                    leftRoomIds = Set(savedIds)
+                }
                 SocketService.shared.fetchChatRooms { rooms in
                     guard let rooms = rooms else {
                         print("❌ rooms가 nil임")
@@ -51,8 +56,16 @@ struct ChatListView: View {
                     }
                     DispatchQueue.main.async {
                         print("✅ rooms.count: \(rooms.count)")
-                        self.chatRooms = rooms
+                        self.chatRooms = rooms.filter { !leftRoomIds.contains($0.id) }
                     }
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .init("ChatRoomDidLeave"))) { note in
+                if let roomId = note.object as? Int {
+                    leftRoomIds.insert(roomId)
+                    // Save updated leftRoomIds to UserDefaults
+                    UserDefaults.standard.set(Array(leftRoomIds), forKey: "leftRoomIds")
+                    chatRooms.removeAll { $0.id == roomId }
                 }
             }
             .background(Color(red: 0.94, green: 0.96, blue: 1.0))

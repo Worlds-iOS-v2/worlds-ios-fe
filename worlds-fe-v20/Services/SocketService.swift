@@ -24,8 +24,8 @@ class SocketService {
         static let joinRoom = "join_room"
         static let sendMessage = "send_message"
         static let receiveMessage = "receive_message"
-        static let messageRead = "message_read"
-        static let markRead = "message_read" // emit용 (서버와 동일 이벤트명 사용)
+        static let readMessage = "read_message"      // 내가 서버로 emit 할 때 사용
+        static let messageRead = "message_read"       // 서버가 브로드캐스트 할 때 수신 이벤트명
     }
     
     private var manager: SocketManager!
@@ -68,6 +68,7 @@ class SocketService {
     }
 
     /// 채팅방 목록을 REST API로 요청 (JWT 기반)
+    /// - Backend now supports unreadCount per chat room.
     /// - Parameters:
     ///   - completion: 응답으로 받은 채팅방 목록 배열(JSON)을 반환하는 클로저
     func fetchChatRooms(completion: @escaping ([ChatRoom]?) -> Void) {
@@ -276,13 +277,24 @@ class SocketService {
         }
     }
     
-    /// 메시지 읽음 이벤트를 수신
-    /// - Parameter handler: 읽음 처리할 메시지 ID를 반환하는 클로저
+    /// 메시지 읽음 이벤트를 수신 (서버 브로드캐스트)
+    /// 서버는 일반적으로 { roomId, userId, lastReadMessageId } 형태를 보냄
     func onMessageRead(_ handler: @escaping (Int) -> Void) {
+        socket.off(Event.messageRead)
         socket.on(Event.messageRead) { data, _ in
+            // 1) 바로 Int만 오는 경우 (구버전 호환)
             if let messageId = data.first as? Int {
                 handler(messageId)
+                return
             }
+            // 2) 딕셔너리 페이로드 { lastReadMessageId: Int, roomId: Int, userId: Int }
+            if let dict = data.first as? [String: Any] {
+                if let lastId = dict["lastReadMessageId"] as? Int {
+                    handler(lastId)
+                    return
+                }
+            }
+            print("⚠️ onMessageRead: 알 수 없는 페이로드", data)
         }
     }
     
@@ -335,6 +347,97 @@ class SocketService {
             }
         }.resume()
     }
+
+    /// 채팅방 나가기(숨김)
+    /// 백엔드: POST /chat/rooms/:roomId/leave (JWT 필요)
+    func leaveRoom(roomId: Int, completion: @escaping (Bool) -> Void) {
+        guard let baseUrl = Bundle.main.object(forInfoDictionaryKey: "APIBaseURL") as? String,
+              let url = URL(string: "\(baseUrl)/chat/rooms/\(roomId)/leave") else {
+            print("❌ APIBaseURL 로딩 실패 또는 URL 생성 실패")
+            completion(false)
+            return
+        }
+        guard let accessToken = UserDefaults.standard.string(forKey: "accessToken") else {
+            print("❌ accessToken 없음")
+            completion(false)
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        request.httpBody = Data() // 빈 바디 허용
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("❌ 채팅방 나가기 요청 실패:", error)
+                completion(false)
+                return
+            }
+            guard let http = response as? HTTPURLResponse else {
+                print("❌ leaveRoom 응답 형식 오류")
+                completion(false)
+                return
+            }
+            let ok = (200...299).contains(http.statusCode)
+            if !ok {
+                let body = String(data: data ?? Data(), encoding: .utf8) ?? "<no body>"
+                print("❌ leaveRoom 실패 status=\(http.statusCode) body=", body)
+            }
+            completion(ok)
+        }.resume()
+    }
+
+    /// 메시지 신고
+    /// 백엔드: POST /chat/messages/:messageId/report (JWT 필요)
+    /// - Parameters:
+    ///   - messageId: 신고할 메시지 ID
+    ///   - reason: 선택 사유(백엔드에서 자유 텍스트를 허용하는 경우)
+    func reportMessage(messageId: Int, reason: String? = nil, completion: @escaping (Bool) -> Void) {
+        guard let baseUrl = Bundle.main.object(forInfoDictionaryKey: "APIBaseURL") as? String,
+              let url = URL(string: "\(baseUrl)/chat/messages/\(messageId)/report") else {
+            print("❌ APIBaseURL 로딩 실패 또는 URL 생성 실패")
+            completion(false)
+            return
+        }
+        guard let accessToken = UserDefaults.standard.string(forKey: "accessToken") else {
+            print("❌ accessToken 없음")
+            completion(false)
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+
+        if let reason = reason, !reason.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            let body: [String: Any] = ["reason": reason]
+            request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+        } else {
+            request.httpBody = Data() // 빈 바디 허용
+        }
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("❌ 메시지 신고 요청 실패:", error)
+                completion(false)
+                return
+            }
+            guard let http = response as? HTTPURLResponse else {
+                print("❌ reportMessage 응답 형식 오류")
+                completion(false)
+                return
+            }
+            let ok = (200...299).contains(http.statusCode)
+            if !ok {
+                let body = String(data: data ?? Data(), encoding: .utf8) ?? "<no body>"
+                print("❌ reportMessage 실패 status=\(http.statusCode) body=", body)
+            }
+            completion(ok)
+        }.resume()
+    }
     /// 단일 메시지 읽음 처리(소켓 emit)
     /// - Parameters:
     ///   - roomId: 채팅방 ID
@@ -347,29 +450,20 @@ class SocketService {
         let payload: [String: Any] = [
             "roomId": roomId,
             "userId": userId,
-            "messageId": messageId
+            "lastReadMessageId": messageId
         ]
-        print("📤 emit message_read:", payload)
-        socket.emit(Event.markRead, payload)
+        print("📤 emit read_message:", payload)
+        socket.emit(Event.readMessage, payload)
     }
 
     /// 여러 메시지 일괄 읽음 처리(소켓 emit)
-    /// 서버가 단건만 받는다면 내부에서 순차 호출
+    /// 서버가 단건만 받는다면 내부에서 최대값(lastReadMessageId)만 전달
     /// - Parameters:
     ///   - roomId: 채팅방 ID
     ///   - messageIds: 읽음 처리할 메시지 ID 배열
     func emitMessagesRead(roomId: Int, messageIds: [Int]) {
-        guard !messageIds.isEmpty else { return }
-        // 서버가 배열 payload를 받도록 구현되어 있다면 아래 주석을 사용하고,
-        // 단건만 받는다면 forEach로 단건 emit
-        // let payload: [String: Any] = [
-        //     "roomId": roomId,
-        //     "userId": currentUserId ?? 0,
-        //     "messageIds": messageIds
-        // ]
-        // socket.emit(Event.markRead, payload)
-
-        messageIds.forEach { emitMessageRead(roomId: roomId, messageId: $0) }
+        guard let lastId = messageIds.max() else { return }
+        emitMessageRead(roomId: roomId, messageId: lastId)
     }
 }
 

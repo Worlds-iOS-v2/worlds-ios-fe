@@ -7,9 +7,14 @@
 
 import Foundation
 import Combine
+import UIKit
 
 class ChatViewModel: ObservableObject {
     @Published var messages: [Message] = []
+
+    // 임시 음수 ID 시드 (서버 ID와 충돌 방지)
+    private var tempIdSeed: Int = -1
+    private func nextTempId() -> Int { defer { tempIdSeed -= 1 }; return tempIdSeed }
 
     // 날짜별로 메시지 그룹화
     var groupedMessages: [String: [Message]] {
@@ -18,7 +23,7 @@ class ChatViewModel: ObservableObject {
             return dateKey.isEmpty ? "unknown date" : dateKey
         }
         return grouped.mapValues { group in
-            group.sorted { 
+            group.sorted {
                 guard let date0 = parseISO8601($0.createdAt), let date1 = parseISO8601($1.createdAt) else {
                     return $0.createdAt < $1.createdAt
                 }
@@ -68,14 +73,14 @@ class ChatViewModel: ObservableObject {
         let nowString = formatter.string(from: now)
 
         let message = Message(
-            id: UUID().hashValue, // 임시 ID
+            id: self.nextTempId(),
             roomId: chatId,
             senderId: userId,
             content: content,
             isRead: false,
             createdAt: nowString,
-            fileUrl: "",
-            fileType: ""
+            fileUrl: nil,
+            fileType: nil
         )
 
         // 서버로 전송
@@ -84,6 +89,86 @@ class ChatViewModel: ObservableObject {
         // 즉시 로컬 반영
         DispatchQueue.main.async {
             self.messages.append(message)
+        }
+    }
+
+    /// 이미지 전송 (낙관적 렌더링): 즉시 말풍선 추가 → 백그라운드 업로드 → URL 수신 후 소켓 전송
+    func sendImage(chatId: Int, userId: Int, image: UIImage) {
+        // 공통 타임스탬프
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let createdAt = formatter.string(from: Date())
+
+        // 1) 즉시 임시 메시지 추가 (fileUrl 없음 → UI에서 업로드 중 표시)
+        let tempId = self.nextTempId()
+        let tempMessage = Message(
+            id: tempId,
+            roomId: chatId,
+            senderId: userId,
+            content: "",
+            isRead: false,
+            createdAt: createdAt,
+            fileUrl: nil,
+            fileType: "image/jpeg"
+        )
+        DispatchQueue.main.async {
+            self.messages.append(tempMessage)
+        }
+
+        // 2) 백그라운드에서 압축 + 업로드 → URL 확보 후 소켓 전송
+        Task.detached { [weak self] in
+            guard let self = self else { return }
+
+            // 압축 (품질: 0.75)
+            guard let data = image.jpegData(compressionQuality: 0.75) else {
+                print("❌ JPEG 변환 실패")
+                // 실패 시 임시 말풍선 제거
+                DispatchQueue.main.async {
+                    if let idx = self.messages.firstIndex(where: { $0.id == tempId }) {
+                        self.messages.remove(at: idx)
+                    }
+                }
+                return
+            }
+
+            SocketService.shared.uploadAttachment(
+                data: data,
+                fileName: "photo_\(Int(Date().timeIntervalSince1970)).jpg",
+                mimeType: "image/jpeg"
+            ) { [weak self] urlString in
+                guard let self = self else { return }
+                guard let fileUrl = urlString else {
+                    print("❌ 업로드 실패: fileUrl 없음")
+                    // 실패 시 임시 말풍선 제거
+                    DispatchQueue.main.async {
+                        if let idx = self.messages.firstIndex(where: { $0.id == tempId }) {
+                            self.messages.remove(at: idx)
+                        }
+                    }
+                    return
+                }
+
+                // 3) 임시 메시지 업데이트 (fileUrl 채우기)
+                DispatchQueue.main.async {
+                    if let idx = self.messages.firstIndex(where: { $0.id == tempId }) {
+                        let old = self.messages[idx]
+                        let new = Message(
+                            id: old.id,
+                            roomId: old.roomId,
+                            senderId: old.senderId,
+                            content: old.content,
+                            isRead: old.isRead,
+                            createdAt: old.createdAt,
+                            fileUrl: fileUrl,                 // <- 업로드된 URL
+                            fileType: "image/jpeg"            // 필요하면 유지/세팅
+                        )
+                        self.messages[idx] = new
+                        // 이어서 실제 소켓 전송
+                        let outbound = new
+                        SocketService.shared.sendMessage(outbound)
+                    }
+                }
+            }
         }
     }
     
@@ -107,6 +192,7 @@ class ChatViewModel: ObservableObject {
             DispatchQueue.main.async {
                 self?.messages.append(message)
             }
+            self?.markUnreadFromOthersAsRead(roomId: message.roomId)
         }
     }
 
@@ -154,6 +240,7 @@ class ChatViewModel: ObservableObject {
                         let prevSkip = max(0, lastSkip - self.pageSize)
                         self.fetchMessages(roomId: roomId, take: self.pageSize, skip: prevSkip, prepend: true)
                     }
+                    self.markUnreadFromOthersAsRead(roomId: roomId)
                 }
             }
         }
@@ -221,11 +308,8 @@ class ChatViewModel: ObservableObject {
     /// 현재 로드된 메시지 중 내가 받은(unread) 것들을 읽음 처리
     func markUnreadFromOthersAsRead(roomId: Int) {
         let myId = UserDefaults.standard.integer(forKey: "userId")
-        let unreadIds = messages
-            .filter { $0.senderId != myId && $0.isRead == false }
-            .map { $0.id }
-        if !unreadIds.isEmpty {
-            SocketService.shared.emitMessagesRead(roomId: roomId, messageIds: unreadIds)
-        }
+        let unreadFromOthers = messages.filter { $0.roomId == roomId && $0.senderId != myId && $0.isRead == false }
+        guard let lastId = unreadFromOthers.map({ $0.id }).max() else { return }
+        SocketService.shared.emitMessageRead(roomId: roomId, messageId: lastId)
     }
 }
