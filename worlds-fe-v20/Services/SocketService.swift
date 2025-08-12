@@ -24,8 +24,8 @@ class SocketService {
         static let joinRoom = "join_room"
         static let sendMessage = "send_message"
         static let receiveMessage = "receive_message"
-        static let readMessage = "read_message"      // 내가 서버로 emit 할 때 사용
-        static let messageRead = "message_read"       // 서버가 브로드캐스트 할 때 수신 이벤트명
+        static let readMessage = "read_message"      // ← 내가 emit 할 때
+        static let messageRead = "messages_read"     // ← 서버가 브로드캐스트
     }
     
     private var manager: SocketManager!
@@ -67,7 +67,7 @@ class SocketService {
         socket.emit(Event.joinRoom, ["roomId": roomId, "userId": userId])
     }
 
-    /// 채팅방 목록을 REST API로 요청 (JWT 기반)
+    /// 채팅방 목록을 REST API로 요청 (JWT 기반) - 디버깅 버전
     /// - Backend now supports unreadCount per chat room.
     /// - Parameters:
     ///   - completion: 응답으로 받은 채팅방 목록 배열(JSON)을 반환하는 클로저
@@ -101,8 +101,14 @@ class SocketService {
             print("Received data:", data)
             print("Response string:", String(data: data, encoding: .utf8) ?? "디코딩 실패")
             do {
+                // 1) 시도: 래퍼 { data: [ChatRoom] }
+                if let wrapped = try? JSONDecoder().decode(ChatRoomResponseWrapper.self, from: data) {
+                    completion(wrapped.data)
+                    return
+                }
+                
+                // 2) 시도: 바로 [ChatRoom]
                 let decoded = try JSONDecoder().decode([ChatRoom].self, from: data)
-                print("Decoded chatRooms:", decoded.count)
                 completion(decoded)
             } catch {
                 print("Decoding error:", error)
@@ -277,24 +283,40 @@ class SocketService {
         }
     }
     
-    /// 메시지 읽음 이벤트를 수신 (서버 브로드캐스트)
-    /// 서버는 일반적으로 { roomId, userId, lastReadMessageId } 형태를 보냄
+    /// 메시지 읽음 이벤트 수신 (서버 브로드캐스트)
+    /// handler에는 '상대가 읽었다'고 판단할 수 있는 마지막 messageId를 넘겨줌
     func onMessageRead(_ handler: @escaping (Int) -> Void) {
+        // 기존 핸들러 제거
         socket.off(Event.messageRead)
+        socket.off("message_read") // 레거시 안전 장치
+
+        // 신규: messages_read
         socket.on(Event.messageRead) { data, _ in
-            // 1) 바로 Int만 오는 경우 (구버전 호환)
-            if let messageId = data.first as? Int {
-                handler(messageId)
-                return
-            }
-            // 2) 딕셔너리 페이로드 { lastReadMessageId: Int, roomId: Int, userId: Int }
             if let dict = data.first as? [String: Any] {
-                if let lastId = dict["lastReadMessageId"] as? Int {
-                    handler(lastId)
-                    return
+                if let last = dict["lastReadMessageId"] as? Int {
+                    handler(last); return
+                }
+                if let ids = dict["messageIds"] as? [Int], let maxId = ids.max() {
+                    handler(maxId); return
                 }
             }
-            print("⚠️ onMessageRead: 알 수 없는 페이로드", data)
+            print("⚠️ onMessageRead(messages_read): 알 수 없는 페이로드", data)
+        }
+
+        // 레거시: message_read (혹시 남아있다면)
+        socket.on("message_read") { data, _ in
+            if let lastId = data.first as? Int {
+                handler(lastId); return
+            }
+            if let dict = data.first as? [String: Any] {
+                if let last = dict["lastReadMessageId"] as? Int {
+                    handler(last); return
+                }
+                if let ids = dict["messageIds"] as? [Int], let maxId = ids.max() {
+                    handler(maxId); return
+                }
+            }
+            print("⚠️ onMessageRead(legacy message_read): 알 수 없는 페이로드", data)
         }
     }
     
@@ -450,7 +472,7 @@ class SocketService {
         let payload: [String: Any] = [
             "roomId": roomId,
             "userId": userId,
-            "lastReadMessageId": messageId
+            "messageIds": [messageId]
         ]
         print("📤 emit read_message:", payload)
         socket.emit(Event.readMessage, payload)
@@ -462,8 +484,14 @@ class SocketService {
     ///   - roomId: 채팅방 ID
     ///   - messageIds: 읽음 처리할 메시지 ID 배열
     func emitMessagesRead(roomId: Int, messageIds: [Int]) {
-        guard let lastId = messageIds.max() else { return }
-        emitMessageRead(roomId: roomId, messageId: lastId)
+        guard let userId = currentUserId, !messageIds.isEmpty else { return }
+        let payload: [String: Any] = [
+            "roomId": roomId,
+            "userId": userId,
+            "messageIds": messageIds
+        ]
+        print("📤 emit read_message (bulk):", payload)
+        socket.emit(Event.readMessage, payload)
     }
 }
 
@@ -473,7 +501,7 @@ extension SocketService {
         let token: String
         let expiresAt: String
     }
-
+    
     /// 1) QR 생성: POST /pairings → { token, expiresAt }
     func createPairingToken(completion: @escaping (_ token: String?, _ expiresAt: String?) -> Void) {
         guard let base = Bundle.main.object(forInfoDictionaryKey: "APIBaseURL") as? String,
@@ -487,13 +515,13 @@ extension SocketService {
             completion(nil, nil)
             return
         }
-
+        
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
         req.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         req.httpBody = try? JSONSerialization.data(withJSONObject: [:])
-
+        
         URLSession.shared.dataTask(with: req) { data, resp, err in
             if let err = err {
                 print("❌ 요청 실패 @ \(url.absoluteString):", err)
@@ -521,7 +549,7 @@ extension SocketService {
             }
         }.resume()
     }
-
+    
     /// 2) QR 스캔(상대): POST /pairings/claim { token } → ChatRoom
     func claimPairing(token: String, completion: @escaping (ChatRoom?) -> Void) {
         guard let base = Bundle.main.object(forInfoDictionaryKey: "APIBaseURL") as? String,
@@ -535,7 +563,7 @@ extension SocketService {
             completion(nil)
             return
         }
-
+        
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -547,7 +575,7 @@ extension SocketService {
         print("🔎 raw == cleaned?", rawToken == cleanedToken)
         let body = ["token": cleanedToken]
         req.httpBody = try? JSONSerialization.data(withJSONObject: body)
-
+        
         URLSession.shared.dataTask(with: req) { data, resp, err in
             if let err = err {
                 print("❌ 요청 실패 @ \(url.absoluteString):", err)
@@ -574,5 +602,17 @@ extension SocketService {
                 completion(nil)
             }
         }.resume()
+    }
+    
+    /// 현재 보이는 메시지 중 내가 보낸 게 아닌 마지막 메시지까지 읽음 emit
+    func emitReadUpToLastIncoming(roomId: Int, messages: [Message]) {
+        guard let me = currentUserId else { return }
+        // 상대가 보낸 메시지들 중 가장 큰 id
+        let lastIncomingId = messages.filter { $0.roomId == roomId && $0.senderId != me }
+            .map { $0.id }
+            .max()
+        if let lastId = lastIncomingId {
+            emitMessagesRead(roomId: roomId, messageIds: [lastId])
+        }
     }
 }

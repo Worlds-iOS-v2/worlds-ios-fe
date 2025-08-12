@@ -68,6 +68,30 @@ struct ChatListView: View {
                     chatRooms.removeAll { $0.id == roomId }
                 }
             }
+            // 새 메시지 수신 시 unreadCount 업데이트
+            .onReceive(NotificationCenter.default.publisher(for: .init("NewMessageReceived"))) { note in
+                if let userInfo = note.userInfo,
+                   let roomId = userInfo["roomId"] as? Int,
+                   let senderId = userInfo["senderId"] as? Int {
+                    let currentUserId = UserDefaults.standard.integer(forKey: "userId")
+                    
+                    // 내가 보낸 메시지가 아닌 경우에만 unreadCount 증가
+                    if senderId != currentUserId {
+                        if let index = chatRooms.firstIndex(where: { $0.id == roomId }) {
+                            chatRooms[index].unreadCount = (chatRooms[index].unreadCount ?? 0) + 1
+                        }
+                    }
+                }
+            }
+            // 메시지 읽음 처리 시 unreadCount 업데이트
+            .onReceive(NotificationCenter.default.publisher(for: .init("MessagesRead"))) { note in
+                if let userInfo = note.userInfo,
+                   let roomId = userInfo["roomId"] as? Int {
+                    if let index = chatRooms.firstIndex(where: { $0.id == roomId }) {
+                        chatRooms[index].unreadCount = 0
+                    }
+                }
+            }
             .background(Color(red: 0.94, green: 0.96, blue: 1.0))
             .ignoresSafeArea(edges: .bottom)
             .sheet(isPresented: $isPresentingAddChatView) {
@@ -88,6 +112,34 @@ struct ChatRow: View {
         self.currentUserId = UserDefaults.standard.integer(forKey: "userId")
         self.partnerName = (chat.userA.id == currentUserId) ? chat.userB.userName : chat.userA.userName
     }
+    
+    // 디버깅을 위한 계산된 속성들
+    private var serverUnreadCount: Int? {
+        chat.unreadCount
+    }
+    
+    private var localUnreadCount: Int {
+        // 안전한 접근을 위한 guard 문 추가
+        guard let messages = chat.messages as [Message]? else {
+            return 0
+        }
+        
+        let unreadMessages = messages.filter { message in
+            return !message.isRead && message.senderId != currentUserId
+        }
+        
+        return unreadMessages.count
+    }
+    
+    // 로컬에서 계산한 값을 우선 사용, 서버 값은 참고용으로만
+    private var unreadCount: Int {
+        // 로컬에서 계산한 값 사용 (서버 값보다 정확함)
+        return localUnreadCount
+    }
+    
+    private var unreadBadgeText: String {
+        unreadCount > 99 ? "99+" : "\(unreadCount)"
+    }
 
     var body: some View {
         HStack(alignment: .top) {
@@ -96,15 +148,44 @@ struct ChatRow: View {
                     .font(.headline)
                     .fontWeight(.bold)
                     .foregroundColor(.black)
-                Text(chat.messages.last?.content ?? "")
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
+                if let lastMessage = chat.messages.last {
+                    if let fileUrl = lastMessage.fileUrl, !fileUrl.isEmpty {
+                        Text("사진")
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                    } else {
+                        Text(lastMessage.content)
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                            .lineLimit(1)
+                    }
+                } else {
+                    Text("새로운 채팅을 시작해보세요")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                }
             }
             Spacer()
-            if let lastMessage = chat.messages.last {
-                Text(lastMessage.formattedDate)
-                    .font(.footnote)
-                    .foregroundColor(.gray)
+            VStack(alignment: .trailing, spacing: 6) {
+                if let lastMessage = chat.messages.last {
+                    Text(lastMessage.formattedDate)
+                        .font(.footnote)
+                        .foregroundColor(.gray)
+                }
+                // 읽지 않은 메시지 배지
+                if unreadCount > 0 {
+                    Text(unreadBadgeText)
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(.white)
+                        .frame(minWidth: 22, minHeight: 22)
+                        .padding(.horizontal, unreadCount > 9 ? 4 : 0)
+                        .background(
+                            Capsule()
+                                .fill(Color(red: 0.22, green: 0.47, blue: 0.99))
+                        )
+                        .accessibilityLabel("읽지 않은 메시지 \(unreadCount)개")
+                        .animation(.easeInOut(duration: 0.2), value: unreadCount)
+                }
             }
         }
         .padding(.vertical, 20)
@@ -115,6 +196,10 @@ struct ChatRow: View {
                 .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 2)
         )
         .padding(.horizontal)
+        .onAppear {
+            // ChatRow가 나타날 때마다 디버깅 정보 출력
+            _ = localUnreadCount // 이렇게 하면 디버깅 로그가 출력됨
+        }
     }
 }
 
