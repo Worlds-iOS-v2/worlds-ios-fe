@@ -243,7 +243,7 @@ class UserAPIManager {
     // 액세스, 리프레시 모두 유저디폴트에 저장할 듯
     func getNewAccessToken() async throws -> APIResponse {
         guard let refreshToken = UserDefaults.standard.string(forKey: "refreshToken") else {
-            print("토큰 값이 유효하지 않습니다.")
+            print("refreshToken 토큰 값이 유효하지 않습니다.")
             throw UserAPIError.invalidToken
         }
         
@@ -406,8 +406,8 @@ class UserAPIManager {
         case .success(let data):
             do {
                 let response = try JSONDecoder().decode(APIResponse.self, from: data)
-                
-                // print("사용자 정보: \(response)")
+                                
+                UserDefaults.standard.set(response.userInfo?.userName, forKey: "username")
                 
                 return response
             } catch {
@@ -642,7 +642,7 @@ class UserAPIManager {
             do {
                 let response = try JSONDecoder().decode(CultureInfo.self, from: data)
                 
-                print("문화정보: \(response)")
+                // print("문화정보: \(response)")
                 
                 return response
             } catch {

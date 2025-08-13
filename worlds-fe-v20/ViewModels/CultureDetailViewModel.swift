@@ -26,7 +26,6 @@ final class CultureDetailViewModel: ObservableObject {
             self.govermentPrograms = info.governmentData
             self.koreanPrograms = info.koreanData
             self.errorMessage = nil
-           // print("✅ 문화 정보 로드 완료: \(eventPrograms.count)개 이벤트, \(govermentPrograms.count)개 정부프로그램, \(koreanPrograms.count)개 한국어프로그램")
         } catch {
             print("❌ fetchCultureInfo 에러 발생:", error)
             self.errorMessage = "문화 정보 목록을 불러오는데 실패했습니다: \(error.localizedDescription)"
