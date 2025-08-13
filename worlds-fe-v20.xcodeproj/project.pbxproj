@@ -7,17 +7,31 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9F25395A2E17C57600B526A5 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 9F2539592E17C57600B526A5 /* Alamofire */; };
-		9F25395C2E17C57600B526A5 /* AlamofireDynamic in Frameworks */ = {isa = PBXBuildFile; productRef = 9F25395B2E17C57600B526A5 /* AlamofireDynamic */; };
+		9F25395A2E17C57600B526A5 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
+		B3A398032E308E9600FC2798 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = B3A398022E308E9600FC2798 /* Alamofire */; };
+		CCECCA652E49CA7F00E73684 /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = CCECCA642E49CA7F00E73684 /* SocketIO */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		9F2539392E17C53900B526A5 /* worlds-fe-v20.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "worlds-fe-v20.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		9F2539812E1CFA3000B526A5 /* Exceptions for "worlds-fe-v20" folder in "worlds-fe-v20" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 9F2539382E17C53900B526A5 /* worlds-fe-v20 */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		9F25393B2E17C53900B526A5 /* worlds-fe-v20 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				9F2539812E1CFA3000B526A5 /* Exceptions for "worlds-fe-v20" folder in "worlds-fe-v20" target */,
+			);
 			path = "worlds-fe-v20";
 			sourceTree = "<group>";
 		};
@@ -28,8 +42,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9F25395A2E17C57600B526A5 /* Alamofire in Frameworks */,
-				9F25395C2E17C57600B526A5 /* AlamofireDynamic in Frameworks */,
+				9F25395A2E17C57600B526A5 /* (null) in Frameworks */,
+				B3A398032E308E9600FC2798 /* Alamofire in Frameworks */,
+				CCECCA652E49CA7F00E73684 /* SocketIO in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,8 +87,8 @@
 			);
 			name = "worlds-fe-v20";
 			packageProductDependencies = (
-				9F2539592E17C57600B526A5 /* Alamofire */,
-				9F25395B2E17C57600B526A5 /* AlamofireDynamic */,
+				B3A398022E308E9600FC2798 /* Alamofire */,
+				CCECCA642E49CA7F00E73684 /* SocketIO */,
 			);
 			productName = "worlds-fe-v20";
 			productReference = 9F2539392E17C53900B526A5 /* worlds-fe-v20.app */;
@@ -104,7 +119,8 @@
 			mainGroup = 9F2539302E17C53900B526A5;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				9F2539582E17C57600B526A5 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				B3A398012E308E9600FC2798 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				CCECCA632E49CA7F00E73684 /* XCRemoteSwiftPackageReference "socket.io-client-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9F25393A2E17C53900B526A5 /* Products */;
@@ -139,6 +155,8 @@
 /* Begin XCBuildConfiguration section */
 		9F2539452E17C53B00B526A5 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 9F25393B2E17C53900B526A5 /* worlds-fe-v20 */;
+			baseConfigurationReferenceRelativePath = Endpoint.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -202,6 +220,8 @@
 		};
 		9F2539462E17C53B00B526A5 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 9F25393B2E17C53900B526A5 /* worlds-fe-v20 */;
+			baseConfigurationReferenceRelativePath = Endpoint.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -258,26 +278,34 @@
 		};
 		9F2539482E17C53B00B526A5 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 9F25393B2E17C53900B526A5 /* worlds-fe-v20 */;
+			baseConfigurationReferenceRelativePath = Endpoint.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"worlds-fe-v20/Preview Content\"";
-				DEVELOPMENT_TEAM = A64NU99HZZ;
+				DEVELOPMENT_TEAM = 8YXQMG6LKS;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "worlds-fe-v20/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "월스";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				INFOPLIST_KEY_NSCameraUsageDescription = "질문 등록을 위해 카메라 접근 권한이 필요합니다.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "질문 등록을 위해 사진 접근 권한이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.kibwa.shl.worlds-fe-v20";
+				MARKETING_VERSION = 1.0.4;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.kibwa.worlds-fe-v20";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -287,26 +315,34 @@
 		};
 		9F2539492E17C53B00B526A5 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 9F25393B2E17C53900B526A5 /* worlds-fe-v20 */;
+			baseConfigurationReferenceRelativePath = Endpoint.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"worlds-fe-v20/Preview Content\"";
-				DEVELOPMENT_TEAM = A64NU99HZZ;
+				DEVELOPMENT_TEAM = 8YXQMG6LKS;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "worlds-fe-v20/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "월스";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				INFOPLIST_KEY_NSCameraUsageDescription = "질문 등록을 위해 카메라 접근 권한이 필요합니다.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "질문 등록을 위해 사진 접근 권한이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.kibwa.shl.worlds-fe-v20";
+				MARKETING_VERSION = 1.0.4;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.kibwa.worlds-fe-v20";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -338,26 +374,34 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		9F2539582E17C57600B526A5 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+		B3A398012E308E9600FC2798 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			repositoryURL = "https://github.com/Alamofire/Alamofire";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 5.10.2;
 			};
 		};
+		CCECCA632E49CA7F00E73684 /* XCRemoteSwiftPackageReference "socket.io-client-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/socketio/socket.io-client-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 16.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		9F2539592E17C57600B526A5 /* Alamofire */ = {
+		B3A398022E308E9600FC2798 /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 9F2539582E17C57600B526A5 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			package = B3A398012E308E9600FC2798 /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
 		};
-		9F25395B2E17C57600B526A5 /* AlamofireDynamic */ = {
+		CCECCA642E49CA7F00E73684 /* SocketIO */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 9F2539582E17C57600B526A5 /* XCRemoteSwiftPackageReference "Alamofire" */;
-			productName = AlamofireDynamic;
+			package = CCECCA632E49CA7F00E73684 /* XCRemoteSwiftPackageReference "socket.io-client-swift" */;
+			productName = SocketIO;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
