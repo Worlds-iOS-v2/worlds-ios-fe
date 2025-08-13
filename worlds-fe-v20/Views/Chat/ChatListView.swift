@@ -104,7 +104,7 @@ struct ChatListView: View {
             DispatchQueue.main.async {
                 print("✅ rooms.count: \(rooms.count)")
                 
-                // 🔥 핵심 수정: 현재 사용자가 참여하고 있고, 나가지 않은 채팅방만 필터링
+                // 현재 사용자가 참여하고 있고, 나가지 않은 채팅방만 필터링
                 self.chatRooms = rooms.filter { room in
                     let isParticipant = (room.userA.id == currentUserId || room.userB.id == currentUserId)
                     let hasNotLeft = !leftRoomIds.contains(room.id)
