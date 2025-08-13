@@ -45,20 +45,7 @@ struct ChatListView: View {
                 }
             }
             .onAppear {
-                // Load leftRoomIds from UserDefaults
-                if let savedIds = UserDefaults.standard.object(forKey: "leftRoomIds") as? [Int] {
-                    leftRoomIds = Set(savedIds)
-                }
-                SocketService.shared.fetchChatRooms { rooms in
-                    guard let rooms = rooms else {
-                        print("❌ rooms가 nil임")
-                        return
-                    }
-                    DispatchQueue.main.async {
-                        print("✅ rooms.count: \(rooms.count)")
-                        self.chatRooms = rooms.filter { !leftRoomIds.contains($0.id) }
-                    }
-                }
+                loadChatRooms()
             }
             .onReceive(NotificationCenter.default.publisher(for: .init("ChatRoomDidLeave"))) { note in
                 if let roomId = note.object as? Int {
@@ -99,8 +86,38 @@ struct ChatListView: View {
             }
         }
     }
+    
+    // MARK: - 채팅방 로드 함수 분리
+    private func loadChatRooms() {
+        // Load leftRoomIds from UserDefaults
+        if let savedIds = UserDefaults.standard.object(forKey: "leftRoomIds") as? [Int] {
+            leftRoomIds = Set(savedIds)
+        }
+        
+        let currentUserId = UserDefaults.standard.integer(forKey: "userId")
+        
+        SocketService.shared.fetchChatRooms { rooms in
+            guard let rooms = rooms else {
+                print("❌ rooms가 nil임")
+                return
+            }
+            DispatchQueue.main.async {
+                print("✅ rooms.count: \(rooms.count)")
+                
+                // 현재 사용자가 참여하고 있고, 나가지 않은 채팅방만 필터링
+                self.chatRooms = rooms.filter { room in
+                    let isParticipant = (room.userA.id == currentUserId || room.userB.id == currentUserId)
+                    let hasNotLeft = !leftRoomIds.contains(room.id)
+                    return isParticipant && hasNotLeft
+                }
+                
+                print("✅ 필터링된 채팅방 수: \(self.chatRooms.count)")
+            }
+        }
+    }
 }
 
+// ChatRow는 동일하게 유지
 struct ChatRow: View {
     var chat: ChatRoom
     
