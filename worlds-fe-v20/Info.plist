@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>APICrawlURL</key>
-	<string>$(API_CRAWL_URL)</string>
 	<key>APIAccessTokenURL</key>
 	<string>$(API_ACCESS_TOKEN_URL)</string>
 	<key>APIBaseURL</key>
@@ -12,6 +10,8 @@
 	<string>$(API_CHANGE_PASSWORD_URL)</string>
 	<key>APICheckEmailURL</key>
 	<string>$(API_CHECK_EMAIL_URL)</string>
+	<key>APICrawlURL</key>
+	<string>$(API_CRAWL_URL)</string>
 	<key>APIDeleteAccountURL</key>
 	<string>$(API_DELETE_ACCOUNT_URL)</string>
 	<key>APIFindEmailURL</key>
