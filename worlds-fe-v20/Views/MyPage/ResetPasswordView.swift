@@ -69,7 +69,7 @@ struct ResetPasswordView: View {
                         .font(.caption)
                 }
                 
-                CommonSignUpTextField(title: "비밀번호", placeholder: "비밀번호를 입력해주세요", isSecure: true, content: $newPassword)
+                CommonSignUpTextField(title: "새로운 비밀번호", placeholder: "비밀번호를 입력해주세요", isSecure: true, content: $newPassword)
                     .padding(.top, 20)
                 
                 if !newPassword.isEmpty && !isValidPassword(newPassword) {
