@@ -8,31 +8,60 @@
 import SwiftUI
 
 struct ResetPasswordView: View {
-    @StateObject var viewModel: MyPageViewModel = MyPageViewModel()
+    @StateObject var viewModel: ResetPasswordViewModel = ResetPasswordViewModel()
     @Environment(\.dismiss) var dismiss
 
+    @State var email: String = ""
     @State var oldPassword: String = ""
     @State var newPassword: String = ""
     @State var passwordCheck: String = ""
     
+    var isLoginView: Bool = false
+    @State var alertMessage: String = ""
+    @State var showAlert: Bool = false
+    
     var isFilled: Bool {
-        !oldPassword.isEmpty &&
-        isValidPassword(oldPassword) &&
-        !newPassword.isEmpty &&
-        !passwordCheck.isEmpty &&
-        newPassword == passwordCheck
+        if !isLoginView {
+            !oldPassword.isEmpty &&
+            isValidPassword(oldPassword) &&
+            !newPassword.isEmpty &&
+            !passwordCheck.isEmpty &&
+            newPassword == passwordCheck
+        } else {
+            !email.isEmpty &&
+            isValidEmail(email) &&
+            !oldPassword.isEmpty &&
+            isValidPassword(oldPassword) &&
+            !newPassword.isEmpty &&
+            !passwordCheck.isEmpty &&
+            newPassword == passwordCheck
+        }
     }
+    
     @State var isSuceed: Bool = false
         
     var body: some View {
-        VStack {
+        ScrollView {
             VStack(alignment: .leading) {
                 Text("변경할 비밀번호를 입력해주세요.")
-                    .font(.system(size: 27, weight: .bold))
-                    .padding(.top, 40)
+                    .font(.system(size: 24, weight: .bold))
+                    .padding(.top, 20)
+                
+                if isLoginView {
+                    CommonSignUpTextField(title: "이메일", placeholder: "이메일을 입력해주세요.", isSecure: false, content: $email)
+                        .textInputAutocapitalization(.never) // 자동 대문자처리 해제
+                        .keyboardType(.emailAddress)
+                        .padding(.top, 20)
+                    
+                    if !email.isEmpty && !isValidEmail(email) {
+                        Text("올바른 이메일 형식이 아닙니다.")
+                            .foregroundColor(.red)
+                            .font(.caption)
+                    }
+                }
                 
                 CommonSignUpTextField(title: "기존 비밀번호", placeholder: "기존 비밀번호를 입력해주세요", isSecure: true, content: $oldPassword)
-                    .padding(.top, 40)
+                    .padding(.top, 20)
                 
                 if !oldPassword.isEmpty && !isValidPassword(oldPassword) {
                     Text("비밀번호는 영문, 숫자, 특수문자 중 2가지 이상 조합으로 8~16자여야 합니다.")
@@ -41,7 +70,7 @@ struct ResetPasswordView: View {
                 }
                 
                 CommonSignUpTextField(title: "비밀번호", placeholder: "비밀번호를 입력해주세요", isSecure: true, content: $newPassword)
-                    .padding(.top, 40)
+                    .padding(.top, 20)
                 
                 if !newPassword.isEmpty && !isValidPassword(newPassword) {
                     Text("비밀번호는 영문, 숫자, 특수문자 중 2가지 이상 조합으로 8~16자여야 합니다.")
@@ -50,7 +79,7 @@ struct ResetPasswordView: View {
                 }
                 
                 CommonSignUpTextField(title: "비밀번호 확인", placeholder: "비밀번호를 한 번 더 입력해주세요.", isSecure: true, content: $passwordCheck)
-                    .padding(.top, 40)
+                    .padding(.top, 20)
                 
                 if !passwordCheck.isEmpty && newPassword != passwordCheck {
                     Text("비밀번호가 일치하지 않습니다.")
@@ -62,15 +91,30 @@ struct ResetPasswordView: View {
                 
                 CommonSignUpButton(text: "완료", isFilled: isFilled) {
                     Task {
-                        await viewModel.resetPassword(oldPassword: oldPassword, newPassword: newPassword)
-                        
-                        dismiss()
+                        do {
+                            if isLoginView {
+                                let loginSuccess = await viewModel.login(email: email, password: oldPassword)
+                                guard loginSuccess else {
+                                    self.alertMessage = viewModel.errorMessage ?? "알 수 없는 에러가 발생했습니다."
+                                    showAlert = true
+                                    return
+                                }
+                            }
+                            
+                            await viewModel.resetPassword(oldPassword: oldPassword, newPassword: newPassword)
+                            dismiss()
+                            
+                        }
                     }
                 }
-                .padding(.top, 40)
+                .alert(alertMessage, isPresented: $showAlert) {
+                    Button("확인", role: .cancel) { }
+                }
+                .padding(.top, 20)
                 .padding(.bottom, 12)
             }
         }
+        .scrollIndicators(.hidden)
         .padding()
         .background(.backgroundws)
         .navigationTitle("비밀번호 변경")
@@ -124,6 +168,13 @@ extension ResetPasswordView {
         
         // 최소 2가지 조건 이상 만족해야 함
         return conditionsMet >= 2
+    }
+    
+    func isValidEmail(_ email: String) -> Bool {
+        let emailRegEx =
+        #"^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"#
+
+        return NSPredicate(format: "SELF MATCHES %@", emailRegEx).evaluate(with: email)
     }
 }
 //
