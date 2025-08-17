@@ -15,6 +15,7 @@ struct SignUpAccountView: View {
     @State var email: String = ""
     @State var password: String = ""
     @State var passwordCheck: String = ""
+    @State var otp: String = "" // 인증번호
     
     var isFilled: Bool {
         !email.isEmpty &&
@@ -25,11 +26,13 @@ struct SignUpAccountView: View {
     }
     // var isFilled = true
     @State var isSuceed: Bool = false
+    @State var otpSent: Bool = false // 인증번호 전송 여부
+    @State var otpConfirmed: Bool = false // 인증번호 인증 여부
     
     @EnvironmentObject var viewModel: SignUpViewModel
     
     var body: some View {
-        VStack {
+        ScrollView {
             VStack(alignment: .leading) {
                 Text("로그인 정보를 입력해주세요.")
                     .font(.system(size: 27, weight: .bold))
@@ -39,11 +42,35 @@ struct SignUpAccountView: View {
                     .keyboardType(.emailAddress)
                     .padding(.top, 40)
                 
-                if !email.isEmpty && !isValidEmail(email) {
-                    Text("올바른 이메일 형식이 아닙니다.")
-                        .foregroundColor(.red)
-                        .font(.caption)
+                
+                HStack {
+                    if !email.isEmpty && !isValidEmail(email) {
+                        Text("올바른 이메일 형식이 아닙니다.")
+                            .foregroundColor(.red)
+                            .font(.caption)
+                    }
+                    
+                    Spacer()
+                    
+                    Button {
+                        otpSent = true
+                    } label: {
+                        Text("인증번호 전송")
+                            .foregroundColor(.mainws)
+                            .font(.callout)
+                    }
                 }
+                
+                HStack(alignment: .bottom) {
+                    CommonSignUpTextField(title: "이메일 인증", placeholder: "인증번호", content: $otp)
+                        .keyboardType(.numberPad)
+                    
+                    CommonSignUpButton(text: "인증", isFilled: otpSent) {
+                        otpConfirmed = true
+                    }
+                    .frame(width: 120)
+                }
+                .padding(.top, 40)
                 
                 CommonSignUpTextField(title: "비밀번호", placeholder: "비밀번호를 입력해주세요", isSecure: true, content: $password)
                     .padding(.top, 40)
@@ -88,6 +115,7 @@ struct SignUpAccountView: View {
                     .font(.system(size: 14))
             }
         }
+        .scrollIndicators(.hidden)
         .padding()
         .background(.backgroundws)
         .navigationTitle("회원가입")
