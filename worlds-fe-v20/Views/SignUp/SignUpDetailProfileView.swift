@@ -41,10 +41,11 @@ struct SignUpDetailProfileView: View {
                 CommonSignUpTextField(title: "이름", placeholder: "이름을 입력해주세요", content: $name)
                     .padding(.bottom, 40)
                     .padding(.top, 40)
-                
-                CommonSignUpTextField(title: "전화번호", placeholder: "전화번호를 입력해주세요", content: $phoneNumber)
-                    .keyboardType(.numberPad)
-                    .padding(.bottom, 40)
+
+                // 전화번호 입력 부분 주석처리.
+//                CommonSignUpTextField(title: "전화번호", placeholder: "전화번호를 입력해주세요", content: $phoneNumber)
+//                    .keyboardType(.numberPad)
+//                    .padding(.bottom, 40)
                 
                 Text("생년월일")
                     .foregroundStyle(Color.gray)
