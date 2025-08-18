@@ -32,6 +32,10 @@
 	<string>$(API_USER_INFO_URL)</string>
 	<key>CFBundleIconName</key>
 	<string>AppIcon</string>
+	<key>APIUserAttendanceURL</key>
+	<string>$(API_USER_ATTENDANCE_URL)</string>
+	<key>APIUserAttendanceListURL</key>
+	<string>$(API_ATTENDANCE_LIST_URL)</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
