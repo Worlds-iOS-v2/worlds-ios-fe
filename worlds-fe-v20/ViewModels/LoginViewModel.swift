@@ -35,4 +35,26 @@ final class LoginViewModel: ObservableObject {
             return false
         }
     }
+    
+    @MainActor
+    func attendanceCheck() async -> Bool {
+        do {
+            let _ = try await UserAPIManager.shared.attendanceCheck()
+            self.errorMessage = nil
+            
+            return true
+        } catch UserAPIError.serverError(let message) {
+            self.errorMessage = message
+            print("서버 에러: \(message)")
+            
+            return false
+        } catch {
+            if error.localizedDescription == "The data couldn’t be read because it isn’t in the correct format." {
+                self.errorMessage = "출석체크가 되지 않았습니다."
+            }
+            print("기타 에러: \(errorMessage)")
+            
+            return false
+        }
+    }
 }
