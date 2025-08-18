@@ -68,6 +68,7 @@ struct LoginView: View {
                                 let isLoggedIn = await viewModel.login()
                                 
                                 if isLoggedIn {
+                                    await viewModel.attendanceCheck()
                                     appState.flow = .main
                                 } else {
                                     // 401 -> 이메일이나 비번이 바르지 않을 경우

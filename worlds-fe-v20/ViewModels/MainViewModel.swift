@@ -10,6 +10,7 @@ import SwiftUI
 final class MainViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var posts: [QuestionList] = []
+    @Published var attendanceList: [String] = []
 
     func getUsername() -> String {
         guard let username = UserDefaults.standard.string(forKey: "username") else {
@@ -27,6 +28,18 @@ final class MainViewModel: ObservableObject {
         } catch {
             print("❌ fetchLatestPosts 에러 발생:", error)
             self.errorMessage = "질문 최신 목록을 불러오는데 실패했습니다: \(error.localizedDescription)"
+        }
+    }
+    
+    @MainActor
+    func fetchAttendanceList() async {
+        do {
+            let attendanceData = try await UserAPIManager.shared.getAttendanceList()
+            self.attendanceList = attendanceData.attendanceDates ?? []
+            self.errorMessage = nil
+        } catch {
+            print("❌ fetchAttendanceList 에러 발생:", error)
+            self.errorMessage = "출석 목록을 불러오는데 실패했습니다: \(error.localizedDescription)"
         }
     }
 }

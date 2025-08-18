@@ -26,6 +26,7 @@ struct MyPageView: View {
                         .font(.system(size: 27))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 24)
+                        .padding(.top, 28)
                     
                     UserInfoCardView(userInfo: viewModel.userInfo)
                         .cornerRadius(20)
