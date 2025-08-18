@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct OCRSummaryView: View {
+struct OCRSummaryModalView: View {
     @EnvironmentObject private var viewModel: OCRViewModel
 
     var body: some View {
@@ -80,6 +80,6 @@ struct OCRSummaryView: View {
 }
 
 #Preview {
-    OCRSummaryView()
+    OCRSummaryModalView()
         .environmentObject(OCRViewModel())
 }
