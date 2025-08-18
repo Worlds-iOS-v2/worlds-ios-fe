@@ -15,7 +15,7 @@ struct ChatRoom: Identifiable, Codable {
     let createdAt: String
     let userA: ChatUser
     let userB: ChatUser
-    let messages: [Message]
+    var messages: [Message]
     var unreadCount: Int?
 
     var name: String {
@@ -50,5 +50,12 @@ struct Message: Identifiable, Codable {
     var isSender: Bool {
         let currentUserId = UserDefaults.standard.integer(forKey: "userId")
         return senderId == currentUserId
+    }
+}
+
+// Message를 Equatable로 만들어서 중복 체크 가능하게 함
+extension Message: Equatable {
+    static func == (lhs: Message, rhs: Message) -> Bool {
+        return lhs.id == rhs.id
     }
 }
