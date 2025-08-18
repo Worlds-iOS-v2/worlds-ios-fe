@@ -36,60 +36,60 @@ struct MainView: View {
     
     var body: some View {
         ScrollView {
-            VStack {
-                VStack {
-                    Text("안녕하세요! \(viewModel.getUsername())님")
-                        .font(.system(size: 27))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 24)
+            VStack(alignment: .leading) {
+                Text("안녕하세요! \(viewModel.getUsername())님")
+                    .font(.system(size: 27))
+                    .padding(.horizontal, 24)
+                    .padding(.top, 28)
+
+                // 출석 체크 화면
+                ZStack() {
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(.thickMaterial)
+                        .opacity(0.8)
+                        .frame(height: 200)
                     
-                    // 출석 체크 화면
-                    ZStack() {
-                        RoundedRectangle(cornerRadius: 16)
-                               .fill(.thickMaterial) // 또는 .regularMaterial, .thickMaterial
-                               .opacity(0.8)
-                               .frame(height: 160)
+                    VStack(alignment: .leading) {
+                        Text("이번주 출석 현황")
+                            .font(.title)
+                            .padding(8)
                         
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color.white)
-                            .frame(height: 120)
-                            .padding(.horizontal, 12)
-                            .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
-                        
-                        HStack() {
+                        HStack(spacing: 0) {
                             ForEach(1...7, id: \.self) { weekday in
                                 AttendanceRowView(
                                     weekday: weekday,
                                     isAttended: attendanceData[weekday] ?? true,
-                                    isToday: weekday == Calendar.current.component(.weekday, from: Date()))
+                                    isToday: weekday == Calendar.current.component(.weekday, from: Date())
+                                )
+                                .frame(maxWidth: .infinity) // 각각을 균등 분배
                             }
                         }
+                        .padding(8)
+                        .background {
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.white)
+                                .frame(height: 120)
+                                .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
+                        }
                     }
-                    .padding(.horizontal, 24)
                 }
-                .background(
-                    Rectangle()
-                        .fill(Color.sub2Ws)
-                        .padding(.bottom, 60)
-                        .padding(.top, -120)
-                )
-                .padding(.vertical, 40)
+                .padding(.horizontal, 24)
                 
                 HStack() {
                     Text("이번주 소식")
                         .font(.system(size: 27))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 24)
                         .padding(.bottom, 20)
+                    
+                    Spacer()
                     
                     NavigationLink(destination: CultureDetailView()) {
                         Text("더보기 >")
                             .font(.system(size: 16))
                             .foregroundStyle(Color.mainws)
-                            .padding(.horizontal, 24)
                             .padding(.bottom, 20)
                     }
                 }
+                .padding(.horizontal, 24)
                 
                 AutoSlideViewWithTimer(datas: cultureViewModel.eventPrograms, isLoading: cultureViewModel.isLoading)
                     .frame(height: 300)
@@ -97,9 +97,8 @@ struct MainView: View {
                 
                 Text("최신글")
                     .font(.system(size: 27))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 24)
                     .padding(.bottom, 20)
+                    .padding(.horizontal, 24)
                 
                 VStack(spacing: 16) {
                     Spacer()
@@ -134,8 +133,8 @@ struct MainView: View {
                         .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
                 )
             }
-            .padding(.bottom, 100)
-            .background(Color.white)
+            .padding(.bottom, 60)
+            .background(.white)
         }
         .scrollIndicators(.hidden)
         .onAppear {
