@@ -52,6 +52,20 @@ struct MyPageView: View {
                     Divider()
                         .padding(.horizontal, 32)
                     
+                    NavigationLink(destination: OCRListView()) {
+                        Text("나의 OCR")
+                            .font(.system(size: 18))
+                            .foregroundStyle(Color.black)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .padding(.horizontal, 32)
+                    .onAppear{
+                        // OCR 목록 호출
+                    }
+                    
+                    Divider()
+                        .padding(.horizontal, 32)
+                    
                     Button {
                         alertMessage = "로그아웃 하시겠습니까?"
                         showAlert = true
