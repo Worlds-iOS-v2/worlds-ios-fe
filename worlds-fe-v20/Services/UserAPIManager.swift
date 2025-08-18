@@ -190,6 +190,108 @@ class UserAPIManager {
         }
     }
     
+    func attendanceCheck() async throws -> APIResponse {
+        guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
+            print("토큰 값이 유효하지 않습니다.")
+            throw UserAPIError.invalidToken
+        }
+                
+        guard let endPoint = Bundle.main.object(forInfoDictionaryKey: "APIUserAttendanceURL") as? String else {
+            throw UserAPIError.invalidEndPoint
+        }
+                
+        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
+        
+        let dataResponse = await AF.request(endPoint, method: .post, encoding: JSONEncoding.default, headers: headers)
+            .validate()
+            .serializingData()
+            .response
+                
+        switch dataResponse.result {
+        case .success(let data):
+            do {
+                let response = try JSONDecoder().decode(APIResponse.self, from: data)
+                print("출석체크 정보: \(response)")
+
+                return response
+            } catch {
+                print("디코딩 에러: \(error.localizedDescription)")
+                
+                if let rawJSON = String(data: data, encoding: .utf8) {
+                     print("출석체크 원본 JSON 응답:\n\(rawJSON)")
+                }
+                
+                throw UserAPIError.decodingError(description: "디코딩 실패: \(error)")
+            }
+            
+        case .failure:
+            if let rawData = dataResponse.data,
+               let rawString = String(data: rawData, encoding: .utf8) {
+                print("출석체크 서버 원본 응답: \(rawString)")
+                
+                // 서버 에러 응답 파싱 시도
+                let errorResponse = try JSONDecoder().decode(APIErrorResponse.self, from: rawData)
+                print("출석체크 파싱된 에러 응답: \(errorResponse)")
+                
+                let errorMessage = errorResponse.message[0]
+                throw UserAPIError.serverError(message: errorMessage)
+            } else {
+                throw UserAPIError.serverError(message: "출석체크 서버 응답 파싱 실패")
+            }
+        }
+    }
+    
+    func getAttendanceList() async throws -> APIResponse {
+        guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
+            print("토큰 값이 유효하지 않습니다.")
+            throw UserAPIError.invalidToken
+        }
+                
+        guard let endPoint = Bundle.main.object(forInfoDictionaryKey: "APIUserAttendanceListURL") as? String else {
+            throw UserAPIError.invalidEndPoint
+        }
+                
+        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
+        
+        let dataResponse = await AF.request(endPoint, method: .get, encoding: JSONEncoding.default, headers: headers)
+            .validate()
+            .serializingData()
+            .response
+                
+        switch dataResponse.result {
+        case .success(let data):
+            do {
+                let response = try JSONDecoder().decode(APIResponse.self, from: data)
+                print("출석체크 정보: \(response)")
+
+                return response
+            } catch {
+                print("디코딩 에러: \(error.localizedDescription)")
+                
+                if let rawJSON = String(data: data, encoding: .utf8) {
+                     print("출석체크 원본 JSON 응답:\n\(rawJSON)")
+                }
+                
+                throw UserAPIError.decodingError(description: "디코딩 실패: \(error)")
+            }
+            
+        case .failure:
+            if let rawData = dataResponse.data,
+               let rawString = String(data: rawData, encoding: .utf8) {
+                print("출석체크 서버 원본 응답: \(rawString)")
+                
+                // 서버 에러 응답 파싱 시도
+                let errorResponse = try JSONDecoder().decode(APIErrorResponse.self, from: rawData)
+                print("출석체크 파싱된 에러 응답: \(errorResponse)")
+                
+                let errorMessage = errorResponse.message[0]
+                throw UserAPIError.serverError(message: errorMessage)
+            } else {
+                throw UserAPIError.serverError(message: "출석체크 서버 응답 파싱 실패")
+            }
+        }
+    }
+    
     // 이메일 중복 체크
     func emailCheck(email: String) async throws -> APIResponse {
         guard let endPoint = Bundle.main.object(forInfoDictionaryKey: "APICheckEmailURL") as? String else {
