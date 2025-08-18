@@ -12,7 +12,6 @@ struct SignUpDetailProfileView: View {
     @Environment(\.dismiss) var dismiss
 
     @State var name: String = ""
-    @State var phoneNumber: String = ""
     
     @State var birthDate = Date()
     @State var birthYear: Int = Calendar.current.component(.year, from: Date())
@@ -21,10 +20,8 @@ struct SignUpDetailProfileView: View {
     
     @State var isDatePickerPresented: Bool = false
     
-    // @State var isFilled: Bool = true
     var isFilled: Bool {
-        !name.isEmpty &&
-        !phoneNumber.isEmpty
+        !name.isEmpty
     }
     
     @State private var showAlert = false
@@ -41,11 +38,11 @@ struct SignUpDetailProfileView: View {
                 CommonSignUpTextField(title: "이름", placeholder: "이름을 입력해주세요", content: $name)
                     .padding(.bottom, 40)
                     .padding(.top, 40)
-
+                
                 // 전화번호 입력 부분 주석처리.
-//                CommonSignUpTextField(title: "전화번호", placeholder: "전화번호를 입력해주세요", content: $phoneNumber)
-//                    .keyboardType(.numberPad)
-//                    .padding(.bottom, 40)
+                //                CommonSignUpTextField(title: "전화번호", placeholder: "전화번호를 입력해주세요", content: $phoneNumber)
+                //                    .keyboardType(.numberPad)
+                //                    .padding(.bottom, 40)
                 
                 Text("생년월일")
                     .foregroundStyle(Color.gray)
@@ -56,8 +53,7 @@ struct SignUpDetailProfileView: View {
                     isDatePickerPresented.toggle()
                 } label: {
                     HStack {
-                        // Text("\(String(birthYear))년 \(birthMonth)월 \(birthDay)일")
-                        Text("\(birthDate.toString())")
+                        Text("\(String(birthYear))년 \(birthMonth)월 \(birthDay)일")
                             .foregroundStyle(Color.gray)
                             .font(.system(size: 20))
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -79,47 +75,37 @@ struct SignUpDetailProfileView: View {
                 
                 if isDatePickerPresented {
                     // 커스텀 데이터피커 오류 발생 이슈로 주석처리..
-                    //                    HStack(spacing: 0) {
-                    //                        // 년
-                    //                        Picker("년도", selection: $birthYear) {
-                    //                            ForEach(1900...Calendar.current.component(.year, from: Date()), id: \.self) { year in
-                    //                                Text("\(String(year))년").tag(year)
-                    //                            }
-                    //                        }
-                    //                        .pickerStyle(.wheel)
-                    //                        .frame(maxWidth: .infinity)
-                    //
-                    //                        // 월
-                    //                        Picker("월", selection: $birthMonth) {
-                    //                            ForEach(1...12, id: \.self) { month in
-                    //                                Text("\(month)월").tag(month)
-                    //                            }
-                    //                        }
-                    //                        .pickerStyle(.wheel)
-                    //                        .frame(maxWidth: .infinity)
-                    //
-                    //                        // 일
-                    //                        Picker("일", selection: $birthDay) {
-                    //                            ForEach(1...daysInMonth(year: birthYear, month: birthMonth), id: \.self) { day in
-                    //                                Text("\(day)일").tag(day)
-                    //                            }
-                    //                        }
-                    //                        .pickerStyle(.wheel)
-                    //                        .frame(maxWidth: .infinity)
-                    //                    }
-                    //                    .background(Color.white)
-                    //                    .cornerRadius(16)
-                    //                    .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
-                    //                }
-                    
-                    DatePicker(
-                        "",
-                        selection: $birthDate,
-                        displayedComponents: [.date]
-                    )
-                    .datePickerStyle(.wheel)
-                    .frame(height: 200)
-                    .padding(.horizontal)
+                    HStack(spacing: 0) {
+                        // 년
+                        Picker("년도", selection: $birthYear) {
+                            ForEach(1900...Calendar.current.component(.year, from: Date()), id: \.self) { year in
+                                Text("\(String(year))년").tag(year)
+                            }
+                        }
+                        .pickerStyle(.wheel)
+                        .frame(maxWidth: .infinity)
+                        
+                        // 월
+                        Picker("월", selection: $birthMonth) {
+                            ForEach(1...12, id: \.self) { month in
+                                Text("\(month)월").tag(month)
+                            }
+                        }
+                        .pickerStyle(.wheel)
+                        .frame(maxWidth: .infinity)
+                        
+                        // 일
+                        Picker("일", selection: $birthDay) {
+                            ForEach(1...daysInMonth(year: birthYear, month: birthMonth), id: \.self) { day in
+                                Text("\(day)일").tag(day)
+                            }
+                        }
+                        .pickerStyle(.wheel)
+                        .frame(maxWidth: .infinity)
+                    }
+                    .background(Color.white)
+                    .cornerRadius(16)
+                    .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
                 }
             }
             
@@ -127,23 +113,13 @@ struct SignUpDetailProfileView: View {
             
             CommonSignUpButton(text: "완료", isFilled: isFilled) {
                 viewModel.name = name
-               // viewModel.phoneNumber = phoneNumber
                 
-//                let calendar = Calendar.current
-//                var dateComponents = DateComponents()
-//                dateComponents.year = birthYear
-//                dateComponents.month = birthMonth
-//                dateComponents.day = birthDay
-//                viewModel.birthDate = calendar.date(from: dateComponents)?.toStringForServer() ?? Date().toStringForServer()
-                
-                viewModel.birthDate = birthDate.toStringForServer()
-                
-                print("signup Detail View: \(viewModel.email)")
-                print("signup Detail View: \(viewModel.password)")
-                print("signup Detail View: \(viewModel.name)")
-                print("signup Detail View: \(viewModel.password)")
-                print("signup Detail View: \(viewModel.birthDate)")
-                print("signup Detail View: \(viewModel.isMentor)")
+                let calendar = Calendar.current
+                var dateComponents = DateComponents()
+                dateComponents.year = birthYear
+                dateComponents.month = birthMonth
+                dateComponents.day = birthDay
+                viewModel.birthDate = calendar.date(from: dateComponents)?.toStringForServer() ?? Date().toStringForServer()
                 
                 Task {
                     let isSignIn = await viewModel.signup()
