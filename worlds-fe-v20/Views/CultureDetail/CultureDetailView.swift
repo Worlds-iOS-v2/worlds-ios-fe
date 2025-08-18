@@ -9,7 +9,10 @@ import SwiftUI
 
 struct CultureDetailView: View {
     @Environment(\.dismiss) var dismiss
-    @StateObject var viewModel = CultureDetailViewModel()
+    
+    let eventPrograms: [EventProgram]
+    let govermentPrograms: [GovernmentProgram]
+    let koreanPrograms: [KoreanProgram]
     
     var body: some View {
         ZStack {
@@ -24,7 +27,7 @@ struct CultureDetailView: View {
                         .padding(.horizontal, 24)
                         .padding(.vertical, 20)
                     
-                    AutoSlideViewWithTimer(datas: viewModel.eventPrograms, isLoading: false)
+                    AutoSlideViewWithTimer(datas: eventPrograms, isLoading: false)
                         .frame(height: 300)
                         .padding(.horizontal, 24)
                         .padding(.bottom, 20)
@@ -34,7 +37,7 @@ struct CultureDetailView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 24)
                     
-                    CultureSlideView<GovernmentProgram>(datas: viewModel.govermentPrograms, isLoading: viewModel.isLoading)
+                    CultureSlideView<GovernmentProgram>(datas: govermentPrograms, isLoading: false)
                         .frame(height: 150)
                         .padding(.horizontal, 24)
                     
@@ -43,7 +46,7 @@ struct CultureDetailView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 24)
                     
-                    CultureSlideView<KoreanProgram>(datas: viewModel.koreanPrograms, isLoading: viewModel.isLoading)
+                    CultureSlideView<KoreanProgram>(datas: koreanPrograms, isLoading: false)
                         .frame(height: 150)
                         .padding(.horizontal, 24)
                 }
@@ -65,14 +68,5 @@ struct CultureDetailView: View {
             }
             .scrollIndicators(.hidden)
         }
-        .onAppear {
-            Task {
-                await viewModel.fetchCultureInfo()
-            }
-        }
     }
-}
-
-#Preview {
-    CultureDetailView()
 }
