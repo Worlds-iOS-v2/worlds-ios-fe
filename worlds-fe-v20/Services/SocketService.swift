@@ -42,12 +42,24 @@ class SocketService {
     
     /// 소켓 서버에 연결
     func connect() {
+        if socket.status == .connected {
+            print("⚠️ 이미 연결되어 있음")
+            return
+        }
+        
         socket.on(clientEvent: .connect) { _, _ in
-            print("Socket connected")
+            print("✅ [SOCKET] 연결 성공!")
         }
+        
         socket.on(clientEvent: .disconnect) { _, _ in
-            print("Socket disconnected")
+            print("❌ [SOCKET] 연결 끊어짐")
         }
+        
+        socket.on(clientEvent: .error) { data, _ in
+            print("🚨 [SOCKET] 에러: \(data)")
+        }
+        
+        print("🔌 [SOCKET] 연결 시도 중...")
         socket.connect()
     }
     
@@ -61,10 +73,18 @@ class SocketService {
     ///   - roomId: 채팅방 ID
     func joinRoom(roomId: Int) {
         guard let userId = currentUserId else {
-            print("No CurrentUserId found in UserDefaults")
+            print("❌ currentUserId 없음")
             return
         }
-        socket.emit(Event.joinRoom, ["roomId": roomId, "userId": userId])
+        
+        let payload = ["roomId": roomId, "userId": userId]
+        print("🏠 [SOCKET] 방 참여 시도: \(payload)")
+        socket.emit(Event.joinRoom, payload)
+        
+        // 방 참여 응답 리스너 (선택사항)
+        socket.on("join_room_response") { data, _ in
+            print("✅ [SOCKET] 방 참여 응답: \(data)")
+        }
     }
 
     /// 채팅방 목록을 REST API로 요청 (JWT 기반) - 디버깅 버전
@@ -262,23 +282,37 @@ class SocketService {
     /// - Parameter completion: 수신한 메시지를 반환하는 클로저
     func onReceiveMessage(completion: @escaping (_ message: Message) -> Void) {
         socket.off(Event.receiveMessage)
+        
         socket.on(Event.receiveMessage) { data, _ in
-            print("Raw receive_message data:", data)
+            print("📨 [SOCKET] receive_message 이벤트 수신!")
+            
             if let dict = data.first as? [String: Any] {
-                print("Parsed dictionary:", dict)
-                if let jsonData = try? JSONSerialization.data(withJSONObject: dict) {
-                    print("JSON data string:", String(data: jsonData, encoding: .utf8) ?? "nil")
-                    if let message = try? JSONDecoder().decode(Message.self, from: jsonData) {
-                        print("Decoded Message:", message)
-                        completion(message)
-                    } else {
-                        print("Failed to decode Message from jsonData")
+                do {
+                    let jsonData = try JSONSerialization.data(withJSONObject: dict)
+                    let message = try JSONDecoder().decode(Message.self, from: jsonData)
+                    print("✅ [SOCKET] 메시지 디코딩 성공: \(message.content)")
+                    
+                    completion(message)
+                    
+                    // 🔥 채팅 목록 업데이트를 위한 상세 알림 전송
+                    DispatchQueue.main.async {
+                        NotificationCenter.default.post(
+                            name: .init("NewMessageReceived"),
+                            object: nil,
+                            userInfo: [
+                                "roomId": message.roomId,
+                                "senderId": message.senderId,
+                                "messageId": message.id,
+                                "content": message.content,
+                                "createdAt": message.createdAt,
+                                "fileUrl": message.fileUrl ?? "",
+                                "fileType": message.fileType ?? ""
+                            ]
+                        )
                     }
-                } else {
-                    print("Failed to serialize dictionary to JSON")
+                } catch {
+                    print("❌ [SOCKET] 메시지 디코딩 실패: \(error)")
                 }
-            } else {
-                print("Failed to cast data[0] to dictionary")
             }
         }
     }
