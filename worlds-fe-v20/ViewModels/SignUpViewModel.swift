@@ -13,7 +13,6 @@ final class SignUpViewModel: ObservableObject {
     @Published var password: String = ""
     @Published var name: String = ""
     @Published var birthDate: String = ""
-    @Published var mentorCode: String?
     
     @Published var errorMessage: String?
     
@@ -21,7 +20,7 @@ final class SignUpViewModel: ObservableObject {
     @MainActor
     func signup() async -> Bool {
         do {
-            let user = try await UserAPIManager.shared.signUp(name: name, email: email, password: password, birth: birthDate, isMentor: isMentor, mentorCode: mentorCode)
+            let user = try await UserAPIManager.shared.signUp(name: name, email: email, password: password, birth: birthDate, isMentor: isMentor)
             print("회원 가입 정보: \(user)")
             self.errorMessage = nil
             
