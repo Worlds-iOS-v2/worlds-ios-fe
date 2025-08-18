@@ -14,6 +14,8 @@
 	<string>$(API_CRAWL_URL)</string>
 	<key>APIDeleteAccountURL</key>
 	<string>$(API_DELETE_ACCOUNT_URL)</string>
+	<key>APIEmailCodeURL</key>
+	<string>$(API_EMAIL_CODE_URL)</string>
 	<key>APIFindEmailURL</key>
 	<string>$(API_FIND_EMAIL_URL)</string>
 	<key>APILoginURL</key>
