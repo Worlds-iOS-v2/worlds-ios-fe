@@ -10,6 +10,7 @@ import SwiftUI
 final class MyPageViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var questions: [QuestionList] = []
+    @Published var ocrList: [OCRList] = []
     @Published var userInfo: User?
     
     @MainActor
@@ -45,6 +46,21 @@ final class MyPageViewModel: ObservableObject {
         } catch {
             print("❌ fetchMyQuestions 에러 발생:", error)
             self.errorMessage = "질문 목록을 불러오는데 실패했습니다: \(error.localizedDescription)"
+        }
+    }
+    
+    @MainActor
+    func fetchMyOCRList() async {
+        guard let userID = userInfo?.id else { return }
+        
+        do {
+            let ocrList = try await UserAPIManager.shared.getOCRList(userID: userID)
+            self.ocrList = ocrList
+            print("\(ocrList)")
+            self.errorMessage = nil
+        } catch {
+            print("ocrList 에러 발생:", error)
+            self.errorMessage = "OCR 목록을 불러오는데 실패했습니다: \(error.localizedDescription)"
         }
     }
     
