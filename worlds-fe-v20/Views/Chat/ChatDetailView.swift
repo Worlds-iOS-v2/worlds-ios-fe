@@ -76,13 +76,20 @@ struct ChatDetailView: View {
                         } label: {
                             Label("상대 프로필", systemImage: "person.crop.circle")
                         }
-
-                        Button {
-                            // TODO: OCR 기록 보기
-                        } label: {
+                        
+                        NavigationLink(destination: OCRListView()) {
                             Label("OCR 기록", systemImage: "folder")
                         }
-
+                        .padding(.horizontal, 32)
+                        .onAppear{
+                            Task {
+                                let currentUserId = UserDefaults.standard.integer(forKey: "userId")
+                                let partnerUserId = (chat.userA.id == currentUserId) ? chat.userB.id : chat.userA.id
+                                
+                                await viewModel.fetchOCRList(userID: partnerUserId)
+                            }
+                        }
+                        
                         Divider()
 
                         Button(role: .destructive) {
