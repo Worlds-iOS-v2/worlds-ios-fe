@@ -58,14 +58,14 @@ struct ChatDetailView: View {
                 HStack {
                     Button(action: { dismiss() }) {
                         Image(systemName: "chevron.left")
-                            .font(.title3)
+                            .font(.bmjua(.regular, size: 18))
                             .foregroundColor(.black)
                     }
                     
                     Spacer()
                     
                     Text(targetUserName)
-                        .font(.headline)
+                        .font(.bmjua(.regular, size: 20))
                         .bold()
                     
                     Spacer()
@@ -211,7 +211,7 @@ struct ChatDetailView: View {
             TextField("메시지를 입력하세요", text: $messageText)
                 .padding(10)
                 .background(
-                    RoundedRectangle(cornerRadius: 20)
+                    RoundedRectangle(cornerRadius: 16)
                         .stroke(Color.blue, lineWidth: 1)
                 )
                 .focused($isTextFieldFocused)
@@ -494,6 +494,7 @@ struct ImageViewerOverlay: View {
                         Image(systemName: "photo")
                             .font(.largeTitle)
                             .foregroundColor(.white)
+                        
                         Text("이미지를 불러올 수 없습니다")
                             .foregroundColor(.white)
                     }
@@ -520,7 +521,7 @@ struct DateHeader: View {
     let dateString: String
     var body: some View {
         Text(dateString)
-            .font(.caption)
+            .font(.bmjua(.regular, size: 14))
             .foregroundColor(.gray)
             .padding(.vertical, 6)
             .frame(maxWidth: .infinity)
@@ -594,23 +595,23 @@ struct ChatBubble: View {
                     .scaledToFill()
                     .frame(maxWidth: 220, maxHeight: 220)
                     .clipped()
-                    .cornerRadius(15)
+                    .cornerRadius(16)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 15)
+                        RoundedRectangle(cornerRadius: 16)
                             .stroke(Color.blue.opacity(0.3), lineWidth: 2)
                     )
                     .onTapGesture {
                         onImageTap?(urlString)
                     }
             } else {
-                RoundedRectangle(cornerRadius: 15)
+                RoundedRectangle(cornerRadius: 16)
                     .fill(Color.gray.opacity(0.2))
                     .frame(width: 180, height: 180)
                     .overlay(
                         VStack {
                             Image(systemName: "photo")
                             Text("이미지 로딩 중...")
-                                .font(.caption)
+                                .font(.bmjua(.regular, size: 14))
                                 .foregroundColor(.gray)
                         }
                     )
@@ -628,23 +629,23 @@ struct ChatBubble: View {
                         .scaledToFill()
                         .frame(maxWidth: 220, maxHeight: 220)
                         .clipped()
-                        .cornerRadius(15)
+                        .cornerRadius(16)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 15)
+                            RoundedRectangle(cornerRadius: 16)
                                 .stroke(Color.gray.opacity(0.2), lineWidth: 0.5)
                         )
                         .onTapGesture {
                             onImageTap?(urlString)
                         }
                 case .failure:
-                    RoundedRectangle(cornerRadius: 15)
+                    RoundedRectangle(cornerRadius: 16)
                         .fill(Color.gray.opacity(0.2))
                         .frame(width: 180, height: 180)
                         .overlay(
                             VStack {
                                 Image(systemName: "photo")
                                 Text("이미지 로드 실패")
-                                    .font(.caption)
+                                    .font(.bmjua(.regular, size: 14))
                                     .foregroundColor(.red)
                             }
                         )
@@ -653,7 +654,7 @@ struct ChatBubble: View {
                 }
             }
         } else {
-            RoundedRectangle(cornerRadius: 15)
+            RoundedRectangle(cornerRadius: 16)
                 .fill(Color.gray.opacity(0.2))
                 .frame(width: 180, height: 180)
                 .overlay(Image(systemName: "photo"))
@@ -678,11 +679,11 @@ struct ChatBubble: View {
                         VStack(alignment: .trailing, spacing: 2) {
                             if message.isRead {
                                 Text("읽음")
-                                    .font(.caption2)
+                                    .font(.bmjua(.regular, size: 12))
                                     .foregroundColor(.gray)
                             }
                             Text(timeString(from: message.createdAt))
-                                .font(.caption2)
+                                .font(.bmjua(.regular, size: 12))
                                 .foregroundColor(.gray)
                         }
 
@@ -694,8 +695,8 @@ struct ChatBubble: View {
                                 .padding(10)
                                 .foregroundColor(.white)
                                 .background(Color.blue)
-                                .cornerRadius(15)
-                                .contentShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+                                .cornerRadius(16)
+                                .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                                 .contextMenu {
                                     Button("복사하기", systemImage: "doc.on.doc") {
                                         UIPasteboard.general.string = message.content
@@ -716,7 +717,7 @@ struct ChatBubble: View {
                     if !message.content.isEmpty {
                         Button(action: toggleTranslateAction) {
                             Text(isTranslating ? "번역 중…" : (showTranslated ? "원문보기" : "번역하기"))
-                                .font(.caption)
+                                .font(.bmjua(.regular, size: 14))
                                 .foregroundColor(.gray)
                         }
                         .disabled(isTranslating)
@@ -733,12 +734,12 @@ struct ChatBubble: View {
                             Text(displayText)
                                 .padding(10)
                                 .background(Color.white)
-                                .cornerRadius(15)
+                                .cornerRadius(16)
                                 .overlay(
-                                    RoundedRectangle(cornerRadius: 15)
+                                    RoundedRectangle(cornerRadius: 16)
                                         .stroke(Color.gray.opacity(0.2), lineWidth: 0.5)
                                 )
-                                .contentShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+                                .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                                 .contextMenu {
                                     Button("복사하기", systemImage: "doc.on.doc") {
                                         UIPasteboard.general.string = message.content
@@ -756,7 +757,7 @@ struct ChatBubble: View {
 
                         // 시간 표시
                         Text(timeString(from: message.createdAt))
-                            .font(.caption2)
+                            .font(.bmjua(.regular, size: 12))
                             .foregroundColor(.gray)
                     }
 
@@ -764,7 +765,7 @@ struct ChatBubble: View {
                     if !message.content.isEmpty {
                         Button(action: toggleTranslateAction) {
                             Text(isTranslating ? "번역 중…" : (showTranslated ? "원문보기" : "번역하기"))
-                                .font(.caption)
+                                .font(.bmjua(.regular, size: 14))
                                 .foregroundColor(.gray)
                         }
                         .disabled(isTranslating)

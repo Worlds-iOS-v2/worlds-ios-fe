@@ -17,16 +17,16 @@ struct AttendanceRowView: View {
                 if isToday {
                     ZStack {
                         Circle()
-                            .fill(Color.gray.opacity(0.3))
+                            .fill(.sub1Ws.opacity(0.8))
                             .frame(width: 40, height: 40)
                         
                         Text(getWeekdayString(for: weekday))
-                            .font(.system(size: 16, weight: .medium))
+                            .font(.bmjua(.regular, size: 16))
                             .foregroundColor(.black)
                     }
                 } else {
                     Text(getWeekdayString(for: weekday))
-                        .font(.system(size: 16, weight: .medium))
+                        .font(.bmjua(.regular, size: 16))
                         .foregroundColor(.black)
                         .frame(width: 40, height: 40)
                 }

@@ -15,7 +15,7 @@ struct CustomTabBarView: View {
     var body: some View {
         NavigationStack {
             ZStack(alignment: .bottom) {                
-                Color.basicbackgroundws
+                Color.background2Ws
                     .ignoresSafeArea(.all)
                 
                 TabView(selection: $selectedTab) {
@@ -87,7 +87,7 @@ struct CustomTabBar: View {
         }
         .frame(height: 80)
         .background(
-            RoundedRectangle(cornerRadius: 25)
+            RoundedRectangle(cornerRadius: 24)
                 .fill(Color.white)
                 .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: -5)
         )

@@ -18,6 +18,8 @@ struct AddChatView: View {
     @State private var errorMessage: String? = nil
     @State private var activeChatRoom: ChatRoom?
     @State private var pendingChatRoom: ChatRoom?
+    
+    var textColor: Color = .mainfontws
 
     var body: some View {
         NavigationStack {
@@ -31,8 +33,9 @@ struct AddChatView: View {
                 }
                 Spacer()
                 Text("대화상대추가")
-                    .font(.headline)
-                    .foregroundColor(.black)
+                    .font(.bmjua(.regular, size: 20))
+                    .foregroundColor(textColor)
+                
                 Spacer()
                 // 오른쪽 공간 확보용
                 Spacer().frame(width: 20)
@@ -42,14 +45,16 @@ struct AddChatView: View {
 
             VStack(spacing: 8) {
                 Text("QR로 채팅 상대를 추가하세요")
-                    .font(.title3)
-                    .fontWeight(.bold)
+                    .font(.bmjua(.regular, size: 22))
+                    .foregroundColor(textColor)
+                
                 Text("상대방의 QR 코드를 스캔하면\n자동으로 채팅방이 생성돼요.")
+                    .font(.bmjua(.regular, size: 18))
                     .multilineTextAlignment(.center)
                     .foregroundColor(.gray)
             }
 
-            RoundedRectangle(cornerRadius: 16)
+            RoundedRectangle(cornerRadius: 12)
                 .fill(Color.white)
                 .frame(width: 280, height: 280)
                 .shadow(radius: 4)
@@ -63,6 +68,7 @@ struct AddChatView: View {
                                 .padding(20)
                         } else {
                             Text("QR 생성 준비 중…")
+                                .font(.bmjua(.regular, size: 18))
                                 .foregroundColor(.gray)
                         }
                     }
@@ -73,12 +79,12 @@ struct AddChatView: View {
                 isShowingScanner = true
             }) {
                 Text("QR 스캔하기")
-                    .fontWeight(.semibold)
+                    .font(.bmjua(.regular, size: 20))
                     .foregroundColor(.white)
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(Color.blue)
-                    .cornerRadius(14)
+                    .background(.mainws)
+                    .cornerRadius(12)
                     .shadow(color: .gray.opacity(0.3), radius: 4, x: 0, y: 3)
             }
             .padding(.horizontal, 24)
