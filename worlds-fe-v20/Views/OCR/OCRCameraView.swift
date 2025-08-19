@@ -27,6 +27,8 @@ struct OCRCameraView: View {
     // 공유 OCRViewModel 인스턴스
     @StateObject private var ocrViewModel = OCRViewModel()
     
+    @Environment(\.dismiss) var dismiss
+    
     var body: some View {
         ZStack {
             CameraPreview(
@@ -107,7 +109,7 @@ struct OCRCameraView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button {
-                    // dismiss()
+                    dismiss()
                 } label: {
                     Image(systemName: "chevron.left")
                         .foregroundColor(.mainws)
