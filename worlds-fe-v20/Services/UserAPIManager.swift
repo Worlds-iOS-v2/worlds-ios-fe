@@ -757,6 +757,27 @@ class UserAPIManager {
         return response
     }
     
+    func getOCRList(userID: Int) async throws -> [OCRList] {
+        guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
+            print("토큰 값이 유효하지 않습니다.")
+            throw UserAPIError.invalidToken
+        }
+        
+        guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "APIOCRURL") as? String else {
+            throw UserAPIError.invalidEndPoint
+        }
+        
+        let endPoint = "\(baseURL)/\(userID)"
+                
+        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
+              
+        let response = try await AF.request(endPoint, method: .get, headers: headers)
+            .serializingDecodable([OCRList].self)
+            .value
+        
+        return response
+    }
+    
     func getCultureInfo() async throws -> CultureInfo {
         guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
             print("토큰 값이 유효하지 않습니다.")
