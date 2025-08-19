@@ -60,7 +60,9 @@ struct MyPageView: View {
                     }
                     .padding(.horizontal, 32)
                     .onAppear{
-                        // OCR 목록 호출
+                        Task {
+                            await viewModel.fetchMyOCRList()
+                        }
                     }
                     
                     Divider()
