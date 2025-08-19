@@ -8,8 +8,7 @@
 import SwiftUI
 
 struct MainView: View {
-    @StateObject var viewModel: MainViewModel
-    @StateObject var cultureViewModel = CultureDetailViewModel()
+    @StateObject var viewModel = MainViewModel()
 
     @State private var selectedDate = Date()
     
@@ -82,7 +81,11 @@ struct MainView: View {
                     
                     Spacer()
                     
-                    NavigationLink(destination: CultureDetailView()) {
+                    NavigationLink(destination: CultureDetailView(
+                        eventPrograms: viewModel.eventPrograms,
+                        govermentPrograms: viewModel.govermentPrograms,
+                        koreanPrograms: viewModel.koreanPrograms
+                    )) {
                         Text("더보기 >")
                             .font(.system(size: 16))
                             .foregroundStyle(Color.mainws)
@@ -91,7 +94,7 @@ struct MainView: View {
                 }
                 .padding(.horizontal, 24)
                 
-                AutoSlideViewWithTimer(datas: cultureViewModel.eventPrograms, isLoading: cultureViewModel.isLoading)
+                AutoSlideViewWithTimer(datas: viewModel.eventPrograms, isLoading: viewModel.isLoading)
                     .frame(height: 300)
                     .padding(.horizontal, 24)
                 
@@ -134,13 +137,12 @@ struct MainView: View {
                 )
             }
             .padding(.bottom, 60)
-            .background(.white)
         }
         .scrollIndicators(.hidden)
         .onAppear {
-            Task { await viewModel.fetchLatestPosts() }
-            Task { await cultureViewModel.fetchCultureInfo() }
-            Task { await viewModel.fetchAttendanceList() }
+            Task {
+                await viewModel.fetchAllDatas()
+            }
         }
     }
     

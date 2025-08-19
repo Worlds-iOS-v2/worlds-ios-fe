@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct AutoSlideViewWithTimer: View {
     // MARK: - properties
@@ -71,21 +72,40 @@ struct AutoSlideViewWithTimer: View {
                     view: { index in
                         ZStack {
                             VStack(spacing: 0) {
-                                AsyncImage(url: URL(string: datas[index].image)) { phase in
-                                    if let image = phase.image {
-                                        image
-                                            .resizable()
-                                            .scaledToFill() // 원하는 크기에 맞게 설정
-                                    } else if phase.error != nil {
-                                        Color.red // 오류 시 대체 색상
-                                    } else {
-                                        ProgressView() // 로딩 중 표시
+                                KFImage(URL(string: datas[index].image))
+                                    .placeholder {
+                                        // 로딩 중
+                                        Rectangle()
+                                            .fill(Color.gray.opacity(0.1))
+                                            .overlay(
+                                                ProgressView()
+                                                    .progressViewStyle(CircularProgressViewStyle(tint: .gray))
+                                            )
                                     }
-                                }
-                                .tag(index)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 150) // 원하는 사이즈로 설정
-                                .clipped()
+                                    .onFailure { error in
+                                        print("이미지 로드 실패: \(error)")
+                                    }
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(height: 150)
+                                    .clipped()
+                                    .overlay(
+                                        // 이미지 로드 실패 시 오버레이
+                                        Rectangle()
+                                            .fill(Color.gray.opacity(0.1))
+                                            .overlay(
+                                                VStack(spacing: 8) {
+                                                    Image(systemName: "photo")
+                                                        .font(.title2)
+                                                        .foregroundColor(.gray)
+                                                    
+                                                    Text("이미지 없음")
+                                                        .font(.caption)
+                                                        .foregroundColor(.gray)
+                                                }
+                                            )
+                                            .opacity(0) // Kingfisher가 실패 시 자동으로 처리
+                                    )
                                 
                                 Link(destination: URL(string: datas[index].url)!) {
                                     VStack(alignment: .leading) {
