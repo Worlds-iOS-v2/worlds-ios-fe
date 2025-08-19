@@ -134,7 +134,6 @@ struct MainView: View {
                 )
             }
             .padding(.bottom, 60)
-            .background(.white)
         }
         .scrollIndicators(.hidden)
         .onAppear {
