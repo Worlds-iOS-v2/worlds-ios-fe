@@ -38,7 +38,7 @@ struct worlds_fe_v20App: App {
                 
                 // 추후 메인 화면으로 변경
             case .main:
-                TabbarView()
+                CustomTabBarView()
                     .environmentObject(appState)
             }
         }
