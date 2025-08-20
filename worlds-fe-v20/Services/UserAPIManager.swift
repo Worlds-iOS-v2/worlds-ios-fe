@@ -203,59 +203,28 @@ class UserAPIManager {
         }
     }
     
-    /// 프로필 이미지 설정 (1~4)
-    func setProfileImage(index: Int) async throws -> ProfileImageResponse {
-        guard (1...4).contains(index) else {
-            throw UserAPIError.serverError(message: "이미지 인덱스는 1~4 범위여야 합니다.")
-        }
+    // 프로필 이미지 설정
+    func updateProfileImage(imageNumber: Int) async throws -> APIResponse {
         guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
+            print("토큰 값이 유효하지 않습니다.")
             throw UserAPIError.invalidToken
         }
-        // Info.plist에 "APIProfileImageURL" 키가 $(API_PROFILE_IMAGE_URL) 을 참조하도록 설정되어 있어야 합니다.
+        
         guard let endPoint = Bundle.main.object(forInfoDictionaryKey: "APIProfileImageURL") as? String else {
             throw UserAPIError.invalidEndPoint
         }
-
-        let headers: HTTPHeaders = [
-            "Authorization": "Bearer \(token)",
-            "Content-Type": "application/json"
-        ]
-
+                                
+        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
+        
         let parameters: [String: Any] = [
-            "image": index
+            "image": imageNumber
         ]
-
-        let dataResponse = await AF.request(endPoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
-            .validate()
-            .serializingData()
-            .response
-
-        switch dataResponse.result {
-        case .success(let data):
-            do {
-                let response = try JSONDecoder().decode(ProfileImageResponse.self, from: data)
-                // 필요 시 저장: UserDefaults.standard.set(response.profileImage, forKey: "profileImage")
-                //              UserDefaults.standard.set(response.profileImageUrl, forKey: "profileImageUrl")
-                return response
-            } catch {
-                throw UserAPIError.decodingError(description: "프로필 이미지 디코딩 실패: \(error)")
-            }
-
-        case .failure:
-            if let rawData = dataResponse.data {
-                // 백엔드에서 내려주는 공통 에러 포맷 시도
-                if let apiErr = try? JSONDecoder().decode(APIErrorResponse.self, from: rawData),
-                   let first = apiErr.message.first {
-                    // 예: 400 범위 밖, 401 토큰 문제
-                    if dataResponse.response?.statusCode == 401 {
-                        throw UserAPIError.serverError(message: first)
-                    } else {
-                        throw UserAPIError.serverError(message: first)
-                    }
-                }
-            }
-            throw UserAPIError.serverError(message: "프로필 이미지 설정 실패")
-        }
+              
+        let response = try await AF.request(endPoint, method: .post, parameters: parameters, headers: headers)
+            .serializingDecodable(APIResponse.self)
+            .value
+        
+        return response
     }
 
     func attendanceCheck() async throws -> APIResponse {
@@ -330,7 +299,7 @@ class UserAPIManager {
         case .success(let data):
             do {
                 let response = try JSONDecoder().decode(APIResponse.self, from: data)
-                print("출석체크 정보: \(response)")
+                // print("출석체크 정보: \(response)")
 
                 return response
             } catch {
