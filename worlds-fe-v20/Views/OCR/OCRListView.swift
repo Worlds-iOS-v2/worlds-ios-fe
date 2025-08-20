@@ -12,6 +12,9 @@ struct OCRListView: View {
     @Environment(\.dismiss) var dismiss
     
     var ocrList: [OCRList] = []
+    
+    var textSize: CGFloat = 20
+    var textColor: Color = .mainfontws
 
     var body: some View {
         ZStack {
@@ -30,7 +33,7 @@ struct OCRListView: View {
                 .padding(.top, 8)
                 .padding(.horizontal, 20)
             }
-            .navigationTitle("나의 OCR 목록")
+            .navigationTitle("OCR 목록")
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
             .toolbar {
@@ -51,18 +54,21 @@ struct OCRListView: View {
 struct OCRCardView: View {
     let OCRContent: OCRList
     
+    var textSize: CGFloat = 20
+    var textColor: Color = .mainfontws
+    
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 6) {
                 Text(OCRContent.keyConcept)
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.bmjua(.regular, size: 16))
                     .foregroundColor(Color(.systemGray))
                     .padding(.top, 8)
                 
                 HStack(alignment: .center, spacing: 8) {
                     Text(OCRContent.summary)
-                        .font(.system(size: 20, weight: .bold))
-                        .foregroundColor(.black)
+                        .font(.bmjua(.regular, size: textSize))
+                        .foregroundStyle(textColor)
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
 
@@ -71,7 +77,7 @@ struct OCRCardView: View {
                 .padding(.top, 2)
                 
                 Text(OCRContent.createdAt)
-                    .font(.system(size: 15))
+                    .font(.bmjua(.regular, size: 14))
                     .foregroundColor(Color(.systemGray2))
                     .lineLimit(2)
                     .padding(.bottom, 6)

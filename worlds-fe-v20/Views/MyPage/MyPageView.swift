@@ -58,8 +58,8 @@ struct MyPageView: View {
                     
                     NavigationLink(destination: OCRListView(ocrList: viewModel.ocrList)) {
                         Text("나의 OCR")
-                            .font(.system(size: 18))
-                            .foregroundStyle(Color.black)
+                            .font(.bmjua(.regular, size: textSize))
+                            .foregroundStyle(textColor)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .padding(.horizontal, 32)

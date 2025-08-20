@@ -16,13 +16,17 @@ struct OCRListDetailView: View {
     @Environment(\.dismiss) var dismiss
     
     var ocrContent: OCRList
+    
+    var textSize: CGFloat = 20
+    var textColor: Color = .mainfontws
+    let translatedLanguage: String = SupportedLanguage.getCurrentLanguageName()
         
     var body: some View {
-        VStack(spacing: 20) {
+        VStack() {
             HStack(spacing: 15) {
                 Text("한국어")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(.black)
+                    .font(.bmjua(.regular, size: 18))
+                    .foregroundColor(textColor)
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(.sub2Ws)
@@ -35,14 +39,15 @@ struct OCRListDetailView: View {
                     .foregroundColor(.sub2Ws)
                     .padding()
                 
-                Text("영어")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(.black)
+                Text("\(translatedLanguage)")
+                    .font(.bmjua(.regular, size: 18))
+                    .foregroundColor(textColor)
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(.sub2Ws)
                     .cornerRadius(16)
             }
+            .padding(.bottom, 20)
             
             // 선택된 이미지 표시
             //                Image(uiImage: ocrContent.)
@@ -75,6 +80,7 @@ struct OCRListDetailView: View {
                 .background(.background1Ws)
             }
             .cornerRadius(8)
+            .padding(.bottom, 20)
             
             Button {
                 withAnimation(.easeInOut) {
@@ -83,8 +89,8 @@ struct OCRListDetailView: View {
             } label: {
                 HStack {
                     Text("개념 확인")
-                        .font(.headline)
-                        .foregroundColor(.black)
+                        .font(.bmjua(.regular, size: 22))
+                        .foregroundColor(textColor)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     
                     Spacer()
@@ -97,16 +103,18 @@ struct OCRListDetailView: View {
                 .background(.background1Ws)
                 .cornerRadius(8)
             }
-            
+
             ScrollView() {
                 VStack(alignment: .leading) {
                     Text("핵심 개념")
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundStyle(Color.black)
+                        .font(.bmjua(.regular, size: 20))
+                        .foregroundStyle(textColor)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.top, 20)
                     
-                    
                     Text(ocrContent.keyConcept)
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(textColor)
                         .padding()
                         .background(
                             RoundedRectangle(cornerRadius: 16)
@@ -115,10 +123,12 @@ struct OCRListDetailView: View {
                         .padding(.bottom, 32)
                     
                     Text("문제 요약")
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundStyle(Color.black)
+                        .font(.bmjua(.regular, size: 20))
+                        .foregroundStyle(textColor)
                     
                     Text(ocrContent.summary)
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(textColor)
                         .padding()
                         .background(
                             RoundedRectangle(cornerRadius: 16)
@@ -127,10 +137,12 @@ struct OCRListDetailView: View {
                         .padding(.bottom, 32)
                     
                     Text("힌트")
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundStyle(Color.black)
+                        .font(.bmjua(.regular, size: 20))
+                        .foregroundStyle(textColor)
                     
                     Text(ocrContent.solution)
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(textColor)
                         .padding()
                         .background(
                             RoundedRectangle(cornerRadius: 16)
@@ -142,6 +154,7 @@ struct OCRListDetailView: View {
             }
             .frame(height: expandSummaryAccordionView ? nil : 0)
             .background(.background1Ws)
+            .cornerRadius(8)
         }
         .padding()
         .navigationTitle("OCR 리스트")

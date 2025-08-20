@@ -28,6 +28,7 @@ struct OCRResultView: View {
     @EnvironmentObject private var viewModel: OCRViewModel
     
     var textColor: Color = .mainfontws
+    let translatedLanguage: String = SupportedLanguage.getCurrentLanguageName()
     
     var body: some View {
         ZStack {
@@ -48,7 +49,7 @@ struct OCRResultView: View {
                         .foregroundColor(.sub2Ws)
                         .padding()
                     
-                    Text("영어")
+                    Text("\(translatedLanguage)")
                         .font(.bmjua(.regular, size: 18))
                         .foregroundColor(textColor)
                         .frame(maxWidth: .infinity)
@@ -198,6 +199,7 @@ struct OCRResultView: View {
             .onAppear {
                 Task {
                     try await viewModel.fetchOCR(selectedImage: selectedImage)
+                    try await viewModel.fetchOCRSolution()
                 }
             }
         }
