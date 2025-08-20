@@ -15,7 +15,7 @@ struct OCRListView: View {
 
     var body: some View {
         ZStack {
-            Color.backgroundws
+            Color.background2Ws
                 .ignoresSafeArea()
             
             ScrollView {
