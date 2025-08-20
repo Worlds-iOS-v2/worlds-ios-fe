@@ -38,9 +38,41 @@ struct worlds_fe_v20App: App {
                 
                 // 추후 메인 화면으로 변경
             case .main:
-                TabbarView()
+                RootRouter()
                     .environmentObject(appState)
             }
+        }
+    }
+}
+
+struct RootRouter: View {
+    @EnvironmentObject var appState: AppState
+    @StateObject private var myPageVM = MyPageViewModel()
+    @State private var isLoading = true
+
+    var body: some View {
+        Group {
+            if isLoading {
+                ZStack {
+                    Color(.systemBackground).ignoresSafeArea()
+                    ProgressView("불러오는 중…")
+                }
+            } else {
+                if let user = myPageVM.userInfo,
+                   !(user.profileImage?.isEmpty ?? true) || !(user.profileImageUrl?.isEmpty ?? true) {
+                    TabbarView()
+                        .environmentObject(appState)
+                } else {
+                    PuzzleCharactersMainView()
+                        .environmentObject(myPageVM)
+                        // Force a lightweight refresh when profile changes so navigation updates immediately
+                        .id((myPageVM.userInfo?.profileImage ?? "") + (myPageVM.userInfo?.profileImageUrl ?? ""))
+                }
+            }
+        }
+        .task {
+            await myPageVM.fetchMyInformation()
+            isLoading = false
         }
     }
 }
