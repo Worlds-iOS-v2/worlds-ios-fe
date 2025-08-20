@@ -25,6 +25,7 @@ struct worlds_fe_v20App: App {
                 .task {
                     await appState.autoLogin()
                 }
+                
                 // 로그인 화면
             case .login:
                 LoginView()
@@ -36,7 +37,12 @@ struct worlds_fe_v20App: App {
                     .environmentObject(appState)
                     .environmentObject(signUpViewModel)
                 
-                // 추후 메인 화면으로 변경
+                // 프로필 이미지 선택 화면
+            case .profileSelection:
+                ProfileImageSelectionView()
+                    .environmentObject(appState)
+                
+                // 메인 화면
             case .main:
                 CustomTabBarView()
                     .environmentObject(appState)

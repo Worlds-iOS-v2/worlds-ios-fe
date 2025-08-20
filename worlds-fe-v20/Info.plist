@@ -34,6 +34,8 @@
 	<string>$(API_ATTENDANCE_LIST_URL)</string>
 	<key>APIUserAttendanceURL</key>
 	<string>$(API_USER_ATTENDANCE_URL)</string>
+	<key>APIProfileImageURL</key>
+	<string>$(API_PROFILE_IMAGE_URL)</string>
 	<key>APIUserInfoURL</key>
 	<string>$(API_USER_INFO_URL)</string>
 	<key>CFBundleIconName</key>

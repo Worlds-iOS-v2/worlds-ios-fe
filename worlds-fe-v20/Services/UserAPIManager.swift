@@ -6,9 +6,23 @@
 //
 
 // User CRUD 관련 API 코드 => 충돌 날까봐 따로 코드 작성 / 추후 APIService에 합칠 것임
+
 import Foundation
 import Alamofire
 import UIKit
+
+struct ProfileImageRequest: Encodable {
+    let image: Int   // 1~4
+}
+
+struct ProfileImageResponse: Decodable {
+    let message: String?
+    let error: String?
+    let statusCode: Int?
+    let profileImage: String?
+    let profileImageUrl: String?
+    let path: String?
+}
 
 enum UserAPIError: Error, LocalizedError {
     case missingToken
@@ -189,6 +203,30 @@ class UserAPIManager {
         }
     }
     
+    // 프로필 이미지 설정
+    func updateProfileImage(imageNumber: Int) async throws -> APIResponse {
+        guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
+            print("토큰 값이 유효하지 않습니다.")
+            throw UserAPIError.invalidToken
+        }
+        
+        guard let endPoint = Bundle.main.object(forInfoDictionaryKey: "APIProfileImageURL") as? String else {
+            throw UserAPIError.invalidEndPoint
+        }
+                                
+        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
+        
+        let parameters: [String: Any] = [
+            "image": imageNumber
+        ]
+              
+        let response = try await AF.request(endPoint, method: .post, parameters: parameters, headers: headers)
+            .serializingDecodable(APIResponse.self)
+            .value
+        
+        return response
+    }
+
     func attendanceCheck() async throws -> APIResponse {
         guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
             print("토큰 값이 유효하지 않습니다.")
@@ -261,7 +299,7 @@ class UserAPIManager {
         case .success(let data):
             do {
                 let response = try JSONDecoder().decode(APIResponse.self, from: data)
-                print("출석체크 정보: \(response)")
+                // print("출석체크 정보: \(response)")
 
                 return response
             } catch {

@@ -69,7 +69,9 @@ struct LoginView: View {
                                 
                                 if isLoggedIn {
                                     await viewModel.attendanceCheck()
-                                    appState.flow = .main
+                                    // 프로필 체크 후 적절한 화면으로 이동
+                                    await appState.checkProfileAfterLogin()
+                                    // appState.flow = .main
                                 } else {
                                     // 401 -> 이메일이나 비번이 바르지 않을 경우
                                     // 400 -> 이메일 제대로, 비밀번호 틀렸을 경우

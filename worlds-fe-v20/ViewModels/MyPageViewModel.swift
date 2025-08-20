@@ -86,4 +86,13 @@ final class MyPageViewModel: ObservableObject {
             self.errorMessage = "회원탈퇴에 실패했습니다: \(error.localizedDescription)"
         }
     }
+    
+    @MainActor
+    func updateProfileImage(with response: ProfileImageResponse) {
+        guard var current = self.userInfo else { return }
+        current.profileImage = response.profileImage
+        current.profileImageUrl = response.profileImageUrl
+        self.userInfo = current       // <- 재할당하여 퍼블리시 트리거
+        self.errorMessage = nil
+    }
 }

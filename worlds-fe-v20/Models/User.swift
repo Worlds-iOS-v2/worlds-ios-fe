@@ -15,4 +15,7 @@ struct User: Codable, Hashable, Identifiable {
     let isMentor: Bool
     let reportCount: Int
     // let menteeTranslations: [MenteeTranslation]
+    
+    var profileImage: String?      // "himchan" | "doran" | "malgeum" | "saengak"
+    var profileImageUrl: String?   // blob url
 }
