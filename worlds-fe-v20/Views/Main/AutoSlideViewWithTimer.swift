@@ -35,31 +35,31 @@ struct AutoSlideViewWithTimer: View {
                     VStack(alignment: .leading) {
                         HStack {
                             Text(isLoading ? "로딩 중..." : "데이터 없음")
-                                .font(.bmjua(.regular, size: 20))
+                                .font(.pretendard(.regular, size: 20))
                                 .foregroundColor(textColor)
                             
                             Spacer()
                             
                             Text("")
-                                .font(.bmjua(.regular, size: 14))
+                                .font(.pretendard(.regular, size: 14))
                                 .foregroundColor(textColor)
                         }
                         .padding(.bottom, 12)
                         
                         Text("신청 기간: \(isLoading ? "로딩 중..." : "데이터 없음")")
-                            .font(.bmjua(.regular, size: 14))
+                            .font(.pretendard(.regular, size: 14))
                             .foregroundColor(.gray)
                             .padding(.bottom, 4)
                         
                         Text("활동 기간: \(isLoading ? "로딩 중..." : "데이터 없음")")
-                            .font(.bmjua(.regular, size: 14))
+                            .font(.pretendard(.regular, size: 14))
                             .foregroundColor(.gray)
                     }
                     .padding()
                     .frame(maxWidth: .infinity)
                     .background{
                         Rectangle()
-                            .fill(Color.background1Ws)
+                            .fill(Color.white)
                     }
                 }
                 .ignoresSafeArea()
@@ -97,11 +97,11 @@ struct AutoSlideViewWithTimer: View {
                                             .overlay(
                                                 VStack(spacing: 8) {
                                                     Image(systemName: "photo")
-                                                        .font(.bmjua(.regular, size: 24))
+                                                        .font(.pretendard(.regular, size: 24))
                                                         .foregroundColor(.gray)
                                                     
                                                     Text("이미지 없음")
-                                                        .font(.bmjua(.regular, size: 14))
+                                                        .font(.pretendard(.regular, size: 14))
                                                         .foregroundColor(.gray)
                                                 }
                                             )
@@ -110,33 +110,33 @@ struct AutoSlideViewWithTimer: View {
                                 
                                 Link(destination: URL(string: datas[index].url)!) {
                                     VStack(alignment: .leading) {
-                                        HStack {
-                                            Text(datas[index].title)
-                                                .font(.bmjua(.regular, size: 20))
-                                                .foregroundColor(textColor)
-
-                                            Spacer()
-                                            
-                                            Text(datas[index].location)
-                                                .font(.bmjua(.regular, size: 14))
-                                                .foregroundColor(textColor)
-                                        }
-                                        .padding(.bottom, 12)
+                                        Text(datas[index].borough)
+                                            .font(.pretendard(.bold, size: 16))
+                                            .foregroundColor(.subfontws)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .padding(.bottom, 8)
+                                        
+                                        Text(datas[index].title)
+                                            .font(.pretendard(.semiBold, size: 20))
+                                            .foregroundColor(textColor)
+                                            .lineLimit(1)
+                                            .padding(.bottom, 8)
+ 
                                         
                                         Text("신청 기간: \(datas[index].applicationPeriod)")
-                                            .font(.bmjua(.regular, size: 14))
+                                            .font(.pretendard(.medium, size: 14))
                                             .foregroundColor(.gray)
                                             .padding(.bottom, 4)
                                         
                                         Text("활동 기간: \(datas[index].programPeriod)")
-                                            .font(.bmjua(.regular, size: 14))
+                                            .font(.pretendard(.medium, size: 14))
                                             .foregroundColor(.gray)
                                     }
                                     .padding()
                                     .frame(maxWidth: .infinity)
                                     .background{
                                         Rectangle()
-                                            .fill(Color.background1Ws)
+                                            .fill(Color.white)
                                     }
                                 }
                             }
@@ -232,13 +232,16 @@ extension AutoSlideViewWithTimer {
     private func imageCustomIndicator() -> some View {
         ZStack {
             if datas.count > 1 {
-                HStack(spacing: 4) {
+                HStack(spacing: 6) {
                     ForEach(datas.indices, id: \.self) { index in
                         Capsule()
-                            .stroke(.sub1Ws, lineWidth: 1)
+                            .fill(currentIndex == index ? Color.mainws : Color.mainfontws)
                             .frame(width: currentIndex == index ? 16 : 6, height: 6)
+                            .overlay(
+                                Capsule()
+                                    .stroke(Color.sub1Ws, lineWidth: 1)
+                            )
                             .opacity(currentIndex == index ? 1 : 0.5)
-                            .background(currentIndex == index ? .sub1Ws : .background1Ws)
                     }
                 } // H
                 .padding(.bottom, 24)

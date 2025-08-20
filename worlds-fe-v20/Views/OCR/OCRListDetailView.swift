@@ -25,7 +25,7 @@ struct OCRListDetailView: View {
         VStack() {
             HStack(spacing: 15) {
                 Text("한국어")
-                    .font(.bmjua(.regular, size: 18))
+                    .font(.pretendard(.bold, size: 18))
                     .foregroundColor(textColor)
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -40,7 +40,7 @@ struct OCRListDetailView: View {
                     .padding()
                 
                 Text("\(translatedLanguage)")
-                    .font(.bmjua(.regular, size: 18))
+                    .font(.pretendard(.bold, size: 18))
                     .foregroundColor(textColor)
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -63,11 +63,11 @@ struct OCRListDetailView: View {
                     ForEach(0..<ocrContent.originalText.count, id: \.self) { index in
                         VStack(alignment: .leading, spacing: 8) {
                             Text(ocrContent.originalText[index])
-                                .font(.body)
+                                .font(.pretendard(.medium, size: 16))
                                 .foregroundColor(.black)
                             
                             Text(ocrContent.translatedText[index])
-                                .font(.body)
+                                .font(.pretendard(.medium, size: 16))
                                 .foregroundColor(.mainws)
                             
                             Divider()
@@ -89,7 +89,7 @@ struct OCRListDetailView: View {
             } label: {
                 HStack {
                     Text("개념 확인")
-                        .font(.bmjua(.regular, size: 22))
+                        .font(.pretendard(.bold, size: 22))
                         .foregroundColor(textColor)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     
@@ -107,13 +107,13 @@ struct OCRListDetailView: View {
             ScrollView() {
                 VStack(alignment: .leading) {
                     Text("핵심 개념")
-                        .font(.bmjua(.regular, size: 20))
+                        .font(.pretendard(.bold, size: 22))
                         .foregroundStyle(textColor)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.top, 20)
                     
                     Text(ocrContent.keyConcept)
-                        .font(.system(size: 16, weight: .medium))
+                        .font(.pretendard(.medium, size: 20))
                         .foregroundStyle(textColor)
                         .padding()
                         .background(
@@ -123,11 +123,11 @@ struct OCRListDetailView: View {
                         .padding(.bottom, 32)
                     
                     Text("문제 요약")
-                        .font(.bmjua(.regular, size: 20))
+                        .font(.pretendard(.bold, size: 22))
                         .foregroundStyle(textColor)
                     
                     Text(ocrContent.summary)
-                        .font(.system(size: 16, weight: .medium))
+                        .font(.pretendard(.medium, size: 20))
                         .foregroundStyle(textColor)
                         .padding()
                         .background(
@@ -137,11 +137,11 @@ struct OCRListDetailView: View {
                         .padding(.bottom, 32)
                     
                     Text("힌트")
-                        .font(.bmjua(.regular, size: 20))
+                        .font(.pretendard(.bold, size: 22))
                         .foregroundStyle(textColor)
                     
                     Text(ocrContent.solution)
-                        .font(.system(size: 16, weight: .medium))
+                        .font(.pretendard(.medium, size: 20))
                         .foregroundStyle(textColor)
                         .padding()
                         .background(

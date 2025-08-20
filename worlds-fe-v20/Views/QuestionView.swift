@@ -47,7 +47,7 @@ struct QuestionView: View {
             VStack(spacing: 0) {
                 HStack {
                     Text("게시판")
-                        .font(.bmjua(.regular, size: 27))
+                        .font(.pretendard(.bold, size: 27))
                         .foregroundStyle(textColor)
                         .padding(.top, 4)
                     
@@ -68,7 +68,7 @@ struct QuestionView: View {
                         .foregroundColor(.gray)
                     
                     TextField("검색", text: $searchText)
-                        .font(.bmjua(.regular, size: 16))
+                        .font(.pretendard(.semiBold, size: 16))
                 }
                 .padding(12)
                 .background(Color.white)
@@ -86,7 +86,7 @@ struct QuestionView: View {
                                     selectedCategory = category
                                 }) {
                                     Text(category.displayName)
-                                        .font(.bmjua(.regular, size: 18))
+                                        .font(.pretendard(.semiBold, size: 18))
                                         .foregroundColor(selectedCategory == category ? .white : .gray)
                                         .frame(width: 66, height: 36)
                                         .background(selectedCategory == category ? Color.mainws : Color(.systemGray5))
@@ -103,7 +103,7 @@ struct QuestionView: View {
                     } label: {
                         HStack {
                             Text("정렬 기준")
-                                .font(.bmjua(.regular, size: 16))
+                                .font(.pretendard(.medium, size: 16))
                                 .foregroundStyle(textColor)
                             
                             Image(systemName: "chevron.down")
@@ -135,6 +135,7 @@ struct QuestionView: View {
                     .padding(.top, 8)
                     .padding(.horizontal, 20)
                 }
+                .padding(.bottom, 100)
                 .refreshable {
                     await viewModel.fetchQuestions()
                 }
@@ -207,20 +208,20 @@ struct QuestionCard: View {
             // Left: texts
             VStack(alignment: .leading, spacing: 6) {
                 Text(question.category.displayName)
-                    .font(.bmjua(.regular, size: 14))
+                    .font(.pretendard(.bold, size: 16))
                     .foregroundColor(Color(.systemGray))
                     .padding(.top, 8)
                 
                 HStack(alignment: .center, spacing: 8) {
                     Text(question.title)
-                        .font(.bmjua(.regular, size: 20))
+                        .font(.pretendard(.semiBold, size: 22))
                         .foregroundColor(textColor)
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
                     
                     if question.answerCount > 0 {
                         Text("답변 \(question.answerCount)개")
-                            .font(.bmjua(.regular, size: 14))
+                            .font(.pretendard(.semiBold, size: 14))
                             .foregroundColor(.white)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 2)
@@ -232,7 +233,7 @@ struct QuestionCard: View {
                 .padding(.top, 2)
                 
                 Text(question.content)
-                    .font(.bmjua(.regular, size: 16))
+                    .font(.pretendard(.medium, size: 16))
                     .foregroundColor(Color(.systemGray2))
                     .lineLimit(2)
                     .padding(.bottom, 6)
@@ -261,7 +262,7 @@ struct QuestionCard: View {
                             .frame(width: 72, height: 72)
                             .overlay(
                                 Image(systemName: "photo")
-                                    .font(.bmjua(.regular, size: 20))
+                                    .font(.pretendard(.regular, size: 20))
                                     .foregroundColor(.gray)
                             )
                     @unknown default:

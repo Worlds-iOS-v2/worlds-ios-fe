@@ -18,10 +18,10 @@ struct CommonSignUpButton: View {
                 RoundedRectangle(cornerRadius: 12)
                     .fill(isFilled ? Color.mainws: Color.gray)
                     .frame(height: 60)
-                    .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
+                    // .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
                 
                 Text("\(text)")
-                    .font(.bmjua(.regular, size: 24))
+                    .font(.pretendard(.bold, size: 24))
                     .foregroundStyle(.white)
             }
         }

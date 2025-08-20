@@ -17,23 +17,24 @@ struct AttendanceRowView: View {
                 if isToday {
                     ZStack {
                         Circle()
-                            .fill(.sub1Ws.opacity(0.8))
+                            .fill(.mainws.opacity(0.2))
                             .frame(width: 40, height: 40)
                         
                         Text(getWeekdayString(for: weekday))
-                            .font(.bmjua(.regular, size: 16))
-                            .foregroundColor(.black)
+                            .font(.pretendard(.bold, size: 16))
+                            .foregroundColor(.mainfontws)
                     }
                 } else {
                     Text(getWeekdayString(for: weekday))
-                        .font(.bmjua(.regular, size: 16))
-                        .foregroundColor(.black)
+                        .font(.pretendard(.medium, size: 16))
+                        .foregroundColor(.mainfontws)
                         .frame(width: 40, height: 40)
                 }
                 
                 if isAttended {
-                    Text("📚")
+                    Image("bookws")
                         .font(.system(size: 20))
+                        .frame(width: 20, height: 20)
                 } else {
                     Rectangle()
                         .fill(.clear)

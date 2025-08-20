@@ -35,7 +35,7 @@ struct OCRResultView: View {
             VStack(spacing: 20) {
                 HStack(spacing: 15) {
                     Text("한국어")
-                        .font(.bmjua(.regular, size: 18))
+                        .font(.pretendard(.bold, size: 18))
                         .foregroundColor(textColor)
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -50,7 +50,7 @@ struct OCRResultView: View {
                         .padding()
                     
                     Text("\(translatedLanguage)")
-                        .font(.bmjua(.regular, size: 18))
+                        .font(.pretendard(.bold, size: 18))
                         .foregroundColor(textColor)
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -74,7 +74,7 @@ struct OCRResultView: View {
                             .progressViewStyle(CircularProgressViewStyle(tint: .mainws))
                         
                         Text("텍스트를 분석하고 있습니다...")
-                            .font(.bmjua(.regular, size: 18))
+                            .font(.pretendard(.semiBold, size: 18))
                             .foregroundColor(.gray)
                     }
                     .frame(maxWidth: .infinity)
@@ -88,11 +88,11 @@ struct OCRResultView: View {
                             ForEach(0..<viewModel.originalText.count, id: \.self) { index in
                                 VStack(alignment: .leading, spacing: 8) {
                                     Text(viewModel.originalText[index])
-                                        .font(.body)
+                                        .font(.pretendard(.medium, size: 16))
                                         .foregroundColor(.black)
                                     
                                     Text(viewModel.translatedText[index])
-                                        .font(.body)
+                                        .font(.pretendard(.medium, size: 16))
                                         .foregroundColor(.mainws)
                                     
                                     Divider()
@@ -114,7 +114,7 @@ struct OCRResultView: View {
                         showingSummaryModalView = true
                     } label: {
                             Text("개념 보기")
-                            .font(.bmjua(.regular, size: 16))
+                            .font(.pretendard(.bold, size: 16))
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
                             .padding()
@@ -127,7 +127,7 @@ struct OCRResultView: View {
                         showingCreateQuestionView = true
                     } label: {
                         Text("질문하기")
-                            .font(.bmjua(.regular, size: 16))
+                            .font(.pretendard(.bold, size: 16))
                             .foregroundColor(.gray)
                             .frame(maxWidth: .infinity)
                             .padding()
@@ -140,7 +140,7 @@ struct OCRResultView: View {
                         dismiss()
                     } label: {
                         Text("재촬영")
-                            .font(.bmjua(.regular, size: 16))
+                            .font(.pretendard(.bold, size: 16))
                             .foregroundColor(.gray)
                             .frame(maxWidth: .infinity)
                             .padding()

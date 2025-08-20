@@ -1,0 +1,23 @@
+{
+  "images" : [
+    {
+      "filename" : "‘flamel-fill-1834098-2x-undefined’의 배경이 제거됨 2.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "‘flamel-fill-1834098-2x-undefined’의 배경이 제거됨 2@2x.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "‘flamel-fill-1834098-2x-undefined’의 배경이 제거됨 2@3x.png",
+      "idiom" : "universal",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

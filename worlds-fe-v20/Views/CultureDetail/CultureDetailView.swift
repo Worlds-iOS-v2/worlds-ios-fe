@@ -29,7 +29,7 @@ struct CultureDetailView: View {
                         .padding(.vertical, 20)
                     
                     AutoSlideViewWithTimer(datas: eventPrograms, isLoading: false)
-                        .frame(height: 300)
+                        .frame(height: 340)
                         .padding(.horizontal, 24)
                         .padding(.bottom, 20)
                     
@@ -38,18 +38,19 @@ struct CultureDetailView: View {
                         .padding(.horizontal, 24)
                     
                     CultureSlideView<GovernmentProgram>(datas: govermentPrograms, isLoading: false)
-                        .frame(height: 150)
+                        .frame(height: 190)
                         .padding(.horizontal, 24)
+                        .padding(.bottom, 20)
                     
                     Text("한국어 교육 프로그램")
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 24)
                     
                     CultureSlideView<KoreanProgram>(datas: koreanPrograms, isLoading: false)
-                        .frame(height: 150)
+                        .frame(height: 190)
                         .padding(.horizontal, 24)
                 }
-                .font(.bmjua(.regular, size: 27))
+                .font(.pretendard(.bold, size: 24))
                 .foregroundStyle(textColor)
                 .padding(.bottom, 20)
             }

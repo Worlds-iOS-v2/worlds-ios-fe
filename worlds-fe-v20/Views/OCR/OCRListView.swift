@@ -61,13 +61,13 @@ struct OCRCardView: View {
         HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 6) {
                 Text(OCRContent.keyConcept)
-                    .font(.bmjua(.regular, size: 16))
+                    .font(.pretendard(.bold, size: 16))
                     .foregroundColor(Color(.systemGray))
                     .padding(.top, 8)
                 
                 HStack(alignment: .center, spacing: 8) {
                     Text(OCRContent.summary)
-                        .font(.bmjua(.regular, size: textSize))
+                        .font(.pretendard(.semiBold, size: textSize))
                         .foregroundStyle(textColor)
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
@@ -77,7 +77,7 @@ struct OCRCardView: View {
                 .padding(.top, 2)
                 
                 Text(OCRContent.createdAt)
-                    .font(.bmjua(.regular, size: 14))
+                    .font(.pretendard(.medium, size: 14))
                     .foregroundColor(Color(.systemGray2))
                     .lineLimit(2)
                     .padding(.bottom, 6)

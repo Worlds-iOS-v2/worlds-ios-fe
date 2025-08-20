@@ -44,7 +44,7 @@ struct SignUpAccountView: View {
         ScrollView {
             VStack(alignment: .leading) {
                 Text("로그인 정보를 입력해주세요.")
-                    .font(.bmjua(.regular, size: 27))
+                    .font(.pretendard(.bold, size: 27))
                     .foregroundColor(textColor)
                     .padding(.top, 40)
                 
@@ -56,7 +56,7 @@ struct SignUpAccountView: View {
                     if !email.isEmpty && !isValidEmail(email) {
                         Text("올바른 이메일 형식이 아닙니다.")
                             .foregroundColor(.red)
-                            .font(.bmjua(.regular, size: 16))
+                            .font(.pretendard(.medium, size: 16))
                     }
                     
                     Spacer()
@@ -79,7 +79,7 @@ struct SignUpAccountView: View {
                     } label: {
                         Text("인증번호 전송")
                             .foregroundColor(.mainws)
-                            .font(.bmjua(.regular, size: 16))
+                            .font(.pretendard(.semiBold, size: 16))
                     }
                     .alert(emailCheckAlertMessage, isPresented: $showEmailCheckAlert) {
                         Button("확인", role: .cancel) { }
@@ -117,7 +117,7 @@ struct SignUpAccountView: View {
                 if !password.isEmpty && !isValidPassword(password) {
                     Text("비밀번호는 영문, 숫자, 특수문자 중 2가지 이상 조합으로 8~16자여야 합니다.")
                         .foregroundColor(.red)
-                        .font(.bmjua(.regular, size: 16))
+                        .font(.pretendard(.medium, size: 16))
                 }
                 
                 CommonSignUpTextField(title: "비밀번호 확인", placeholder: "비밀번호를 한 번 더 입력해주세요.", isSecure: true, content: $passwordCheck)
@@ -126,7 +126,7 @@ struct SignUpAccountView: View {
                 if !passwordCheck.isEmpty && password != passwordCheck {
                     Text("비밀번호가 일치하지 않습니다.")
                         .foregroundColor(.red)
-                        .font(.bmjua(.regular, size: 16))
+                        .font(.pretendard(.medium, size: 16))
                 }
                 
                 Spacer()
@@ -150,8 +150,8 @@ struct SignUpAccountView: View {
                 appState.flow = .login
             } label: {
                 Text("로그인 하기")
-                    .foregroundStyle(Color.gray)
-                    .font(.bmjua(.regular, size: 16))
+                    .foregroundStyle(.subfontws)
+                    .font(.pretendard(.semiBold, size: 16))
             }
         }
         .scrollIndicators(.hidden)

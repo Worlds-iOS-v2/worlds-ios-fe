@@ -62,7 +62,7 @@ struct QuestionDetailView: View {
                     VStack(alignment: .leading, spacing: 0) {
                         HStack {
                             Text(question.category.displayName)
-                                .font(.subheadline)
+                                .font(.pretendard(.bold, size: 15))
                                 .fontWeight(.bold)
                                 .foregroundColor(.white)
                                 .padding(.horizontal, 16)
@@ -100,10 +100,11 @@ struct QuestionDetailView: View {
                             
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(question.user.name)
-                                    .font(.callout)
+                                    .font(.pretendard(.semiBold, size: 15))
                                     .fontWeight(.bold)
+                                
                                 Text(formatDate(question.createdAt))
-                                    .font(.caption)
+                                    .font(.pretendard(.medium, size: 13))
                                     .foregroundColor(.gray)
                             }
                             
@@ -112,13 +113,12 @@ struct QuestionDetailView: View {
                         .padding(.horizontal)
 
                         Text(translatedTitle ?? question.title)
-                            .font(.title)
-                            .fontWeight(.bold)
+                            .font(.pretendard(.bold, size: 24))
                             .padding(.top, 24)
                             .padding(.horizontal)
 
                         Text(translatedContent ?? question.content)
-                            .font(.body)
+                            .font(.pretendard(.medium, size: 18))
                             .foregroundColor(.black)
                             .padding(.top, 18)
                             .padding(.horizontal)
@@ -183,10 +183,10 @@ struct QuestionDetailView: View {
                                 }
                             }
                         }
-                        .font(.callout)
+                        .font(.pretendard(.semiBold, size: 16))
                         .foregroundColor(.blue)
                         .padding(.horizontal)
-                        .padding(.top, 14)
+                        .padding(.vertical, 14)
 
                         Color.gray.opacity(0.1)
                             .frame(height: 13)
@@ -194,7 +194,7 @@ struct QuestionDetailView: View {
                             .padding(.horizontal, -20)
 
                         Text("댓글 \(commentVM.comments.count)개")
-                            .font(.subheadline)
+                            .font(.pretendard(.semiBold, size: 16))
                             .bold()
                             .padding(.top, 12)
                             .padding(.horizontal)
@@ -202,6 +202,7 @@ struct QuestionDetailView: View {
                         VStack(alignment: .leading, spacing: 15) {
                             if commentVM.comments.isEmpty {
                                 Text("아직 답변이 없습니다.")
+                                    .font(.pretendard(.semiBold, size: 16))
                                     .foregroundColor(.gray)
                                     .padding(.horizontal)
                                     .padding(.top, 10)
@@ -255,6 +256,7 @@ struct QuestionDetailView: View {
                             }
                         }) {
                             Text("등록")
+                                .font(.pretendard(.bold, size: 16))
                                 .frame(minWidth: 60)
                                 .padding(.vertical, 12)
                                 .background(Color.mainws)

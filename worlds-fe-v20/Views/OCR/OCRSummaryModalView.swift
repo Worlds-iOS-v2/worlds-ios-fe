@@ -25,20 +25,20 @@ struct OCRSummaryModalView: View {
                         .progressViewStyle(CircularProgressViewStyle(tint: .mainws))
                     
                     Text("개념을 분석하고 있습니다...")
-                        .font(.bmjua(.regular, size: 18))
+                        .font(.pretendard(.regular, size: 18))
                         .foregroundColor(.gray)
                 }
             } else {
                 ScrollView() {
                     VStack(alignment: .leading) {
                         Text("핵심 개념")
-                            .font(.bmjua(.regular, size: 20))
+                            .font(.pretendard(.bold, size: 24))
                             .foregroundStyle(textColor)
                             .padding(.top, 20)
                         
                         
                         Text(viewModel.keyConcept)
-                            .font(.system(size: 16, weight: .medium))
+                            .font(.pretendard(.medium, size: 20))
                             .foregroundStyle(textColor)
                             .padding()
                             .background(
@@ -48,11 +48,11 @@ struct OCRSummaryModalView: View {
                             .padding(.bottom, 32)
                         
                         Text("문제 요약")
-                            .font(.bmjua(.regular, size: 20))
+                            .font(.pretendard(.bold, size: 24))
                             .foregroundStyle(textColor)
 
                         Text(viewModel.summary)
-                            .font(.system(size: 16, weight: .medium))
+                            .font(.pretendard(.medium, size: 20))
                             .foregroundStyle(textColor)
                             .padding()
                             .background(
@@ -62,11 +62,11 @@ struct OCRSummaryModalView: View {
                             .padding(.bottom, 32)
                         
                         Text("힌트")
-                            .font(.bmjua(.regular, size: 20))
+                            .font(.pretendard(.bold, size: 24))
                             .foregroundStyle(textColor)
 
                         Text(viewModel.solution)
-                            .font(.system(size: 16, weight: .medium))
+                            .font(.pretendard(.medium, size: 20))
                             .foregroundStyle(textColor)
                             .padding()
                             .background(

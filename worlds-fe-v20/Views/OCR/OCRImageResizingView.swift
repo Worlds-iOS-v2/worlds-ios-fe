@@ -95,8 +95,8 @@ struct OCRImageResizingView: View {
                     
                     HStack {
                         Image(systemName: "text.viewfinder")
-                        Text("OCR 실행")
-                            .font(.bmjua(.regular, size: 24))
+                        Text("번역하기")
+                            .font(.pretendard(.bold, size: 24))
                     }
                     .font(.system(size: 20, weight: .bold))
                     .foregroundStyle(.white)

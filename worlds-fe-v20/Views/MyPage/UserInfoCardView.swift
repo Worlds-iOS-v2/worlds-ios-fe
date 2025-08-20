@@ -17,7 +17,7 @@ struct UserInfoCardView: View {
         VStack {
             ZStack(alignment: .top) {
                 Rectangle()
-                    .fill(Color.mainws)
+                    .fill(Color.sub1Ws)
                     .frame(height: 100)
                     .frame(maxWidth: .infinity)
                 
@@ -44,46 +44,51 @@ struct UserInfoCardView: View {
             VStack(alignment: .leading) {
                 HStack {
                     Text("이름")
+                        .font(.pretendard(.semiBold, size: textSize))
 
                     Spacer()
                     
                     if let userInfo = userInfo {
                         Text("\(userInfo.userName)")
+                            .font(.pretendard(.regular, size: textSize))
                     } else {
                         Text("알 수 없음")
+                            .font(.pretendard(.regular, size: textSize))
                     }
                 }
-                .font(.bmjua(.regular, size: textSize))
                 .foregroundStyle(textColor)
                 .padding(.bottom, 8)
                 
                 HStack {
                     Text("이메일")
+                        .font(.pretendard(.semiBold, size: textSize))
                     
                     Spacer()
                     
                     if let userInfo = userInfo {
                         Text("\(userInfo.userEmail)")
+                            .font(.pretendard(.regular, size: textSize))
 
                     } else {
                         Text("알 수 없음")
+                            .font(.pretendard(.regular, size: textSize))
                     }
                 }
-                .font(.bmjua(.regular, size: textSize))
                 .foregroundStyle(textColor)
                 .padding(.bottom, 8)
                 
                 HStack {
                     Text("비밀번호")
+                        .font(.pretendard(.semiBold, size: textSize))
                         .foregroundStyle(textColor)
 
                     Spacer()
                     
                     NavigationLink(destination: ResetPasswordView()) {
                         Text("비밀번호 재설정")
+                            .font(.pretendard(.regular, size: textSize))
                     }
                 }
-                .font(.bmjua(.regular, size: textSize))
                 .padding(.bottom, 16)
             }
             .padding(.horizontal, 16)

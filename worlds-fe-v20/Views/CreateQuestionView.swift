@@ -28,7 +28,6 @@ struct CreateQuestionView: View {
 
     var body: some View {
         NavigationView {
-            
             ScrollView {
                 VStack(alignment: .leading, spacing: 14) {
                 Spacer().frame(height: 15)
@@ -43,8 +42,9 @@ struct CreateQuestionView: View {
                 } label: {
                     HStack {
                         Text(selectedCategory?.displayName ?? "게시판 선택")
-                            .font(.system(size: 15))
+                            .font(.pretendard(.semiBold, size: 16))
                             .foregroundColor(.gray)
+                        
                         Image(systemName: "chevron.down")
                             .foregroundColor(.gray)
                     }
@@ -67,17 +67,19 @@ struct CreateQuestionView: View {
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(Color.mainws, lineWidth: 1)
                     )
-                    .font(.system(size: 17))
+                    .font(.pretendard(.semiBold, size: 20))
                     .padding(.horizontal, 4)
 
                 // 내용 입력
                 ZStack(alignment: .topLeading) {
                     if content.isEmpty {
                         Text("내용")
+                            .font(.pretendard(.medium, size: 18))
                             .foregroundColor(Color(.systemGray3))
                             .padding(.top, 13)
                             .padding(.leading, 17)
                     }
+                    
                     TextEditor(text: $content)
                         .padding(8)
                         .background(Color.white)
@@ -85,7 +87,7 @@ struct CreateQuestionView: View {
                             RoundedRectangle(cornerRadius: 8)
                                 .stroke(Color.mainws, lineWidth: 1)
                         )
-                        .font(.system(size: 17))
+                        .font(.pretendard(.medium, size: 18))
                         .frame(height: 370)
                 }
                 .padding(.horizontal, 4)
@@ -102,7 +104,7 @@ struct CreateQuestionView: View {
                                 .frame(width: 32, height: 28)
                                 .foregroundColor(Color(.systemGray))
                             Text("\(selectedImages.count)/3")
-                                .font(.caption2)
+                                .font(.pretendard(.medium, size: 12))
                                 .foregroundColor(.gray)
                         }
                         .frame(width: 60, height: 48)
@@ -148,17 +150,17 @@ struct CreateQuestionView: View {
                     onSubmit(selectedImages, selected.rawValue)
                 } label: {
                     Text("등록")
-                        .font(.bmjua(.regular, size: 24))
+                        .font(.pretendard(.bold, size: 24))
                         .foregroundColor(.white)
-                        .frame(maxWidth: .infinity, minHeight: 48)
+                        .frame(maxWidth: .infinity, minHeight: 60)
                         .background(Color.mainws)
                         .cornerRadius(12)
-                        .shadow(color: Color(.systemGray3), radius: 3, x: 0, y: 3)
                 }
                 .padding(.bottom, 18)
                 .padding(.horizontal, 4)
                 }
             } // ScrollView 끗
+            .scrollIndicators(.hidden)
             .onTapGesture {
                 UIApplication.shared.endEditing()
             }
