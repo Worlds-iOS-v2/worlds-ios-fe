@@ -14,7 +14,7 @@ struct CustomTabBarView: View {
     
     var body: some View {
         NavigationStack {
-            ZStack(alignment: .bottom) {                
+            ZStack(alignment: .bottom) {
                 Color.background2Ws
                     .ignoresSafeArea(.all)
                 
@@ -37,15 +37,15 @@ struct CustomTabBarView: View {
                     selectedTab: $selectedTab,
                     onCameraTapped: { showCameraView = true }
                 )
-                
-                .navigationDestination(isPresented: $showCameraView) {
-                    OCRCameraView()
-                }
             }
-            .ignoresSafeArea(.keyboard, edges: .bottom)
+            .navigationDestination(isPresented: $showCameraView) {
+                OCRCameraView()
+            }
         }
+        .ignoresSafeArea(.keyboard, edges: .bottom)
     }
 }
+
 
 // MARK: - 커스텀 탭바 컴포넌트
 struct CustomTabBar: View {
