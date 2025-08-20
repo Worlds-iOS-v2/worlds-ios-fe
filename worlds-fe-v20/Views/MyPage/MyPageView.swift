@@ -56,6 +56,22 @@ struct MyPageView: View {
                     Divider()
                         .padding(.horizontal, 32)
                     
+                    NavigationLink(destination: OCRListView(ocrList: viewModel.ocrList)) {
+                        Text("나의 OCR")
+                            .font(.bmjua(.regular, size: textSize))
+                            .foregroundStyle(textColor)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .padding(.horizontal, 32)
+                    .onAppear{
+                        Task {
+                            await viewModel.fetchMyOCRList()
+                        }
+                    }
+                    
+                    Divider()
+                        .padding(.horizontal, 32)
+                    
                     Button {
                         alertMessage = "로그아웃 하시겠습니까?"
                         showAlert = true
