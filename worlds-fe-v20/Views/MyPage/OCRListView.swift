@@ -53,7 +53,6 @@ struct OCRCardView: View {
     
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            // Left: texts
             VStack(alignment: .leading, spacing: 6) {
                 Text(OCRContent.keyConcept)
                     .font(.system(size: 14, weight: .medium))
@@ -86,4 +85,8 @@ struct OCRCardView: View {
         .cornerRadius(18)
         .shadow(color: Color.black.opacity(0.06), radius: 5, x: 0, y: 3)
     }
+}
+
+#Preview {
+    OCRListView()
 }
