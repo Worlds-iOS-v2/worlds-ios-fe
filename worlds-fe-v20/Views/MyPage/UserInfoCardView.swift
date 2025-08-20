@@ -26,10 +26,17 @@ struct UserInfoCardView: View {
                         .fill(.white)
                         .frame(width: 100, height: 100)
                     
-                    Image("mentee")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 100, height: 100)
+                    if let userImage = userInfo?.profileImage {
+                        Image("\(userImage)")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 80, height: 80)
+                    } else {
+                        Image("mentee")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 100, height: 100)
+                    }
                 }
                 .padding(.top, 50)
             }
