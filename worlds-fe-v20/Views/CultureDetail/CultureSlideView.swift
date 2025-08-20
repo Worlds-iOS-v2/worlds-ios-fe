@@ -20,6 +20,8 @@ struct CultureSlideView<T: CultureDisplayable>: View {
     let isLoading: Bool
     /// 현재 인덱스 저장
     @State private var currentIndex = 0
+    
+    var textColor: Color = .mainfontws
 
     // MARK: - body
     var body: some View {
@@ -31,35 +33,35 @@ struct CultureSlideView<T: CultureDisplayable>: View {
                     VStack(alignment: .leading) {
                         HStack {
                             Text(isLoading ? "로딩 중..." : "데이터 없음")
-                                .font(.headline)
-                                .foregroundColor(.black)
+                                .font(.bmjua(.regular, size: 20))
+                                .foregroundColor(textColor)
 
                             Spacer()
 
                             Text("")
-                                .font(.caption)
-                                .foregroundColor(.black)
+                                .font(.bmjua(.regular, size: 14))
+                                .foregroundColor(textColor)
                         }
                         .padding(.bottom, 12)
 
                         Text("신청 기간: \(isLoading ? "로딩 중..." : "데이터 없음")")
-                            .font(.caption)
-                            .foregroundColor(.gray)
+                            .font(.bmjua(.regular, size: 14))
+                            .foregroundColor(textColor)
                             .padding(.bottom, 4)
 
                         Text("활동 기간: \(isLoading ? "로딩 중..." : "데이터 없음")")
-                            .font(.caption)
-                            .foregroundColor(.gray)
+                            .font(.bmjua(.regular, size: 14))
+                            .foregroundColor(textColor)
                     }
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background {
                     Rectangle()
-                        .fill(Color.backgroundws)
+                        .fill(Color.background1Ws)
                 }
                 .ignoresSafeArea()
-                .cornerRadius(16)
+                .cornerRadius(12)
                 .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
             } else {
                 InfinitePageBaseView(
@@ -71,24 +73,24 @@ struct CultureSlideView<T: CultureDisplayable>: View {
                             VStack(alignment: .leading) {
                                 HStack {
                                     Text(datas[index].title)
-                                        .font(.headline)
-                                        .foregroundColor(.black)
+                                        .font(.bmjua(.regular, size: 20))
+                                        .foregroundColor(textColor)
 
                                     Spacer()
 
                                     Text(datas[index].location)
-                                        .font(.caption)
-                                        .foregroundColor(.black)
+                                        .font(.bmjua(.regular, size: 14))
+                                        .foregroundColor(textColor)
                                 }
                                 .padding(.bottom, 12)
 
                                 Text("신청 기간: \(datas[index].applicationPeriod)")
-                                    .font(.caption)
+                                    .font(.bmjua(.regular, size: 14))
                                     .foregroundColor(.gray)
                                     .padding(.bottom, 4)
 
                                 Text("활동 기간: \(datas[index].programPeriod)")
-                                    .font(.caption)
+                                    .font(.bmjua(.regular, size: 14))
                                     .foregroundColor(.gray)
                             }
                         }
@@ -96,11 +98,11 @@ struct CultureSlideView<T: CultureDisplayable>: View {
                         .padding()
                         .background {
                             Rectangle()
-                                .fill(Color.backgroundws)
+                                .fill(Color.background1Ws)
                                 .tag(index)
                         }
                         .ignoresSafeArea()
-                        .cornerRadius(16)
+                        .cornerRadius(12)
                     }
                 )
                 // 인덱스 변화
@@ -141,7 +143,7 @@ extension CultureSlideView {
                             )
                             .opacity(currentIndex == index ? 1 : 0.5)
                             .background(
-                                currentIndex == index ? .sub1Ws : .backgroundws)
+                                currentIndex == index ? .sub1Ws : .background1Ws)
                     }
                 }  // H
                 .padding(.bottom, 24)

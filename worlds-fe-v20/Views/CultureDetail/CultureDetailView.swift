@@ -9,7 +9,12 @@ import SwiftUI
 
 struct CultureDetailView: View {
     @Environment(\.dismiss) var dismiss
-    @StateObject var viewModel = CultureDetailViewModel()
+    
+    let eventPrograms: [EventProgram]
+    let govermentPrograms: [GovernmentProgram]
+    let koreanPrograms: [KoreanProgram]
+    
+    var textColor: Color = .mainfontws
     
     var body: some View {
         ZStack {
@@ -19,34 +24,33 @@ struct CultureDetailView: View {
             ScrollView {
                 VStack {
                     Text("이번주 소식")
-                        .font(.system(size: 27))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 24)
                         .padding(.vertical, 20)
                     
-                    AutoSlideViewWithTimer(datas: viewModel.eventPrograms, isLoading: false)
+                    AutoSlideViewWithTimer(datas: eventPrograms, isLoading: false)
                         .frame(height: 300)
                         .padding(.horizontal, 24)
                         .padding(.bottom, 20)
                     
                     Text("정부 프로그램")
-                        .font(.system(size: 27))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 24)
                     
-                    CultureSlideView<GovernmentProgram>(datas: viewModel.govermentPrograms, isLoading: viewModel.isLoading)
+                    CultureSlideView<GovernmentProgram>(datas: govermentPrograms, isLoading: false)
                         .frame(height: 150)
                         .padding(.horizontal, 24)
                     
                     Text("한국어 교육 프로그램")
-                        .font(.system(size: 27))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 24)
                     
-                    CultureSlideView<KoreanProgram>(datas: viewModel.koreanPrograms, isLoading: viewModel.isLoading)
+                    CultureSlideView<KoreanProgram>(datas: koreanPrograms, isLoading: false)
                         .frame(height: 150)
                         .padding(.horizontal, 24)
                 }
+                .font(.bmjua(.regular, size: 27))
+                .foregroundStyle(textColor)
                 .padding(.bottom, 20)
             }
             .navigationTitle("문화행사정보")
@@ -65,14 +69,5 @@ struct CultureDetailView: View {
             }
             .scrollIndicators(.hidden)
         }
-        .onAppear {
-            Task {
-                await viewModel.fetchCultureInfo()
-            }
-        }
     }
-}
-
-#Preview {
-    CultureDetailView()
 }

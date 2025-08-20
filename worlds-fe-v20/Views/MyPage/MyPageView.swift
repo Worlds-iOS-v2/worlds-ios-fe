@@ -14,22 +14,26 @@ struct MyPageView: View {
     @State private var showAlert = false
     @State private var alertMessage = ""
     @EnvironmentObject var appState: AppState
+    
+    var textSize: CGFloat = 20
+    var textColor: Color = .mainfontws
 
     var body: some View {
         ZStack {
-            Color.sub2Ws
+            Color.background2Ws
                 .ignoresSafeArea()
             
             VStack {
                 VStack {
                     Text("마이페이지")
-                        .font(.system(size: 27))
+                        .font(.bmjua(.regular, size: 27))
+                        .foregroundStyle(textColor)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 24)
                         .padding(.top, 28)
                     
                     UserInfoCardView(userInfo: viewModel.userInfo)
-                        .cornerRadius(20)
+                        .cornerRadius(12)
                         .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
                         .padding(.horizontal, 16)
                 }
@@ -38,8 +42,8 @@ struct MyPageView: View {
                 VStack(spacing: 16) {
                     NavigationLink(destination: MyQuestionView(questions: viewModel.questions)) {
                         Text("내가 쓴 글")
-                            .font(.system(size: 18))
-                            .foregroundStyle(Color.black)
+                            .font(.bmjua(.regular, size: textSize))
+                            .foregroundStyle(textColor)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .padding(.horizontal, 32)
@@ -52,13 +56,29 @@ struct MyPageView: View {
                     Divider()
                         .padding(.horizontal, 32)
                     
+                    NavigationLink(destination: OCRListView(ocrList: viewModel.ocrList)) {
+                        Text("나의 OCR")
+                            .font(.bmjua(.regular, size: textSize))
+                            .foregroundStyle(textColor)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .padding(.horizontal, 32)
+                    .onAppear{
+                        Task {
+                            await viewModel.fetchMyOCRList()
+                        }
+                    }
+                    
+                    Divider()
+                        .padding(.horizontal, 32)
+                    
                     Button {
                         alertMessage = "로그아웃 하시겠습니까?"
                         showAlert = true
                     } label: {
                         Text("로그아웃")
-                            .font(.system(size: 18))
-                            .foregroundStyle(Color.black)
+                            .font(.bmjua(.regular, size: textSize))
+                            .foregroundStyle(textColor)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .padding(.horizontal, 32)
@@ -76,8 +96,8 @@ struct MyPageView: View {
                         .padding(.horizontal, 32)
                     
                     Link("이용약관", destination: URL(string: "https://www.notion.so/World-Study-_2-0-0-1fc800c9877b80d6a86ce296013ec7d7?source=copy_link")!)
-                        .font(.system(size: 18))
-                        .foregroundStyle(Color.black)
+                        .font(.bmjua(.regular, size: textSize))
+                        .foregroundStyle(textColor)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 32)
                     
@@ -86,14 +106,14 @@ struct MyPageView: View {
                     
                     HStack {
                         Text("버전 정보")
-                            .font(.system(size: 18))
-                            .foregroundStyle(Color.black)
+                            .font(.bmjua(.regular, size: textSize))
+                            .foregroundStyle(textColor)
                             .frame(maxWidth: .infinity, alignment: .leading)
                         
                         Spacer()
                         
                         Text("\(appVersion())")
-                            .font(.system(size: 18))
+                            .font(.bmjua(.regular, size: textSize))
                             .foregroundStyle(Color.gray)
                             .frame(maxWidth: .infinity, alignment: .trailing)
                     }
@@ -104,7 +124,7 @@ struct MyPageView: View {
                     
                     NavigationLink(destination: DeleteAccountView()) {
                         Text("회원탈퇴")
-                            .font(.system(size: 18))
+                            .font(.bmjua(.regular, size: textSize))
                             .foregroundStyle(Color.red)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
@@ -112,8 +132,8 @@ struct MyPageView: View {
                 }
                 .padding(.vertical, 24)
                 .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(.backgroundws)
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(.background1Ws)
                         .padding(.horizontal, 16)
                         .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
                 )

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct AutoSlideViewWithTimer: View {
     // MARK: - properties
@@ -18,50 +19,51 @@ struct AutoSlideViewWithTimer: View {
     /// 현재 인덱스 저장
     @State private var currentIndex = 0
     
+    var textColor: Color = .mainfontws
+    
     // MARK: - body
     var body: some View {
-        
         VStack {
             // MARK: - Image Slide
             if datas.isEmpty || isLoading {
                 // 데이터가 없거나 로딩 중일 때 로딩 상태 표시
                 VStack {
                     Rectangle()
-                        .fill(.backgroundws)
+                        .fill(.background1Ws)
                         .frame(height: 200)
                     
                     VStack(alignment: .leading) {
                         HStack {
                             Text(isLoading ? "로딩 중..." : "데이터 없음")
-                                .font(.headline)
-                                .foregroundColor(.black)
+                                .font(.bmjua(.regular, size: 20))
+                                .foregroundColor(textColor)
                             
                             Spacer()
                             
                             Text("")
-                                .font(.caption)
-                                .foregroundColor(.black)
+                                .font(.bmjua(.regular, size: 14))
+                                .foregroundColor(textColor)
                         }
                         .padding(.bottom, 12)
                         
                         Text("신청 기간: \(isLoading ? "로딩 중..." : "데이터 없음")")
-                            .font(.caption)
+                            .font(.bmjua(.regular, size: 14))
                             .foregroundColor(.gray)
                             .padding(.bottom, 4)
                         
                         Text("활동 기간: \(isLoading ? "로딩 중..." : "데이터 없음")")
-                            .font(.caption)
+                            .font(.bmjua(.regular, size: 14))
                             .foregroundColor(.gray)
                     }
                     .padding()
                     .frame(maxWidth: .infinity)
                     .background{
                         Rectangle()
-                            .fill(Color.backgroundws)
+                            .fill(Color.background1Ws)
                     }
                 }
                 .ignoresSafeArea()
-                .cornerRadius(16)
+                .cornerRadius(12)
                 .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
             } else {
                 InfinitePageBaseView(
@@ -71,57 +73,76 @@ struct AutoSlideViewWithTimer: View {
                     view: { index in
                         ZStack {
                             VStack(spacing: 0) {
-                                AsyncImage(url: URL(string: datas[index].image)) { phase in
-                                    if let image = phase.image {
-                                        image
-                                            .resizable()
-                                            .scaledToFill() // 원하는 크기에 맞게 설정
-                                    } else if phase.error != nil {
-                                        Color.red // 오류 시 대체 색상
-                                    } else {
-                                        ProgressView() // 로딩 중 표시
+                                KFImage(URL(string: datas[index].image))
+                                    .placeholder {
+                                        // 로딩 중
+                                        Rectangle()
+                                            .fill(Color.gray.opacity(0.1))
+                                            .overlay(
+                                                ProgressView()
+                                                    .progressViewStyle(CircularProgressViewStyle(tint: .gray))
+                                            )
                                     }
-                                }
-                                .tag(index)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 150) // 원하는 사이즈로 설정
-                                .clipped()
+                                    .onFailure { error in
+                                        print("이미지 로드 실패: \(error)")
+                                    }
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(height: 150)
+                                    .clipped()
+                                    .overlay(
+                                        // 이미지 로드 실패 시 오버레이
+                                        Rectangle()
+                                            .fill(Color.gray.opacity(0.1))
+                                            .overlay(
+                                                VStack(spacing: 8) {
+                                                    Image(systemName: "photo")
+                                                        .font(.bmjua(.regular, size: 24))
+                                                        .foregroundColor(.gray)
+                                                    
+                                                    Text("이미지 없음")
+                                                        .font(.bmjua(.regular, size: 14))
+                                                        .foregroundColor(.gray)
+                                                }
+                                            )
+                                            .opacity(0) // Kingfisher가 실패 시 자동으로 처리
+                                    )
                                 
                                 Link(destination: URL(string: datas[index].url)!) {
                                     VStack(alignment: .leading) {
                                         HStack {
                                             Text(datas[index].title)
-                                                .font(.headline)
-                                                .foregroundColor(.black)
-                                            
+                                                .font(.bmjua(.regular, size: 20))
+                                                .foregroundColor(textColor)
+
                                             Spacer()
                                             
                                             Text(datas[index].location)
-                                                .font(.caption)
-                                                .foregroundColor(.black)
+                                                .font(.bmjua(.regular, size: 14))
+                                                .foregroundColor(textColor)
                                         }
                                         .padding(.bottom, 12)
                                         
                                         Text("신청 기간: \(datas[index].applicationPeriod)")
-                                            .font(.caption)
+                                            .font(.bmjua(.regular, size: 14))
                                             .foregroundColor(.gray)
                                             .padding(.bottom, 4)
                                         
                                         Text("활동 기간: \(datas[index].programPeriod)")
-                                            .font(.caption)
+                                            .font(.bmjua(.regular, size: 14))
                                             .foregroundColor(.gray)
                                     }
                                     .padding()
                                     .frame(maxWidth: .infinity)
                                     .background{
                                         Rectangle()
-                                            .fill(Color.backgroundws)
+                                            .fill(Color.background1Ws)
                                     }
                                 }
                             }
                         }
                         .ignoresSafeArea()
-                        .cornerRadius(16)
+                        .cornerRadius(12)
                     })
                 // 인덱스 변화
                 .onChange(of: currentIndex) { newIndex in  // iOS 16 방식
@@ -217,7 +238,7 @@ extension AutoSlideViewWithTimer {
                             .stroke(.sub1Ws, lineWidth: 1)
                             .frame(width: currentIndex == index ? 16 : 6, height: 6)
                             .opacity(currentIndex == index ? 1 : 0.5)
-                            .background(currentIndex == index ? .sub1Ws : .backgroundws)
+                            .background(currentIndex == index ? .sub1Ws : .background1Ws)
                     }
                 } // H
                 .padding(.bottom, 24)

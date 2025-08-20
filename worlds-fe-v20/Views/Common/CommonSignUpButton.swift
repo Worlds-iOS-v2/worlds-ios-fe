@@ -15,13 +15,13 @@ struct CommonSignUpButton: View {
     var body: some View {
         Button (action: action) {
             ZStack {
-                RoundedRectangle(cornerRadius: 10)
+                RoundedRectangle(cornerRadius: 12)
                     .fill(isFilled ? Color.mainws: Color.gray)
                     .frame(height: 60)
                     .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
                 
                 Text("\(text)")
-                    .font(.system(size: 24, weight: .bold))
+                    .font(.bmjua(.regular, size: 24))
                     .foregroundStyle(.white)
             }
         }

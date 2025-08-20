@@ -22,10 +22,11 @@ struct OCRCameraView: View {
     // 결과 뷰 표시 여부
     @State private var showingResultView = false
     // 카메라 컨트롤러 인스턴스
-    @State private var cameraController: OCRCameraController? = nil
-    
+    @State private var cameraController = OCRCameraController()
     // 공유 OCRViewModel 인스턴스
     @StateObject private var ocrViewModel = OCRViewModel()
+    
+    @Environment(\.dismiss) var dismiss
     
     var body: some View {
         ZStack {
@@ -68,7 +69,7 @@ struct OCRCameraView: View {
                     // 사진 촬영 버튼
                     Button {
                         print("촬영 버튼 클릭됨")
-                        cameraController?.capturePhoto()
+                        cameraController.capturePhoto()
                     } label: {
                         Circle()
                             .fill(.white)
@@ -107,7 +108,7 @@ struct OCRCameraView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button {
-                    // dismiss()
+                    dismiss()
                 } label: {
                     Image(systemName: "chevron.left")
                         .foregroundColor(.mainws)
@@ -143,7 +144,7 @@ struct OCRCameraView: View {
         }
         // 뷰가 나타날 때 카메라 권한 요청
         .onAppear {
-            cameraController?.requestCameraPermission()
+            cameraController.requestCameraPermission()
         }
     }
 }

@@ -39,6 +39,9 @@ class ChatViewModel: ObservableObject {
     private let pageSize = 20
     private var latestPageSkip: Int = 0
     private var discoveredTotal: Int?
+    
+    @Published var errorMessage: String?
+    @Published var ocrList: [OCRList] = []
 
     private func parseISO8601(_ s: String) -> Date? {
         let formatter = ISO8601DateFormatter()
@@ -368,5 +371,18 @@ class ChatViewModel: ObservableObject {
         let unreadFromOthers = messages.filter { $0.roomId == roomId && $0.senderId != myId && $0.isRead == false }
         guard let lastId = unreadFromOthers.map({ $0.id }).max() else { return }
         SocketService.shared.emitMessageRead(roomId: roomId, messageId: lastId)
+    }
+    
+    @MainActor
+    func fetchOCRList(userID: Int) async {        
+        do {
+            let ocrList = try await UserAPIManager.shared.getOCRList(userID: userID)
+            self.ocrList = ocrList
+            print("\(ocrList)")
+            self.errorMessage = nil
+        } catch {
+            print("ocrList 에러 발생:", error)
+            self.errorMessage = "OCR 목록을 불러오는데 실패했습니다: \(error.localizedDescription)"
+        }
     }
 }

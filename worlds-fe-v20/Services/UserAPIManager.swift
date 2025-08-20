@@ -826,6 +826,27 @@ class UserAPIManager {
         return response
     }
     
+    func getOCRList(userID: Int) async throws -> [OCRList] {
+        guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
+            print("토큰 값이 유효하지 않습니다.")
+            throw UserAPIError.invalidToken
+        }
+        
+        guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "APIOCRURL") as? String else {
+            throw UserAPIError.invalidEndPoint
+        }
+        
+        let endPoint = "\(baseURL)/\(userID)"
+                
+        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
+              
+        let response = try await AF.request(endPoint, method: .get, headers: headers)
+            .serializingDecodable([OCRList].self)
+            .value
+        
+        return response
+    }
+    
     func getCultureInfo() async throws -> CultureInfo {
         guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
             print("토큰 값이 유효하지 않습니다.")
@@ -873,32 +894,13 @@ class UserAPIManager {
     }
 }
 
+// MARK: - UserAPIManager Extension 수정
 extension UserAPIManager {
     func getTargetLanguage() -> String {
-        let preferredLanguage = Locale.preferredLanguages.first ?? "en" //ko-KR
-        let languageCode = preferredLanguage.components(separatedBy: "-").first ?? "en" //ko만 출력
-        
-        // 서버에서 요구하는 형태로 매핑
-        // ko로 바꿔서 주게 해주기 . . . . !!!!
-//        switch languageCode.lowercased() {
-//        case "ko":
-//            return "Korean"
-//        case "en":
-//            return "English"
-//        case "vi":
-//            return "Vietnam"
-//        case "ja":
-//            return "Japanese"
-//        case "zh":
-//            return "Chinese"
-//        case "es":
-//            return "Spanish"
-//        case "fr":
-//            return "French"
-//        default:
-//            return "English" // 기본값
-//        }
-        
-        return languageCode.lowercased()
+        return SupportedLanguage.getCurrentLanguageCode()
+    }
+    
+    func getTargetLanguageName() -> String {
+        return SupportedLanguage.getCurrentLanguageName()
     }
 }

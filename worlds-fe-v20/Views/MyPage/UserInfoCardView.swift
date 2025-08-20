@@ -10,6 +10,9 @@ import SwiftUI
 struct UserInfoCardView: View {
     var userInfo: User?
     
+    var textSize: CGFloat = 16
+    var textColor: Color = .mainfontws
+
     var body: some View {
         VStack {
             ZStack(alignment: .top) {
@@ -34,7 +37,7 @@ struct UserInfoCardView: View {
             VStack(alignment: .leading) {
                 HStack {
                     Text("이름")
-                    
+
                     Spacer()
                     
                     if let userInfo = userInfo {
@@ -43,6 +46,8 @@ struct UserInfoCardView: View {
                         Text("알 수 없음")
                     }
                 }
+                .font(.bmjua(.regular, size: textSize))
+                .foregroundStyle(textColor)
                 .padding(.bottom, 8)
                 
                 HStack {
@@ -52,26 +57,31 @@ struct UserInfoCardView: View {
                     
                     if let userInfo = userInfo {
                         Text("\(userInfo.userEmail)")
+
                     } else {
                         Text("알 수 없음")
                     }
                 }
+                .font(.bmjua(.regular, size: textSize))
+                .foregroundStyle(textColor)
                 .padding(.bottom, 8)
                 
                 HStack {
                     Text("비밀번호")
-                    
+                        .foregroundStyle(textColor)
+
                     Spacer()
                     
                     NavigationLink(destination: ResetPasswordView()) {
                         Text("비밀번호 재설정")
                     }
                 }
+                .font(.bmjua(.regular, size: textSize))
                 .padding(.bottom, 16)
             }
             .padding(.horizontal, 16)
         }
-        .background(Color.backgroundws)
+        .background(Color.background1Ws)
     }
 }
 

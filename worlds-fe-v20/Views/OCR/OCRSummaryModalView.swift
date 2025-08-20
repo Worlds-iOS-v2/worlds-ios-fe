@@ -7,12 +7,14 @@
 
 import SwiftUI
 
-struct OCRSummaryView: View {
+struct OCRSummaryModalView: View {
     @EnvironmentObject private var viewModel: OCRViewModel
+
+    var textColor: Color = .mainfontws
 
     var body: some View {
         ZStack {
-            Color(.backgroundws)
+            Color(.background1Ws)
                 .ignoresSafeArea()
             
             if viewModel.isSummaryLoading {
@@ -23,19 +25,21 @@ struct OCRSummaryView: View {
                         .progressViewStyle(CircularProgressViewStyle(tint: .mainws))
                     
                     Text("개념을 분석하고 있습니다...")
-                        .font(.system(size: 18, weight: .medium))
+                        .font(.bmjua(.regular, size: 18))
                         .foregroundColor(.gray)
                 }
             } else {
                 ScrollView() {
                     VStack(alignment: .leading) {
                         Text("핵심 개념")
-                            .font(.system(size: 20, weight: .semibold))
-                            .foregroundStyle(Color.black)
+                            .font(.bmjua(.regular, size: 20))
+                            .foregroundStyle(textColor)
                             .padding(.top, 20)
                         
                         
                         Text(viewModel.keyConcept)
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(textColor)
                             .padding()
                             .background(
                                 RoundedRectangle(cornerRadius: 16)
@@ -44,10 +48,12 @@ struct OCRSummaryView: View {
                             .padding(.bottom, 32)
                         
                         Text("문제 요약")
-                            .font(.system(size: 20, weight: .semibold))
-                            .foregroundStyle(Color.black)
-                        
+                            .font(.bmjua(.regular, size: 20))
+                            .foregroundStyle(textColor)
+
                         Text(viewModel.summary)
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(textColor)
                             .padding()
                             .background(
                                 RoundedRectangle(cornerRadius: 16)
@@ -56,10 +62,12 @@ struct OCRSummaryView: View {
                             .padding(.bottom, 32)
                         
                         Text("힌트")
-                            .font(.system(size: 20, weight: .semibold))
-                            .foregroundStyle(Color.black)
-                        
+                            .font(.bmjua(.regular, size: 20))
+                            .foregroundStyle(textColor)
+
                         Text(viewModel.solution)
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(textColor)
                             .padding()
                             .background(
                                 RoundedRectangle(cornerRadius: 16)
@@ -71,15 +79,10 @@ struct OCRSummaryView: View {
                 }
             }
         }
-        .onAppear {
-            Task {
-                try await viewModel.fetchOCRSolution()
-            }
-        }
     }
 }
 
 #Preview {
-    OCRSummaryView()
+    OCRSummaryModalView()
         .environmentObject(OCRViewModel())
 }
