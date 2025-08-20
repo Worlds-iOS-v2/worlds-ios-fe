@@ -11,6 +11,8 @@ struct ChatListView: View {
     @State private var chatRooms: [ChatRoom] = []
     @State private var isPresentingAddChatView = false
     @State private var leftRoomIds: Set<Int> = UserDefaults.standard.object(forKey: "leftRoomIds") as? Set<Int> ?? []
+    
+    var textColor: Color = .mainfontws
 
     var body: some View {
         NavigationStack {
@@ -18,10 +20,14 @@ struct ChatListView: View {
                 // Top Bar
                 HStack(alignment: .firstTextBaseline) {
                     Text("채팅")
-                        .font(.system(size: 26, weight: .semibold))
+                        .font(.bmjua(.regular, size: 27))
+                        .foregroundStyle(textColor)
+
                     Spacer()
+                    
                     Image(systemName: "plus")
                         .font(.system(size: 22, weight: .bold))
+                        .foregroundStyle(textColor)
                         .alignmentGuide(.firstTextBaseline) { d in d[.bottom] }
                         .onTapGesture {
                                 isPresentingAddChatView = true
@@ -72,7 +78,7 @@ struct ChatListView: View {
                     }
                 }
             }
-            .background(Color(red: 0.94, green: 0.96, blue: 1.0))
+            .background(.background2Ws)
             .ignoresSafeArea(edges: .bottom)
             .sheet(isPresented: $isPresentingAddChatView) {
                 AddChatView()
@@ -297,28 +303,30 @@ struct ChatRow: View {
     private var unreadBadgeText: String {
         unreadCount > 99 ? "99+" : "\(unreadCount)"
     }
+    
+    var textColor: Color = .mainfontws
 
     var body: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 6) {
                 Text(partnerName)
-                    .font(.headline)
-                    .fontWeight(.bold)
-                    .foregroundColor(.black)
+                    .font(.bmjua(.regular, size: 20))
+                    .foregroundStyle(textColor)
+
                 if let lastMessage = chat.messages.last {
                     if let fileUrl = lastMessage.fileUrl, !fileUrl.isEmpty {
                         Text("사진")
-                            .font(.subheadline)
+                            .font(.bmjua(.regular, size: 18))
                             .foregroundColor(.gray)
                     } else {
                         Text(lastMessage.content)
-                            .font(.subheadline)
+                            .font(.bmjua(.regular, size: 18))
                             .foregroundColor(.gray)
                             .lineLimit(1)
                     }
                 } else {
                     Text("새로운 채팅을 시작해보세요")
-                        .font(.subheadline)
+                        .font(.bmjua(.regular, size: 18))
                         .foregroundColor(.gray)
                 }
             }
@@ -326,13 +334,13 @@ struct ChatRow: View {
             VStack(alignment: .trailing, spacing: 6) {
                 if let lastMessage = chat.messages.last {
                     Text(lastMessage.formattedDate)
-                        .font(.footnote)
+                        .font(.bmjua(.regular, size: 12))
                         .foregroundColor(.gray)
                 }
                 // 읽지 않은 메시지 배지
                 if unreadCount > 0 {
                     Text(unreadBadgeText)
-                        .font(.system(size: 11, weight: .bold))
+                        .font(.bmjua(.regular, size: 12))
                         .foregroundColor(.white)
                         .frame(minWidth: 22, minHeight: 22)
                         .padding(.horizontal, unreadCount > 9 ? 4 : 0)

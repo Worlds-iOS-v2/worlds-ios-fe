@@ -39,12 +39,15 @@ struct ResetPasswordView: View {
     }
     
     @State var isSuceed: Bool = false
+    
+    var textColor: Color = .mainfontws
         
     var body: some View {
         ScrollView {
             VStack(alignment: .leading) {
                 Text("변경할 비밀번호를 입력해주세요.")
-                    .font(.system(size: 24, weight: .bold))
+                    .font(.bmjua(.regular, size: 24))
+                    .foregroundStyle(textColor)
                     .padding(.top, 20)
                 
                 if isLoginView {
@@ -56,7 +59,7 @@ struct ResetPasswordView: View {
                     if !email.isEmpty && !isValidEmail(email) {
                         Text("올바른 이메일 형식이 아닙니다.")
                             .foregroundColor(.red)
-                            .font(.caption)
+                            .font(.bmjua(.regular, size: 14))
                     }
                 }
                 
@@ -66,7 +69,7 @@ struct ResetPasswordView: View {
                 if !oldPassword.isEmpty && !isValidPassword(oldPassword) {
                     Text("비밀번호는 영문, 숫자, 특수문자 중 2가지 이상 조합으로 8~16자여야 합니다.")
                         .foregroundColor(.red)
-                        .font(.caption)
+                        .font(.bmjua(.regular, size: 14))
                 }
                 
                 CommonSignUpTextField(title: "새로운 비밀번호", placeholder: "비밀번호를 입력해주세요", isSecure: true, content: $newPassword)
@@ -75,7 +78,7 @@ struct ResetPasswordView: View {
                 if !newPassword.isEmpty && !isValidPassword(newPassword) {
                     Text("비밀번호는 영문, 숫자, 특수문자 중 2가지 이상 조합으로 8~16자여야 합니다.")
                         .foregroundColor(.red)
-                        .font(.caption)
+                        .font(.bmjua(.regular, size: 14))
                 }
                 
                 CommonSignUpTextField(title: "비밀번호 확인", placeholder: "비밀번호를 한 번 더 입력해주세요.", isSecure: true, content: $passwordCheck)
@@ -84,7 +87,7 @@ struct ResetPasswordView: View {
                 if !passwordCheck.isEmpty && newPassword != passwordCheck {
                     Text("비밀번호가 일치하지 않습니다.")
                         .foregroundColor(.red)
-                        .font(.caption)
+                        .font(.bmjua(.regular, size: 14))
                 }
                 
                 Spacer()
@@ -116,7 +119,7 @@ struct ResetPasswordView: View {
         }
         .scrollIndicators(.hidden)
         .padding()
-        .background(.backgroundws)
+        .background(.background1Ws)
         .navigationTitle("비밀번호 변경")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)

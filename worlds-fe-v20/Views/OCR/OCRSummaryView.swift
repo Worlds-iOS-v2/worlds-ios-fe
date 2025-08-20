@@ -12,7 +12,7 @@ struct OCRSummaryView: View {
 
     var body: some View {
         ZStack {
-            Color(.backgroundws)
+            Color(.background2Ws)
                 .ignoresSafeArea()
             
             if viewModel.isSummaryLoading {
@@ -23,19 +23,20 @@ struct OCRSummaryView: View {
                         .progressViewStyle(CircularProgressViewStyle(tint: .mainws))
                     
                     Text("개념을 분석하고 있습니다...")
-                        .font(.system(size: 18, weight: .medium))
+                        .font(.bmjua(.regular, size: 18))
                         .foregroundColor(.gray)
                 }
             } else {
                 ScrollView() {
                     VStack(alignment: .leading) {
                         Text("핵심 개념")
-                            .font(.system(size: 20, weight: .semibold))
+                            .font(.bmjua(.regular, size: 20))
                             .foregroundStyle(Color.black)
                             .padding(.top, 20)
                         
                         
                         Text(viewModel.keyConcept)
+                            .font(.bmjua(.regular, size: 18))
                             .padding()
                             .background(
                                 RoundedRectangle(cornerRadius: 16)
@@ -44,10 +45,11 @@ struct OCRSummaryView: View {
                             .padding(.bottom, 32)
                         
                         Text("문제 요약")
-                            .font(.system(size: 20, weight: .semibold))
+                            .font(.bmjua(.regular, size: 20))
                             .foregroundStyle(Color.black)
                         
                         Text(viewModel.summary)
+                            .font(.bmjua(.regular, size: 18))
                             .padding()
                             .background(
                                 RoundedRectangle(cornerRadius: 16)
@@ -56,10 +58,11 @@ struct OCRSummaryView: View {
                             .padding(.bottom, 32)
                         
                         Text("힌트")
-                            .font(.system(size: 20, weight: .semibold))
+                            .font(.bmjua(.regular, size: 20))
                             .foregroundStyle(Color.black)
                         
                         Text(viewModel.solution)
+                            .font(.bmjua(.regular, size: 18))
                             .padding()
                             .background(
                                 RoundedRectangle(cornerRadius: 16)

@@ -15,13 +15,16 @@ struct SignUpRoleSelectionView: View {
     @State var isSelected: Bool = false
     @State var isSuceed: Bool = false
     
+    var textColor: Color = .mainfontws
+    
     @EnvironmentObject var viewModel: SignUpViewModel
     
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading) {
                 Text("누가 사용할 계정인가요?")
-                    .font(.system(size: 27, weight: .bold))
+                    .font(.bmjua(.regular, size: 27))
+                    .foregroundColor(textColor)
                     .padding(.top, 40)
                 
                 HStack(alignment: .center) {
@@ -44,15 +47,15 @@ struct SignUpRoleSelectionView: View {
                             Spacer()
                             
                             Text("멘토")
-                                .font(.system(size: 20))
-                                .foregroundStyle(Color.black)
+                                .font(.bmjua(.regular, size: 22))
+                                .foregroundStyle(textColor)
                         }
                         .padding()
                         .background(selectedRole == .mentor ? Color.sub2Ws : Color.white)
-                        .cornerRadius(16)
+                        .cornerRadius(12)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 16)
-                                .stroke(Color.sub1Ws, lineWidth: 2)
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.mainws, lineWidth: 2)
                                 .opacity(selectedRole == .mentor ? 1 : 0)
                         )
                         .frame(width: 155, height: 166)
@@ -73,15 +76,15 @@ struct SignUpRoleSelectionView: View {
                             Spacer()
                             
                             Text("멘티")
-                                .font(.system(size: 20))
-                                .foregroundStyle(Color.black)
+                                .font(.bmjua(.regular, size: 22))
+                                .foregroundStyle(textColor)
                         }
                         .padding()
                         .background(selectedRole == .mentee ? Color.sub2Ws : Color.white)
-                        .cornerRadius(16)
+                        .cornerRadius(12)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 16)
-                                .stroke(Color.sub1Ws, lineWidth: 2)
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.mainws, lineWidth: 2)
                                 .opacity(selectedRole == .mentee ? 1 : 0)
                         )
                         .frame(width: 155, height: 166)
@@ -109,13 +112,13 @@ struct SignUpRoleSelectionView: View {
                 } label: {
                     Text("로그인 하기")
                         .foregroundStyle(Color.gray)
-                        .font(.system(size: 14))
+                        .font(.bmjua(.regular, size: 16))
                 }
                 .frame(maxWidth: .infinity)
                 .multilineTextAlignment(.center)
             }
             .padding()
-            .background(.backgroundws)
+            .background(.background1Ws)
             .navigationTitle("회원가입")
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
