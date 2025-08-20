@@ -16,7 +16,7 @@ struct CultureInfo: Codable {
 }
 
 struct GovernmentProgram: Codable, Identifiable, CultureDisplayable {
-    let id = UUID()
+    let id: Int
     let borough: String
     let title: String
     let image: String
@@ -30,7 +30,7 @@ struct GovernmentProgram: Codable, Identifiable, CultureDisplayable {
 }
 
 struct KoreanProgram: Codable, Identifiable, CultureDisplayable {
-    let id = UUID()
+    let id: Int
     let borough: String
     let title: String
     let image: String
@@ -41,7 +41,7 @@ struct KoreanProgram: Codable, Identifiable, CultureDisplayable {
 }
 
 struct EventProgram: Codable, Identifiable {
-    let id = UUID()
+    let id: Int
     let borough: String
     let title: String
     let image: String
