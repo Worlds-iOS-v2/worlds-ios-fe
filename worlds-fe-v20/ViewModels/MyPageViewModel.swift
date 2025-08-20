@@ -41,7 +41,7 @@ final class MyPageViewModel: ObservableObject {
         do {
             let questions = try await UserAPIManager.shared.getMyQuestions()
             self.questions = questions
-            print("\(questions)")
+            // print("\(questions)")
             self.errorMessage = nil
         } catch {
             print("❌ fetchMyQuestions 에러 발생:", error)
@@ -51,12 +51,13 @@ final class MyPageViewModel: ObservableObject {
     
     @MainActor
     func fetchMyOCRList() async {
-        guard let userID = userInfo?.id else { return }
+        let userID = UserDefaults.standard.integer(forKey: "userId")
+        if userID == 0 { return }
         
         do {
             let ocrList = try await UserAPIManager.shared.getOCRList(userID: userID)
             self.ocrList = ocrList
-            print("\(ocrList)")
+            // print("OCR: \(ocrList)")
             self.errorMessage = nil
         } catch {
             print("ocrList 에러 발생:", error)
