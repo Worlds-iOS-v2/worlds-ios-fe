@@ -77,7 +77,7 @@ struct ChatDetailView: View {
                             Label("상대 프로필", systemImage: "person.crop.circle")
                         }
                         
-                        NavigationLink(destination: OCRListView()) {
+                        NavigationLink(destination: OCRListView(ocrList: viewModel.ocrList)) {
                             Label("OCR 기록", systemImage: "folder")
                         }
                         .padding(.horizontal, 32)
@@ -86,6 +86,7 @@ struct ChatDetailView: View {
                                 let currentUserId = UserDefaults.standard.integer(forKey: "userId")
                                 let partnerUserId = (chat.userA.id == currentUserId) ? chat.userB.id : chat.userA.id
                                 
+                                print("partnerUserId \(partnerUserId)")
                                 await viewModel.fetchOCRList(userID: partnerUserId)
                             }
                         }

@@ -56,7 +56,7 @@ struct MyPageView: View {
                     Divider()
                         .padding(.horizontal, 32)
                     
-                    NavigationLink(destination: OCRListView()) {
+                    NavigationLink(destination: OCRListView(ocrList: viewModel.ocrList)) {
                         Text("나의 OCR")
                             .font(.system(size: 18))
                             .foregroundStyle(Color.black)
