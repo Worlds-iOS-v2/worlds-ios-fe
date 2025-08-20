@@ -14,6 +14,8 @@ struct CultureDetailView: View {
     let govermentPrograms: [GovernmentProgram]
     let koreanPrograms: [KoreanProgram]
     
+    var textColor: Color = .mainfontws
+    
     var body: some View {
         ZStack {
             Color(.sub2Ws)
@@ -22,7 +24,6 @@ struct CultureDetailView: View {
             ScrollView {
                 VStack {
                     Text("이번주 소식")
-                        .font(.system(size: 27))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 24)
                         .padding(.vertical, 20)
@@ -33,7 +34,6 @@ struct CultureDetailView: View {
                         .padding(.bottom, 20)
                     
                     Text("정부 프로그램")
-                        .font(.system(size: 27))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 24)
                     
@@ -42,7 +42,6 @@ struct CultureDetailView: View {
                         .padding(.horizontal, 24)
                     
                     Text("한국어 교육 프로그램")
-                        .font(.system(size: 27))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 24)
                     
@@ -50,6 +49,8 @@ struct CultureDetailView: View {
                         .frame(height: 150)
                         .padding(.horizontal, 24)
                 }
+                .font(.bmjua(.regular, size: 27))
+                .foregroundStyle(textColor)
                 .padding(.bottom, 20)
             }
             .navigationTitle("문화행사정보")

@@ -148,11 +148,11 @@ struct CreateQuestionView: View {
                     onSubmit(selectedImages, selected.rawValue)
                 } label: {
                     Text("등록")
-                        .font(.system(size: 18, weight: .semibold))
+                        .font(.bmjua(.regular, size: 24))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity, minHeight: 48)
                         .background(Color.mainws)
-                        .cornerRadius(13)
+                        .cornerRadius(12)
                         .shadow(color: Color(.systemGray3), radius: 3, x: 0, y: 3)
                 }
                 .padding(.bottom, 18)

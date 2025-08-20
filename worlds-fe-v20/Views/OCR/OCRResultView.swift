@@ -27,13 +27,15 @@ struct OCRResultView: View {
     // 공유 OCRViewModel 사용
     @EnvironmentObject private var viewModel: OCRViewModel
     
+    var textColor: Color = .mainfontws
+    
     var body: some View {
         ZStack {
             VStack(spacing: 20) {
                 HStack(spacing: 15) {
                     Text("한국어")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.black)
+                        .font(.bmjua(.regular, size: 18))
+                        .foregroundColor(textColor)
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(.sub2Ws)
@@ -47,8 +49,8 @@ struct OCRResultView: View {
                         .padding()
                     
                     Text("영어")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.black)
+                        .font(.bmjua(.regular, size: 18))
+                        .foregroundColor(textColor)
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(.sub2Ws)
@@ -71,12 +73,12 @@ struct OCRResultView: View {
                             .progressViewStyle(CircularProgressViewStyle(tint: .mainws))
                         
                         Text("텍스트를 분석하고 있습니다...")
-                            .font(.system(size: 16, weight: .medium))
+                            .font(.bmjua(.regular, size: 18))
                             .foregroundColor(.gray)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 40)
-                    .background(.backgroundws)
+                    .background(.background2Ws)
                     .cornerRadius(12)
                 } else {
                     // OCR 결과 표시
@@ -99,7 +101,7 @@ struct OCRResultView: View {
                         }
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(.backgroundws)
+                        .background(.background1Ws)
                     }
                     .cornerRadius(8)
                 }
@@ -111,12 +113,12 @@ struct OCRResultView: View {
                         showingSummaryView = true
                     } label: {
                             Text("개념 보기")
-                            .font(.system(size: 16, weight: .semibold))
+                            .font(.bmjua(.regular, size: 16))
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
                             .padding()
                             .background(.mainws)
-                            .cornerRadius(16)
+                            .cornerRadius(12)
                     }
                     .disabled(viewModel.isOCRLoading)
                     
@@ -124,12 +126,12 @@ struct OCRResultView: View {
                         showingCreateQuestionView = true
                     } label: {
                         Text("질문하기")
-                            .font(.system(size: 16, weight: .semibold))
+                            .font(.bmjua(.regular, size: 16))
                             .foregroundColor(.gray)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(.backgroundws)
-                            .cornerRadius(16)
+                            .background(.background1Ws)
+                            .cornerRadius(12)
                     }
                     .disabled(viewModel.isOCRLoading)
                     
@@ -137,12 +139,12 @@ struct OCRResultView: View {
                         dismiss()
                     } label: {
                         Text("재촬영")
-                            .font(.system(size: 16, weight: .semibold))
+                            .font(.bmjua(.regular, size: 16))
                             .foregroundColor(.gray)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(.backgroundws)
-                            .cornerRadius(16)
+                            .background(.background1Ws)
+                            .cornerRadius(12)
                     }
                     .disabled(viewModel.isOCRLoading)
                 }

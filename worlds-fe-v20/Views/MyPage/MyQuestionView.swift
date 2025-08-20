@@ -15,7 +15,7 @@ struct MyQuestionView: View {
     
     var body: some View {
         ZStack {
-            Color.backgroundws
+            Color.background2Ws
                 .ignoresSafeArea()
             ScrollView {
                 VStack(spacing: 18) {
