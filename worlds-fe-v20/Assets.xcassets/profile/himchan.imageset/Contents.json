@@ -1,15 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "puzzle_cream_glasses.png",
+      "filename" : "image1-1.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "image1@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "image1@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

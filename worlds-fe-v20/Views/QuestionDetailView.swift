@@ -46,6 +46,14 @@ struct QuestionDetailView: View {
         "자유": .purple,
         "전체": .gray
     ]
+    
+    let profileImages: [String] = ["himchan", "doran", "malgeum", "saengak"]
+    
+    private var userProfileImage: String {
+        guard let question = questionDetail else { return "himchan" }
+        let index = abs(question.user.id.hashValue) % profileImages.count
+        return profileImages[index]
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -78,10 +86,18 @@ struct QuestionDetailView: View {
                         .padding(.bottom, 12)
 
                         HStack(spacing: 10) {
-                            Image(systemName: "person.circle.fill")
-                                .resizable()
-                                .frame(width: 38, height: 38)
-                                .foregroundColor(.gray)
+                            
+                            // 학생이면 랜덤 이미지
+                            if let _ = question.user.role {
+                                Image("default")
+                                    .resizable()
+                                    .frame(width: 38, height: 38)
+                            } else {
+                                Image("\(userProfileImage)")
+                                    .resizable()
+                                    .frame(width: 38, height: 38)
+                            }
+                            
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(question.user.name)
                                     .font(.callout)
@@ -90,6 +106,7 @@ struct QuestionDetailView: View {
                                     .font(.caption)
                                     .foregroundColor(.gray)
                             }
+                            
                             Spacer()
                         }
                         .padding(.horizontal)

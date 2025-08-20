@@ -36,6 +36,13 @@ struct CommentRow: View {
     var isReplyingTarget: Bool {
         commentVM.replyingTo == comment.id
     }
+    
+    let profileImages: [String] = ["himchan", "doran", "malgeum", "saengak"]
+    
+    private var userProfileImage: String {
+        let index = abs(comment.user.id.hashValue) % profileImages.count
+        return profileImages[index]
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -54,14 +61,17 @@ struct CommentRow: View {
                     // MARK: - 유저 정보 및 날짜 (프로필 사진 포함)
                     HStack(spacing: 8) {
                         // 프로필 사진
-                        Circle()
-                            .fill(Color.gray.opacity(0.3))
-                            .frame(width: 32, height: 32)
-                            .overlay(
-                                Image(systemName: "person.fill")
-                                    .font(.system(size: 16))
-                                    .foregroundColor(.gray)
-                            )
+                        // 학생이면 랜덤 이미지
+                        if comment.user.isMentor {
+                            Image("default")
+                                .resizable()
+                                .frame(width: 38, height: 38)
+                        } else {
+                            Image("\(userProfileImage)")
+                                .resizable()
+                                .frame(width: 38, height: 38)
+                        }
+                        
                         
                         VStack(alignment: .leading, spacing: 2) {
                             HStack(spacing: 5) {

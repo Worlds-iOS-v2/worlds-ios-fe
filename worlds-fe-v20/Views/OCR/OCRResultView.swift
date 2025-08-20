@@ -12,9 +12,9 @@ import UIKit
 struct OCRResultView: View {
     // 선택된(크롭된) 이미지
     let selectedImage: UIImage
-    @State private var showingSummaryView = false
+    @State private var showingSummaryModalView = false
     @State private var showingCreateQuestionView = false
-    
+        
     @State private var newQuestionTitle = ""
     @State private var newQuestionContent = ""
     @State private var isCreatingQuestion = false
@@ -28,6 +28,7 @@ struct OCRResultView: View {
     @EnvironmentObject private var viewModel: OCRViewModel
     
     var textColor: Color = .mainfontws
+    let translatedLanguage: String = SupportedLanguage.getCurrentLanguageName()
     
     var body: some View {
         ZStack {
@@ -48,7 +49,7 @@ struct OCRResultView: View {
                         .foregroundColor(.sub2Ws)
                         .padding()
                     
-                    Text("영어")
+                    Text("\(translatedLanguage)")
                         .font(.bmjua(.regular, size: 18))
                         .foregroundColor(textColor)
                         .frame(maxWidth: .infinity)
@@ -64,7 +65,7 @@ struct OCRResultView: View {
                     .frame(maxHeight: 300)
                     .cornerRadius(12)
                     .shadow(radius: 5)
-
+                
                 if viewModel.isOCRLoading {
                     // 로딩 중일 때 프로그레스 뷰 표시
                     VStack(spacing: 16) {
@@ -105,12 +106,12 @@ struct OCRResultView: View {
                     }
                     .cornerRadius(8)
                 }
-                            
+                
                 // 버튼들
                 HStack(spacing: 15) {
                     Button {
                         // performOCR()
-                        showingSummaryView = true
+                        showingSummaryModalView = true
                     } label: {
                             Text("개념 보기")
                             .font(.bmjua(.regular, size: 16))
@@ -174,8 +175,8 @@ struct OCRResultView: View {
                     }
                 }
             }
-            .sheet(isPresented: $showingSummaryView) {
-                OCRSummaryView()
+            .sheet(isPresented: $showingSummaryModalView) {
+                OCRSummaryModalView()
                     .environmentObject(viewModel)
             }
             .fullScreenCover(isPresented: $showingCreateQuestionView) {
@@ -198,6 +199,7 @@ struct OCRResultView: View {
             .onAppear {
                 Task {
                     try await viewModel.fetchOCR(selectedImage: selectedImage)
+                    try await viewModel.fetchOCRSolution()
                 }
             }
         }

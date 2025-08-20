@@ -1,15 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "puzzle_orange.png",
+      "filename" : "image5.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "image5@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "image5@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
