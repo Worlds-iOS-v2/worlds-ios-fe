@@ -825,32 +825,13 @@ class UserAPIManager {
     }
 }
 
+// MARK: - UserAPIManager Extension 수정
 extension UserAPIManager {
     func getTargetLanguage() -> String {
-        let preferredLanguage = Locale.preferredLanguages.first ?? "en" //ko-KR
-        let languageCode = preferredLanguage.components(separatedBy: "-").first ?? "en" //ko만 출력
-        
-        // 서버에서 요구하는 형태로 매핑
-        // ko로 바꿔서 주게 해주기 . . . . !!!!
-//        switch languageCode.lowercased() {
-//        case "ko":
-//            return "Korean"
-//        case "en":
-//            return "English"
-//        case "vi":
-//            return "Vietnam"
-//        case "ja":
-//            return "Japanese"
-//        case "zh":
-//            return "Chinese"
-//        case "es":
-//            return "Spanish"
-//        case "fr":
-//            return "French"
-//        default:
-//            return "English" // 기본값
-//        }
-        
-        return languageCode.lowercased()
+        return SupportedLanguage.getCurrentLanguageCode()
+    }
+    
+    func getTargetLanguageName() -> String {
+        return SupportedLanguage.getCurrentLanguageName()
     }
 }
