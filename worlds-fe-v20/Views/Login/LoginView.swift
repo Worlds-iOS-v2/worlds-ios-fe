@@ -26,7 +26,7 @@ struct LoginView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.backgroundws
+                Color.background1Ws
                     .ignoresSafeArea()
                 
                 VStack {
@@ -37,20 +37,20 @@ struct LoginView: View {
                         .textInputAutocapitalization(.never) // 자동 대문자처리 해제
                         .keyboardType(.emailAddress)
                         .foregroundStyle(Color.gray)
-                        .font(.system(size: 20))
+                        .font(.bmjua(.regular, size: 22))
                         .frame(height: 60)
                         .padding(.horizontal, 14)
                         .background(Color.white)
-                        .cornerRadius(16)
+                        .cornerRadius(12)
                         .padding(.bottom, 12)
                     
                     SecureField("비밀번호를 입력하세요", text: $password)
                         .foregroundStyle(Color.gray)
-                        .font(.system(size: 20))
+                        .font(.bmjua(.regular, size: 22))
                         .frame(height: 60)
                         .padding(.horizontal, 14)
                         .background(Color.white)
-                        .cornerRadius(16)
+                        .cornerRadius(12)
                         .padding(.bottom, 20)
                     
                     Button {
@@ -86,13 +86,13 @@ struct LoginView: View {
                         
                     } label: {
                         ZStack {
-                            RoundedRectangle(cornerRadius: 16)
+                            RoundedRectangle(cornerRadius: 12)
                                 .fill(isFilled ? Color.mainws: Color.gray)
                                 .frame(height: 60)
                                 .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
                             
                             Text("로그인")
-                                .font(.system(size: 24))
+                                .font(.bmjua(.regular, size: 24))
                                 .foregroundStyle(.white)
                                 .fontWeight(.semibold)
                         }
@@ -110,7 +110,7 @@ struct LoginView: View {
                         } label: {
                             Text("회원가입")
                                 .foregroundStyle(Color.gray)
-                                .font(.system(size: 20))
+                                .font(.bmjua(.regular, size: 20))
                         }
                         
                         Divider()
@@ -120,7 +120,7 @@ struct LoginView: View {
                         NavigationLink(destination: ResetPasswordView(isLoginView: true)) {
                             Text("비밀번호 재설정")
                                 .foregroundStyle(Color.gray)
-                                .font(.system(size: 20))
+                                .font(.bmjua(.regular, size: 20))
                         }
                     }
                     .padding(.bottom, 68)

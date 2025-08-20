@@ -24,6 +24,8 @@ struct SignUpDetailProfileView: View {
         !name.isEmpty
     }
     
+    var textColor: Color = .mainfontws
+    
     @State private var showAlert = false
     @State private var alertMessage = ""
     
@@ -32,7 +34,8 @@ struct SignUpDetailProfileView: View {
         VStack {
             VStack(alignment: .leading) {
                 Text("사용자 정보를 입력해주세요.")
-                    .font(.system(size: 27, weight: .bold))
+                    .font(.bmjua(.regular, size: 27))
+                    .foregroundColor(textColor)
                     .padding(.top, 40)
                 
                 CommonSignUpTextField(title: "이름", placeholder: "이름을 입력해주세요", content: $name)
@@ -45,8 +48,8 @@ struct SignUpDetailProfileView: View {
                 //                    .padding(.bottom, 40)
                 
                 Text("생년월일")
-                    .foregroundStyle(Color.gray)
-                    .font(.system(size: 20))
+                    .foregroundStyle(textColor)
+                    .font(.bmjua(.regular, size: 22))
                     .fontWeight(.semibold)
                 
                 Button {
@@ -55,7 +58,7 @@ struct SignUpDetailProfileView: View {
                     HStack {
                         Text("\(String(birthYear))년 \(birthMonth)월 \(birthDay)일")
                             .foregroundStyle(Color.gray)
-                            .font(.system(size: 20))
+                            .font(.bmjua(.regular, size: 22))
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.leading, 14)
                         
@@ -66,7 +69,7 @@ struct SignUpDetailProfileView: View {
                             .padding(.horizontal, 16)
                     }
                     .background{
-                        RoundedRectangle(cornerRadius: 16)
+                        RoundedRectangle(cornerRadius: 12)
                             .foregroundStyle(Color.white)
                             .frame(height: 60)
                     }
@@ -103,8 +106,10 @@ struct SignUpDetailProfileView: View {
                         .pickerStyle(.wheel)
                         .frame(maxWidth: .infinity)
                     }
+                    .font(.bmjua(.regular, size: 20))
+                    .foregroundStyle(textColor)
                     .background(Color.white)
-                    .cornerRadius(16)
+                    .cornerRadius(12)
                     .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
                 }
             }
@@ -140,14 +145,14 @@ struct SignUpDetailProfileView: View {
             } label: {
                 Text("로그인 하기")
                     .foregroundStyle(Color.gray)
-                    .font(.system(size: 14))
+                    .font(.bmjua(.regular, size: 16))
             }
         }
         .alert(alertMessage, isPresented: $showAlert) {
             Button("확인", role: .cancel) { }
         }
         .padding()
-        .background(.backgroundws)
+        .background(.background1Ws)
         .navigationTitle("회원가입")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)

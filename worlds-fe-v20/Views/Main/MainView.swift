@@ -33,24 +33,27 @@ struct MainView: View {
         return result
     }
     
+    var textColor: Color = .mainfontws
+    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading) {
-                Text("안녕하세요! \(viewModel.getUsername())님")
-                    .font(.system(size: 27))
+                Text("안녕하세요! \n \(viewModel.getUsername())님")
+                    .font(.bmjua(.regular, size: 27))
                     .padding(.horizontal, 24)
                     .padding(.top, 28)
-
+                
                 // 출석 체크 화면
                 ZStack() {
-                    RoundedRectangle(cornerRadius: 16)
+                    RoundedRectangle(cornerRadius: 12)
                         .fill(.thickMaterial)
                         .opacity(0.8)
                         .frame(height: 200)
+                        .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
                     
                     VStack(alignment: .leading) {
                         Text("이번주 출석 현황")
-                            .font(.title)
+                            .font(.bmjua(.regular, size: 27))
                             .padding(8)
                         
                         HStack(spacing: 0) {
@@ -65,7 +68,7 @@ struct MainView: View {
                         }
                         .padding(8)
                         .background {
-                            RoundedRectangle(cornerRadius: 16)
+                            RoundedRectangle(cornerRadius: 12)
                                 .fill(Color.white)
                                 .frame(height: 120)
                                 .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
@@ -76,7 +79,7 @@ struct MainView: View {
                 
                 HStack() {
                     Text("이번주 소식")
-                        .font(.system(size: 27))
+                        .font(.bmjua(.regular, size: 27))
                         .padding(.bottom, 20)
                     
                     Spacer()
@@ -87,7 +90,7 @@ struct MainView: View {
                         koreanPrograms: viewModel.koreanPrograms
                     )) {
                         Text("더보기 >")
-                            .font(.system(size: 16))
+                            .font(.bmjua(.regular, size: 16))
                             .foregroundStyle(Color.mainws)
                             .padding(.bottom, 20)
                     }
@@ -99,7 +102,7 @@ struct MainView: View {
                     .padding(.horizontal, 24)
                 
                 Text("최신글")
-                    .font(.system(size: 27))
+                    .font(.bmjua(.regular, size: 27))
                     .padding(.bottom, 20)
                     .padding(.horizontal, 24)
                 
@@ -111,12 +114,12 @@ struct MainView: View {
                             
                             HStack(spacing: 40){
                                 Text("\(post.category.displayName)")
-                                    .font(.system(size: 18))
+                                    .font(.bmjua(.regular, size: 18))
                                     .foregroundStyle(Color.black)
                                     .frame(width: 40, alignment: .leading)
                                 
                                 Text("\(post.title)")
-                                    .font(.system(size: 18))
+                                    .font(.bmjua(.regular, size: 18))
                                     .foregroundStyle(Color.black)
                                     .lineLimit(1)
                                     .truncationMode(.tail)
@@ -130,12 +133,13 @@ struct MainView: View {
                     Spacer()
                 }
                 .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(.backgroundws)
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(.background1Ws)
                         .padding(.horizontal, 24)
                         .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
                 )
             }
+            .foregroundStyle(textColor)
             .padding(.bottom, 60)
         }
         .scrollIndicators(.hidden)

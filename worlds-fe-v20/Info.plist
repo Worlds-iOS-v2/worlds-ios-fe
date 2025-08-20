@@ -30,18 +30,22 @@
 	<string>$(API_OCR_URL)</string>
 	<key>APISignupURL</key>
 	<string>$(API_SIGNUP_URL)</string>
+	<key>APIUserAttendanceListURL</key>
+	<string>$(API_ATTENDANCE_LIST_URL)</string>
+	<key>APIUserAttendanceURL</key>
+	<string>$(API_USER_ATTENDANCE_URL)</string>
 	<key>APIUserInfoURL</key>
 	<string>$(API_USER_INFO_URL)</string>
 	<key>CFBundleIconName</key>
 	<string>AppIcon</string>
-	<key>APIUserAttendanceURL</key>
-	<string>$(API_USER_ATTENDANCE_URL)</string>
-	<key>APIUserAttendanceListURL</key>
-	<string>$(API_ATTENDANCE_LIST_URL)</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>BMJUA.otf</string>
+	</array>
 </dict>
 </plist>

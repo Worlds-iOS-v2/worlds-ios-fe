@@ -30,7 +30,7 @@ class OCRCameraController: UIViewController, AVCapturePhotoCaptureDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .backgroundws
+        view.backgroundColor = .background2Ws
         setupPreviewLayer()
         configureCaptureSession(position: cameraPosition)
 
