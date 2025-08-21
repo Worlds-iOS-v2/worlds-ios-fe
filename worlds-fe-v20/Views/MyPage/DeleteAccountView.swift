@@ -17,13 +17,13 @@ struct DeleteAccountView: View {
     var body: some View {
         VStack {
             Text("탈퇴 하시겠습니까?")
-                .font(.bmjua(.regular, size: 32))
+                .font(.pretendard(.bold, size: 30))
                 .foregroundStyle(textColor)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
             
             Text("탈퇴할 경우, 모든 데이터는 삭제되며 다시 복구되지 않습니다.")
-                .font(.bmjua(.regular, size: 22))
+                .font(.pretendard(.medium, size: 22))
                 .foregroundStyle(.gray)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
@@ -45,7 +45,7 @@ struct DeleteAccountView: View {
                     HStack {
                         Text("회원탈퇴")
                     }
-                    .font(.bmjua(.regular, size: 22))
+                    .font(.pretendard(.bold, size: 24))
                     .foregroundStyle(.white)
                 }
             }

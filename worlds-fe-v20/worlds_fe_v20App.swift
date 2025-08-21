@@ -11,20 +11,17 @@ import SwiftUI
 struct worlds_fe_v20App: App {
     @StateObject private var appState = AppState()
     @StateObject private var signUpViewModel = SignUpViewModel()
-
+    
     var body: some Scene {
         WindowGroup {
             switch appState.flow {
-              
+                
                 // 런치 스크린
             case .launch:
-                ZStack {
-                    Color(.systemBackground).ignoresSafeArea()
-                    ProgressView("자동 로그인 중…")
-                }
-                .task {
-                    await appState.autoLogin()
-                }
+                LaunchView()
+                    .task {
+                        await appState.autoLogin()
+                    }
                 
                 // 로그인 화면
             case .login:

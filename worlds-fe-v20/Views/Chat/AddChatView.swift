@@ -33,7 +33,7 @@ struct AddChatView: View {
                     }
                     Spacer()
                     Text("대화상대추가")
-                        .font(.bmjua(.regular, size: 20))
+                        .font(.pretendard(.bold, size: 20))
                         .foregroundColor(textColor)
                     
                     Spacer()
@@ -45,11 +45,11 @@ struct AddChatView: View {
                 
                 VStack(spacing: 8) {
                     Text("QR로 채팅 상대를 추가하세요")
-                        .font(.bmjua(.regular, size: 22))
+                        .font(.pretendard(.semiBold, size: 22))
                         .foregroundColor(textColor)
                     
                     Text("상대방의 QR 코드를 스캔하면\n자동으로 채팅방이 생성돼요.")
-                        .font(.bmjua(.regular, size: 18))
+                        .font(.pretendard(.medium, size: 18))
                         .multilineTextAlignment(.center)
                         .foregroundColor(.gray)
                 }
@@ -68,7 +68,7 @@ struct AddChatView: View {
                                     .padding(20)
                             } else {
                                 Text("QR 생성 준비 중…")
-                                    .font(.bmjua(.regular, size: 18))
+                                    .font(.pretendard(.medium, size: 18))
                                     .foregroundColor(.gray)
                             }
                         }
@@ -79,7 +79,7 @@ struct AddChatView: View {
                     isShowingScanner = true
                 }) {
                     Text("QR 스캔하기")
-                        .font(.bmjua(.regular, size: 20))
+                        .font(.pretendard(.bold, size: 20))
                         .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)

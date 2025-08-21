@@ -24,7 +24,7 @@ final class MainViewModel: ObservableObject {
 
     func getUsername() -> String {
         guard let username = UserDefaults.standard.string(forKey: "username") else {
-            return "사용자 이름을 불러올 수 없습니다."
+            return "사용자"
         }
         return username
     }

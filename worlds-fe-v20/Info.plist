@@ -48,6 +48,7 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>BMJUA.otf</string>
+		<string>PretendardVariable.ttf</string>
 	</array>
 </dict>
 </plist>

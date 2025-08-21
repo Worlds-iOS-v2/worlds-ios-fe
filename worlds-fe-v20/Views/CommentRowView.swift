@@ -76,12 +76,12 @@ struct CommentRow: View {
                         VStack(alignment: .leading, spacing: 2) {
                             HStack(spacing: 5) {
                                 Text(comment.user.userName)
-                                    .font(.subheadline)
+                                    .font(.pretendard(.semiBold, size: 15))
                                     .bold()
 
                                 if comment.user.isMentor {
                                     Text("멘토")
-                                        .font(.caption)
+                                        .font(.pretendard(.semiBold, size: 12))
                                         .foregroundColor(.white)
                                         .padding(.horizontal, 6)
                                         .padding(.vertical, 2)
@@ -91,7 +91,7 @@ struct CommentRow: View {
                             }
                             
                             Text(formatDate(comment.createdAt))
-                                .font(.caption2)
+                                .font(.pretendard(.medium, size: 12))
                                 .foregroundColor(.gray)
                         }
 
@@ -124,13 +124,13 @@ struct CommentRow: View {
                     // MARK: - 본문
                     VStack(alignment: .leading, spacing: 6) {
                         Text(comment.content)
-                            .font(.body)
+                            .font(.pretendard(.medium, size: 16))
                             .fixedSize(horizontal: false, vertical: true)
                         
                         // 번역된 텍스트
                         if let translated = translatedText {
                             Text(translated)
-                                .font(.caption)
+                                .font(.pretendard(.medium, size: 14))
                                 .foregroundColor(.blue)
                                 .padding(.top, 2)
                         }
@@ -149,7 +149,7 @@ struct CommentRow: View {
                                     .font(.system(size: 14))
                             }
                             Text("\(commentVM.likes[comment.id]?.count ?? 0)")
-                                .font(.caption)
+                                .font(.pretendard(.medium, size: 12))
                                 .foregroundColor(.gray)
                         }
 
@@ -159,7 +159,7 @@ struct CommentRow: View {
                             commentVM.replyContent = ""
                         }) {
                             Text(commentVM.replyingTo == comment.id ? "답글 취소" : "답글 달기")
-                                .font(.caption)
+                                .font(.pretendard(.medium, size: 12))
                                 .foregroundColor(.gray)
                         }
                         
@@ -167,7 +167,7 @@ struct CommentRow: View {
                         if isTranslating {
                             Button(action: {}) {
                                 Text("번역 중...")
-                                    .font(.caption)
+                                    .font(.pretendard(.medium, size: 12))
                                     .foregroundColor(.gray)
                             }
                             .disabled(true)
@@ -178,7 +178,7 @@ struct CommentRow: View {
                                 translationConfiguration = nil
                             }) {
                                 Text("번역취소")
-                                    .font(.caption)
+                                    .font(.pretendard(.medium, size: 12))
                                     .foregroundColor(.gray)
                             }
                         } else {
@@ -186,7 +186,7 @@ struct CommentRow: View {
                                 if !isTranslating { startTranslation() }
                             }) {
                                 Text("번역하기")
-                                    .font(.caption)
+                                    .font(.pretendard(.medium, size: 12))
                                     .foregroundColor(.gray)
                             }
                         }

@@ -16,72 +16,86 @@ struct ChatListView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                // Top Bar
-                HStack(alignment: .firstTextBaseline) {
-                    Text("채팅")
-                        .font(.bmjua(.regular, size: 27))
-                        .foregroundStyle(textColor)
-
+            ZStack() {
+                VStack {
                     Spacer()
                     
-                    Image(systemName: "plus")
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundStyle(textColor)
-                        .alignmentGuide(.firstTextBaseline) { d in d[.bottom] }
-                        .onTapGesture {
-                                isPresentingAddChatView = true
-                        }
+                    Image("chatbackgroundws")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(height: 240)
+                        .opacity(0.8)
+                        .padding(.bottom, 50)
                 }
-                .padding(.horizontal, 24)
-                .padding(.top, 20)
-                .padding(.bottom, 24)
-                .foregroundColor(.black)
+                .ignoresSafeArea(.all, edges: .bottom)
 
-                // 채팅방 리스트
-                ScrollView {
-                    VStack(spacing: 12) {
-                        ForEach(chatRooms) { chat in
-                            NavigationLink(destination: ChatDetailView(chat: chat)) {
-                                ChatRow(chat: chat)
+                VStack(spacing: 0) {
+                    // Top Bar
+                    HStack(alignment: .firstTextBaseline) {
+                        Text("채팅")
+                            .font(.pretendard(.bold, size: 27))
+                            .foregroundStyle(textColor)
+                        
+                        Spacer()
+                        
+                        Image(systemName: "plus")
+                            .font(.system(size: 22, weight: .bold))
+                            .foregroundStyle(textColor)
+                            .alignmentGuide(.firstTextBaseline) { d in d[.bottom] }
+                            .onTapGesture {
+                                isPresentingAddChatView = true
+                            }
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 20)
+                    .padding(.bottom, 24)
+                    .foregroundColor(.black)
+                    
+                    // 채팅방 리스트
+                    ScrollView {
+                        VStack(spacing: 12) {
+                            ForEach(chatRooms) { chat in
+                                NavigationLink(destination: ChatDetailView(chat: chat)) {
+                                    ChatRow(chat: chat)
+                                }
                             }
                         }
+                        .padding(.top, 8)
                     }
-                    .padding(.top, 8)
-                }
-                // 🔥 Pull-to-Refresh 기능 추가
-                .refreshable {
-                    await refreshChatRooms()
-                }
-            }
-            .onAppear {
-                loadChatRooms()
-            }
-            .onReceive(NotificationCenter.default.publisher(for: .init("ChatRoomDidLeave"))) { note in
-                if let roomId = note.object as? Int {
-                    leftRoomIds.insert(roomId)
-                    // Save updated leftRoomIds to UserDefaults
-                    UserDefaults.standard.set(Array(leftRoomIds), forKey: "leftRoomIds")
-                    chatRooms.removeAll { $0.id == roomId }
-                }
-            }
-            // 🔥 개선된 새 메시지 수신 처리
-            .onReceive(NotificationCenter.default.publisher(for: .init("NewMessageReceived"))) { note in
-                handleNewMessage(note)
-            }
-            // 메시지 읽음 처리 시 unreadCount 업데이트
-            .onReceive(NotificationCenter.default.publisher(for: .init("MessagesRead"))) { note in
-                if let userInfo = note.userInfo,
-                   let roomId = userInfo["roomId"] as? Int {
-                    if let index = chatRooms.firstIndex(where: { $0.id == roomId }) {
-                        chatRooms[index].unreadCount = 0
+                    // 🔥 Pull-to-Refresh 기능 추가
+                    .refreshable {
+                        await refreshChatRooms()
                     }
                 }
-            }
-            .background(.background2Ws)
-            .ignoresSafeArea(edges: .bottom)
-            .sheet(isPresented: $isPresentingAddChatView) {
-                AddChatView()
+                .onAppear {
+                    loadChatRooms()
+                }
+                .onReceive(NotificationCenter.default.publisher(for: .init("ChatRoomDidLeave"))) { note in
+                    if let roomId = note.object as? Int {
+                        leftRoomIds.insert(roomId)
+                        // Save updated leftRoomIds to UserDefaults
+                        UserDefaults.standard.set(Array(leftRoomIds), forKey: "leftRoomIds")
+                        chatRooms.removeAll { $0.id == roomId }
+                    }
+                }
+                // 🔥 개선된 새 메시지 수신 처리
+                .onReceive(NotificationCenter.default.publisher(for: .init("NewMessageReceived"))) { note in
+                    handleNewMessage(note)
+                }
+                // 메시지 읽음 처리 시 unreadCount 업데이트
+                .onReceive(NotificationCenter.default.publisher(for: .init("MessagesRead"))) { note in
+                    if let userInfo = note.userInfo,
+                       let roomId = userInfo["roomId"] as? Int {
+                        if let index = chatRooms.firstIndex(where: { $0.id == roomId }) {
+                            chatRooms[index].unreadCount = 0
+                        }
+                    }
+                }
+                // .background(.background2Ws)
+                .ignoresSafeArea(edges: .bottom)
+                .sheet(isPresented: $isPresentingAddChatView) {
+                    AddChatView()
+                }
             }
         }
     }
@@ -310,23 +324,23 @@ struct ChatRow: View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 6) {
                 Text(partnerName)
-                    .font(.bmjua(.regular, size: 20))
+                    .font(.pretendard(.semiBold, size: 20))
                     .foregroundStyle(textColor)
 
                 if let lastMessage = chat.messages.last {
                     if let fileUrl = lastMessage.fileUrl, !fileUrl.isEmpty {
                         Text("사진")
-                            .font(.bmjua(.regular, size: 18))
+                            .font(.pretendard(.regular, size: 18))
                             .foregroundColor(.gray)
                     } else {
                         Text(lastMessage.content)
-                            .font(.bmjua(.regular, size: 18))
+                            .font(.pretendard(.medium, size: 18))
                             .foregroundColor(.gray)
                             .lineLimit(1)
                     }
                 } else {
                     Text("새로운 채팅을 시작해보세요")
-                        .font(.bmjua(.regular, size: 18))
+                        .font(.pretendard(.medium, size: 18))
                         .foregroundColor(.gray)
                 }
             }
@@ -334,13 +348,13 @@ struct ChatRow: View {
             VStack(alignment: .trailing, spacing: 6) {
                 if let lastMessage = chat.messages.last {
                     Text(lastMessage.formattedDate)
-                        .font(.bmjua(.regular, size: 12))
+                        .font(.pretendard(.regular, size: 14))
                         .foregroundColor(.gray)
                 }
                 // 읽지 않은 메시지 배지
                 if unreadCount > 0 {
                     Text(unreadBadgeText)
-                        .font(.bmjua(.regular, size: 12))
+                        .font(.pretendard(.medium, size: 14))
                         .foregroundColor(.white)
                         .frame(minWidth: 22, minHeight: 22)
                         .padding(.horizontal, unreadCount > 9 ? 4 : 0)

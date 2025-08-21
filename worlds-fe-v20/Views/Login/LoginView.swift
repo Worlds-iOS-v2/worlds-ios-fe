@@ -31,22 +31,24 @@ struct LoginView: View {
                 
                 VStack {
                     Image("logo")
-                        .padding(.bottom, 80)
+                        .resizable()
+                        .frame(width: 180, height: 180)
+                        .padding(.bottom, 20)
                     
-                    TextField("이메일을 입력하세요", text: $email)
+                    TextField("이메일", text: $email)
                         .textInputAutocapitalization(.never) // 자동 대문자처리 해제
                         .keyboardType(.emailAddress)
                         .foregroundStyle(Color.gray)
-                        .font(.bmjua(.regular, size: 22))
+                        .font(.pretendard(.medium, size: 22))
                         .frame(height: 60)
                         .padding(.horizontal, 14)
                         .background(Color.white)
                         .cornerRadius(12)
                         .padding(.bottom, 12)
                     
-                    SecureField("비밀번호를 입력하세요", text: $password)
+                    SecureField("비밀번호", text: $password)
                         .foregroundStyle(Color.gray)
-                        .font(.bmjua(.regular, size: 22))
+                        .font(.pretendard(.medium, size: 22))
                         .frame(height: 60)
                         .padding(.horizontal, 14)
                         .background(Color.white)
@@ -91,12 +93,10 @@ struct LoginView: View {
                             RoundedRectangle(cornerRadius: 12)
                                 .fill(isFilled ? Color.mainws: Color.gray)
                                 .frame(height: 60)
-                                .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
                             
                             Text("로그인")
-                                .font(.bmjua(.regular, size: 24))
+                                .font(.pretendard(.bold, size: 24))
                                 .foregroundStyle(.white)
-                                .fontWeight(.semibold)
                         }
                     }
                     .alert(alertMessage, isPresented: $showAlert) {
@@ -112,7 +112,7 @@ struct LoginView: View {
                         } label: {
                             Text("회원가입")
                                 .foregroundStyle(Color.gray)
-                                .font(.bmjua(.regular, size: 20))
+                                .font(.pretendard(.semiBold, size: 20))
                         }
                         
                         Divider()
@@ -122,7 +122,7 @@ struct LoginView: View {
                         NavigationLink(destination: ResetPasswordView(isLoginView: true)) {
                             Text("비밀번호 재설정")
                                 .foregroundStyle(Color.gray)
-                                .font(.bmjua(.regular, size: 20))
+                                .font(.pretendard(.semiBold, size: 20))
                         }
                     }
                     .padding(.bottom, 68)

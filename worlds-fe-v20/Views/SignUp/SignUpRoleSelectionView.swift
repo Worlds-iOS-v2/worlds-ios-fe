@@ -23,7 +23,7 @@ struct SignUpRoleSelectionView: View {
         NavigationStack {
             VStack(alignment: .leading) {
                 Text("누가 사용할 계정인가요?")
-                    .font(.bmjua(.regular, size: 27))
+                    .font(.pretendard(.bold, size: 27))
                     .foregroundColor(textColor)
                     .padding(.top, 40)
                 
@@ -39,18 +39,13 @@ struct SignUpRoleSelectionView: View {
                         viewModel.isMentor = true
                     } label: {
                         VStack {
-                            Image("mentor")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .padding()
-                            
-                            Spacer()
-                            
                             Text("멘토")
-                                .font(.bmjua(.regular, size: 22))
+                                .font(.pretendard(.bold, size: 22))
                                 .foregroundStyle(textColor)
+                                .padding()
+                                                        
+                            Image("mentor")
                         }
-                        .padding()
                         .background(selectedRole == .mentor ? Color.sub2Ws : Color.white)
                         .cornerRadius(12)
                         .overlay(
@@ -58,7 +53,6 @@ struct SignUpRoleSelectionView: View {
                                 .stroke(Color.mainws, lineWidth: 2)
                                 .opacity(selectedRole == .mentor ? 1 : 0)
                         )
-                        .frame(width: 155, height: 166)
                     }
                     
                     Button {
@@ -69,17 +63,13 @@ struct SignUpRoleSelectionView: View {
                         viewModel.isMentor = false
                     } label: {
                         VStack {
-                            Image("mentee")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                            
-                            Spacer()
-                            
                             Text("멘티")
-                                .font(.bmjua(.regular, size: 22))
+                                .font(.pretendard(.bold, size: 22))
                                 .foregroundStyle(textColor)
+                                .padding()
+                            
+                            Image("mentee")
                         }
-                        .padding()
                         .background(selectedRole == .mentee ? Color.sub2Ws : Color.white)
                         .cornerRadius(12)
                         .overlay(
@@ -87,7 +77,6 @@ struct SignUpRoleSelectionView: View {
                                 .stroke(Color.mainws, lineWidth: 2)
                                 .opacity(selectedRole == .mentee ? 1 : 0)
                         )
-                        .frame(width: 155, height: 166)
                     }
                     
                     Spacer()
@@ -111,8 +100,8 @@ struct SignUpRoleSelectionView: View {
                     appState.flow = .login
                 } label: {
                     Text("로그인 하기")
-                        .foregroundStyle(Color.gray)
-                        .font(.bmjua(.regular, size: 16))
+                        .foregroundStyle(.subfontws)
+                        .font(.pretendard(.semiBold, size: 16))
                 }
                 .frame(maxWidth: .infinity)
                 .multilineTextAlignment(.center)

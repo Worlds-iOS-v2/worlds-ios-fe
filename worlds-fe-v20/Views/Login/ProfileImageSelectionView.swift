@@ -39,11 +39,11 @@ struct ProfileImageSelectionView: View {
                 
                 VStack(spacing: 16) {
                     Text("캐릭터 선택")
-                        .font(.bmjua(.regular, size: 32))
+                        .font(.pretendard(.regular, size: 32))
                         .foregroundStyle(.mainfontws)
                     
                     Text("함께 공부할 캐릭터를 골라보세요!")
-                        .font(.bmjua(.regular, size: 18))
+                        .font(.pretendard(.regular, size: 18))
                         .foregroundStyle(.gray)
                 }
                 .padding(.top, 60)
@@ -147,7 +147,7 @@ struct CharacterCardView: View {
                 }
                 
                 Text(character.name)
-                    .font(.bmjua(.regular, size: 20))
+                    .font(.pretendard(.regular, size: 20))
                     .foregroundStyle(.black)
             }
         }

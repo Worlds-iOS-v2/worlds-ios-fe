@@ -19,12 +19,12 @@ struct CommonSignUpTextField: View {
         VStack(alignment: .leading) {
             Text("\(title)")
                 .foregroundStyle(textColor)
-                .font(.bmjua(.regular, size: 22))
+                .font(.pretendard(.semiBold, size: 22))
             
             if isSecure {
                 SecureField("\(placeholder)", text: $content)
                     .foregroundStyle(textColor)
-                    .font(.bmjua(.regular, size: 22))
+                    .font(.pretendard(.medium, size: 22))
                     .frame(height: 60)
                     .padding(.horizontal, 14)
                     .background(Color.white)
@@ -34,7 +34,7 @@ struct CommonSignUpTextField: View {
                 TextField("\(placeholder)", text: $content)
                     .textInputAutocapitalization(.never) // 자동 대문자처리 해제
                     .foregroundStyle(textColor)
-                    .font(.bmjua(.regular, size: 22))
+                    .font(.pretendard(.medium, size: 22))
                     .frame(height: 60)
                     .padding(.horizontal, 14)
                     .background(Color.white)

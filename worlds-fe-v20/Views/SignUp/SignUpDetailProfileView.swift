@@ -34,7 +34,7 @@ struct SignUpDetailProfileView: View {
         VStack {
             VStack(alignment: .leading) {
                 Text("사용자 정보를 입력해주세요.")
-                    .font(.bmjua(.regular, size: 27))
+                    .font(.pretendard(.bold, size: 27))
                     .foregroundColor(textColor)
                     .padding(.top, 40)
                 
@@ -49,7 +49,7 @@ struct SignUpDetailProfileView: View {
                 
                 Text("생년월일")
                     .foregroundStyle(textColor)
-                    .font(.bmjua(.regular, size: 22))
+                    .font(.pretendard(.semiBold, size: 22))
                     .fontWeight(.semibold)
                 
                 Button {
@@ -58,7 +58,7 @@ struct SignUpDetailProfileView: View {
                     HStack {
                         Text("\(String(birthYear))년 \(birthMonth)월 \(birthDay)일")
                             .foregroundStyle(Color.gray)
-                            .font(.bmjua(.regular, size: 22))
+                            .font(.pretendard(.medium, size: 22))
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.leading, 14)
                         
@@ -106,7 +106,7 @@ struct SignUpDetailProfileView: View {
                         .pickerStyle(.wheel)
                         .frame(maxWidth: .infinity)
                     }
-                    .font(.bmjua(.regular, size: 20))
+                    .font(.pretendard(.semiBold, size: 20))
                     .foregroundStyle(textColor)
                     .background(Color.white)
                     .cornerRadius(12)
@@ -144,8 +144,8 @@ struct SignUpDetailProfileView: View {
                 appState.flow = .login
             } label: {
                 Text("로그인 하기")
-                    .foregroundStyle(Color.gray)
-                    .font(.bmjua(.regular, size: 16))
+                    .foregroundStyle(.subfontws)
+                    .font(.pretendard(.semiBold, size: 16))
             }
         }
         .alert(alertMessage, isPresented: $showAlert) {

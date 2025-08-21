@@ -53,19 +53,31 @@ struct ChatDetailView: View {
 
     var body: some View {
         ZStack {
+            VStack {
+                Spacer()
+                
+                Image("chatdetailbackgroundws")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(height: 200)
+                    .opacity(0.8)
+                    .padding(.bottom, 50)
+            }
+            .ignoresSafeArea(.all, edges: .bottom)
+            
             VStack(spacing: 0) {
                 // 헤더 (뒤로가기, 사용자명, 메뉴)
                 HStack {
                     Button(action: { dismiss() }) {
                         Image(systemName: "chevron.left")
-                            .font(.bmjua(.regular, size: 18))
-                            .foregroundColor(.black)
+                            .foregroundColor(.mainws)
+                            .font(.system(size: 24, weight: .semibold))
                     }
                     
                     Spacer()
                     
                     Text(targetUserName)
-                        .font(.bmjua(.regular, size: 20))
+                        .font(.pretendard(.regular, size: 20))
                         .bold()
                     
                     Spacer()
@@ -100,7 +112,7 @@ struct ChatDetailView: View {
                         }
                     } label: {
                         Image(systemName: "ellipsis.circle")
-                            .font(.title3)
+                            .font(.system(size: 24))
                             .foregroundColor(.black)
                     }
                 }
@@ -112,8 +124,6 @@ struct ChatDetailView: View {
                 // 입력창 (사진 선택, 텍스트 입력, 전송)
                 inputView
             }
-            .background(Color(red: 0.94, green: 0.96, blue: 1.0))
-            
             // 사진 확대 보기 오버레이
             if showImageViewer {
                 ImageViewerOverlay(
@@ -122,6 +132,7 @@ struct ChatDetailView: View {
                 )
             }
         }
+        .background(Color.sub2Ws)
         .onAppear {
             if !chat.messages.isEmpty {
                 viewModel.seed(initialMessages: chat.messages)
@@ -212,7 +223,7 @@ struct ChatDetailView: View {
                 photoLibrary: .shared()
             ) {
                 Image(systemName: "photo.on.rectangle")
-                    .font(.title2)
+                    .font(.system(size: 24))
             }
 
             // 텍스트 입력 필드
@@ -227,7 +238,7 @@ struct ChatDetailView: View {
             // 전송 버튼
             Button(action: sendMessageAction) {
                 Image(systemName: "arrow.up.circle.fill")
-                    .font(.title2)
+                    .font(.system(size: 30))
                     .foregroundColor(.blue)
             }
         }
@@ -529,7 +540,7 @@ struct DateHeader: View {
     let dateString: String
     var body: some View {
         Text(dateString)
-            .font(.bmjua(.regular, size: 14))
+            .font(.pretendard(.regular, size: 14))
             .foregroundColor(.gray)
             .padding(.vertical, 6)
             .frame(maxWidth: .infinity)
@@ -619,7 +630,7 @@ struct ChatBubble: View {
                         VStack {
                             Image(systemName: "photo")
                             Text("이미지 로딩 중...")
-                                .font(.bmjua(.regular, size: 14))
+                                .font(.pretendard(.regular, size: 14))
                                 .foregroundColor(.gray)
                         }
                     )
@@ -653,7 +664,7 @@ struct ChatBubble: View {
                             VStack {
                                 Image(systemName: "photo")
                                 Text("이미지 로드 실패")
-                                    .font(.bmjua(.regular, size: 14))
+                                    .font(.pretendard(.regular, size: 14))
                                     .foregroundColor(.red)
                             }
                         )
@@ -687,11 +698,11 @@ struct ChatBubble: View {
                         VStack(alignment: .trailing, spacing: 2) {
                             if message.isRead {
                                 Text("읽음")
-                                    .font(.bmjua(.regular, size: 12))
-                                    .foregroundColor(.gray)
+                                    .font(.pretendard(.semiBold, size: 12))
+                                    .foregroundColor(.mainfontws)
                             }
                             Text(timeString(from: message.createdAt))
-                                .font(.bmjua(.regular, size: 12))
+                                .font(.pretendard(.medium, size: 12))
                                 .foregroundColor(.gray)
                         }
 
@@ -700,6 +711,7 @@ struct ChatBubble: View {
                             imageView(from: urlStr)
                         } else {
                             Text(displayText)
+                                .font(.pretendard(.medium, size: 16))
                                 .padding(10)
                                 .foregroundColor(.white)
                                 .background(Color.blue)
@@ -725,7 +737,7 @@ struct ChatBubble: View {
                     if !message.content.isEmpty {
                         Button(action: toggleTranslateAction) {
                             Text(isTranslating ? "번역 중…" : (showTranslated ? "원문보기" : "번역하기"))
-                                .font(.bmjua(.regular, size: 14))
+                                .font(.pretendard(.medium, size: 13))
                                 .foregroundColor(.gray)
                         }
                         .disabled(isTranslating)
@@ -740,6 +752,7 @@ struct ChatBubble: View {
                             imageView(from: urlStr)
                         } else {
                             Text(displayText)
+                                .font(.pretendard(.medium, size: 16))
                                 .padding(10)
                                 .background(Color.white)
                                 .cornerRadius(16)
@@ -765,7 +778,7 @@ struct ChatBubble: View {
 
                         // 시간 표시
                         Text(timeString(from: message.createdAt))
-                            .font(.bmjua(.regular, size: 12))
+                            .font(.pretendard(.medium, size: 12))
                             .foregroundColor(.gray)
                     }
 
@@ -773,7 +786,7 @@ struct ChatBubble: View {
                     if !message.content.isEmpty {
                         Button(action: toggleTranslateAction) {
                             Text(isTranslating ? "번역 중…" : (showTranslated ? "원문보기" : "번역하기"))
-                                .font(.bmjua(.regular, size: 14))
+                                .font(.pretendard(.medium, size: 13))
                                 .foregroundColor(.gray)
                         }
                         .disabled(isTranslating)
