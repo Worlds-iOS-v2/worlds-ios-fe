@@ -603,8 +603,8 @@ struct ChatBubble: View {
         } else {
             isTranslating = true
             if #available(iOS 18.0, *) {
-                let targetCode = Locale.current.language.languageCode?.identifier ?? "en"
-                translationConfigurationAny = TranslationSession.Configuration(source: nil, target: Locale.Language(identifier: targetCode))
+                let targetLang = SupportedLanguage.getCurrentLanguageCode()
+                translationConfigurationAny = TranslationSession.Configuration(source: nil, target: Locale.Language(identifier: targetLang))
             } else {
                 self.isTranslating = false
             }
