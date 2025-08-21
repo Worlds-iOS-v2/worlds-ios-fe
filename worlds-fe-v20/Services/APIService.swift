@@ -388,4 +388,14 @@ func createQuestion(title: String, content: String, category: String, images: [D
 
         return response
     }
+    
+    func unhideRoom(roomId: Int) async throws -> UnhideResponse {
+        let headers = try getAuthHeaders()
+
+        let response = try await AF.request("\(baseURL)/chat/rooms/\(roomId)/unhide", method: .post, headers: headers)
+            .serializingDecodable(UnhideResponse.self)
+            .value
+
+        return response
+    }
 }
