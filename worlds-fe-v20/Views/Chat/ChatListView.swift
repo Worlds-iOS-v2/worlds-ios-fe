@@ -11,6 +11,8 @@ struct ChatListView: View {
     @State private var chatRooms: [ChatRoom] = []
     @State private var isPresentingAddChatView = false
     @State private var leftRoomIds: Set<Int> = UserDefaults.standard.object(forKey: "leftRoomIds") as? Set<Int> ?? []
+    @State private var pendingChatRoom: ChatRoom? = nil // 🔥 추가
+    @State private var shouldNavigateToChat = false // 🔥 추가
     
     var textColor: Color = .mainfontws
 
@@ -28,7 +30,7 @@ struct ChatListView: View {
                         .padding(.bottom, 50)
                 }
                 .ignoresSafeArea(.all, edges: .bottom)
-
+                
                 VStack(spacing: 0) {
                     // Top Bar
                     HStack(alignment: .firstTextBaseline) {
@@ -73,12 +75,14 @@ struct ChatListView: View {
                 .onReceive(NotificationCenter.default.publisher(for: .init("ChatRoomDidLeave"))) { note in
                     if let roomId = note.object as? Int {
                         leftRoomIds.insert(roomId)
-                        // Save updated leftRoomIds to UserDefaults
+                        // UserDefaults 저장 방식 수정
                         UserDefaults.standard.set(Array(leftRoomIds), forKey: "leftRoomIds")
                         chatRooms.removeAll { $0.id == roomId }
+                        
+                        // 소켓에서도 해당 방 나가기
+                        SocketService.shared.socket.emit("leave_room", ["roomId": roomId])
                     }
                 }
-                // 🔥 개선된 새 메시지 수신 처리
                 .onReceive(NotificationCenter.default.publisher(for: .init("NewMessageReceived"))) { note in
                     handleNewMessage(note)
                 }
@@ -91,20 +95,39 @@ struct ChatListView: View {
                         }
                     }
                 }
+                .onReceive(NotificationCenter.default.publisher(for: .init("RefreshChatRooms"))) { _ in
+                    print("[ChatList] 새로고침 알림 받음")
+                    Task {
+                        await refreshChatRooms()
+                    }
+                }
                 // .background(.background2Ws)
                 .ignoresSafeArea(edges: .bottom)
                 .sheet(isPresented: $isPresentingAddChatView) {
-                    AddChatView()
+                    AddChatView { chatRoom in
+                        // 🔥 채팅방 생성 완료 시 처리
+                        self.pendingChatRoom = chatRoom
+                        self.shouldNavigateToChat = true
+                    }
+                }
+                .navigationDestination(isPresented: $shouldNavigateToChat) {
+                    if let chatRoom = pendingChatRoom {
+                        ChatDetailView(chat: chatRoom)
+                            .onAppear {
+                                print("🎯 [ChatList] ChatDetailView 로드됨")
+                            }
+                    }
                 }
             }
         }
     }
     
-    // 🔥 새 메시지 처리 함수 (완전한 실시간 업데이트)
+    // 새 메시지 처리 함수 (완전한 실시간 업데이트)
     private func handleNewMessage(_ note: Notification) {
         guard let userInfo = note.userInfo,
               let roomId = userInfo["roomId"] as? Int,
               let senderId = userInfo["senderId"] as? Int else {
+            print("❌ [ChatList] 메시지 정보 파싱 실패")
             return
         }
         
@@ -165,8 +188,8 @@ struct ChatListView: View {
         print("🔄 [ChatList] Pull-to-refresh 시작")
         
         return await withCheckedContinuation { continuation in
-            // Load leftRoomIds from UserDefaults
-            if let savedIds = UserDefaults.standard.object(forKey: "leftRoomIds") as? [Int] {
+            // UserDefaults에서 최신 leftRoomIds 로드
+            if let savedIds = UserDefaults.standard.array(forKey: "leftRoomIds") as? [Int] {
                 leftRoomIds = Set(savedIds)
             }
             
