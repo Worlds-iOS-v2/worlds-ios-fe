@@ -67,6 +67,10 @@ final class SignUpViewModel: ObservableObject {
             
             return true
         } catch UserAPIError.serverError(let message) {
+            if message == "이미 인증이 완료된 이메일입니다." {
+                return true
+            }
+            
             self.errorMessage = message
             print(message)
             
