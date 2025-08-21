@@ -385,4 +385,9 @@ class ChatViewModel: ObservableObject {
             self.errorMessage = "OCR 목록을 불러오는데 실패했습니다: \(error.localizedDescription)"
         }
     }
+    
+    func clearMessages() {
+        messages.removeAll()
+        objectWillChange.send()
+    }
 }

@@ -19,8 +19,10 @@ struct AddChatView: View {
     @State private var activeChatRoom: ChatRoom?
     @State private var pendingChatRoom: ChatRoom?
     
-    var textColor: Color = .mainfontws
+    let onChatRoomCreated: ((ChatRoom) -> Void)?
 
+    var textColor: Color = .mainfontws
+    
     var body: some View {
         NavigationStack {
             VStack(spacing: 24) {
@@ -89,25 +91,23 @@ struct AddChatView: View {
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 40)
-                .sheet(isPresented: $isShowingScanner, onDismiss: {
-                    // 시트(스캐너)가 완전히 내려간 뒤에 네비게이션 푸시 수행
-                    if let room = pendingChatRoom {
-                        self.activeChatRoom = room
-                        self.pendingChatRoom = nil
-                    }
-                }) {
+                .sheet(isPresented: $isShowingScanner) {
                     QRCodeScannerView { token in
-                        // 스캔 성공 → claim 호출, 결과는 pending으로 보관
                         SocketService.shared.claimPairing(token: token) { chatRoom in
                             DispatchQueue.main.async {
                                 if let chatRoom = chatRoom {
-                                    self.pendingChatRoom = chatRoom
+                                    print("[AddChat] 채팅방 생성 성공: \(chatRoom.id)")
+                                    self.isShowingScanner = false
+                                    
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                        self.onChatRoomCreated?(chatRoom)
+                                        self.dismiss()
+                                    }
                                 } else {
                                     self.errorMessage = "채팅방 생성에 실패했어요. 다시 시도해주세요."
                                     self.showAlert = true
+                                    self.isShowingScanner = false
                                 }
-                                // 시트 닫기 (닫힌 뒤 onDismiss에서 push)
-                                self.isShowingScanner = false
                             }
                         }
                     }
@@ -134,9 +134,6 @@ struct AddChatView: View {
                 Alert(title: Text("알림"),
                       message: Text(errorMessage ?? "알 수 없는 오류가 발생했습니다."),
                       dismissButton: .default(Text("확인")))
-            }
-            .fullScreenCover(item: $activeChatRoom) { room in
-                ChatDetailView(chat: room)
             }
         }
     }
@@ -176,5 +173,5 @@ struct AddChatView: View {
 }
 
 #Preview {
-    AddChatView()
+   // AddChatView()
 }

@@ -29,7 +29,7 @@ class SocketService {
     }
     
     private var manager: SocketManager!
-    private var socket: SocketIOClient!
+    var socket: SocketIOClient!
     
     private init() {
         guard let baseUrl = Bundle.main.object(forInfoDictionaryKey: "APIBaseURL") as? String,
@@ -284,17 +284,15 @@ class SocketService {
         socket.off(Event.receiveMessage)
         
         socket.on(Event.receiveMessage) { data, _ in
-            print("📨 [SOCKET] receive_message 이벤트 수신!")
             
             if let dict = data.first as? [String: Any] {
                 do {
                     let jsonData = try JSONSerialization.data(withJSONObject: dict)
                     let message = try JSONDecoder().decode(Message.self, from: jsonData)
-                    print("✅ [SOCKET] 메시지 디코딩 성공: \(message.content)")
                     
                     completion(message)
                     
-                    // 🔥 채팅 목록 업데이트를 위한 상세 알림 전송
+                    // 채팅 목록 업데이트를 위한 상세 알림 전송
                     DispatchQueue.main.async {
                         NotificationCenter.default.post(
                             name: .init("NewMessageReceived"),
@@ -606,7 +604,6 @@ extension SocketService {
         let cleanedToken = rawToken.trimmingCharacters(in: .whitespacesAndNewlines)
         print("🔎 claim raw token:", rawToken)
         print("🔎 claim cleaned token:", cleanedToken)
-        print("🔎 raw == cleaned?", rawToken == cleanedToken)
         let body = ["token": cleanedToken]
         req.httpBody = try? JSONSerialization.data(withJSONObject: body)
         
@@ -628,11 +625,39 @@ extension SocketService {
                 completion(nil)
                 return
             }
+            
             do {
                 let room = try JSONDecoder().decode(ChatRoom.self, from: data)
+                print("🎯 [Socket] claimPairing 성공: roomId=\(room.id)")
+                
+                // 새로 연결된 방은 leftRoomIds에서 제거하고 숨김 해제
+                DispatchQueue.main.async {
+                    var leftRooms = Set(UserDefaults.standard.array(forKey: "leftRoomIds") as? [Int] ?? [])
+                    leftRooms.remove(room.id)
+                    UserDefaults.standard.set(Array(leftRooms), forKey: "leftRoomIds")
+                    print("🎯 [Socket] leftRoomIds에서 제거: \(room.id)")
+                    
+                    // 백엔드에서 방 숨김 해제 (APIService 사용)
+                    Task {
+                        do {
+                            let unhideResponse = try await APIService.shared.unhideRoom(roomId: room.id)
+                            print("✅ [Socket] 방 숨김 해제 성공: roomId=\(unhideResponse.roomId), unhiddenFor=\(unhideResponse.unhiddenFor), alreadyVisible=\(unhideResponse.alreadyVisible)")
+                            
+                            // 채팅방 목록 새로고침 알림
+                            DispatchQueue.main.async {
+                                NotificationCenter.default.post(name: .init("RefreshChatRooms"), object: nil)
+                            }
+                            
+                        } catch {
+                            print("[Socket] 방 숨김 해제 실패: \(error)")
+                            // 실패해도 계속 진행
+                        }
+                    }
+                }
+                
                 completion(room)
             } catch {
-                print("❌ 디코딩 실패 @ \(url.absoluteString):", error)
+                print("❌ [Socket] claimPairing 디코딩 실패: \(error)")
                 completion(nil)
             }
         }.resume()

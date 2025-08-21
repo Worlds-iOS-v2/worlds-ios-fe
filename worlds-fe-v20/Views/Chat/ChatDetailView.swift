@@ -134,6 +134,14 @@ struct ChatDetailView: View {
         }
         .background(Color.sub2Ws)
         .onAppear {
+            // 나간 방인지 체크
+            let leftRooms = Set(UserDefaults.standard.array(forKey: "leftRoomIds") as? [Int] ?? [])
+            if leftRooms.contains(chat.id) {
+                // 나간 방이면 메시지 클리어
+                viewModel.clearMessages()
+                return
+            }
+            
             if !chat.messages.isEmpty {
                 viewModel.seed(initialMessages: chat.messages)
             }
@@ -141,6 +149,12 @@ struct ChatDetailView: View {
         }
         .onDisappear {
             viewModel.disconnect()
+            
+            // 나간 방이라면 소켓에서도 완전히 나가기
+            let leftRooms = Set(UserDefaults.standard.array(forKey: "leftRoomIds") as? [Int] ?? [])
+            if leftRooms.contains(chat.id) {
+                SocketService.shared.socket.emit("leave_room", ["roomId": chat.id])
+            }
         }
         // 노티피케이션 리스너들
         .onReceive(NotificationCenter.default.publisher(for: .pasteIntoComposer)) { note in
@@ -372,6 +386,8 @@ struct ChatDetailView: View {
     
     /// 채팅 연결 및 초기 설정
     private func setupChatConnection() {
+        print("[ChatDetail] 소켓 연결 시작")
+
         viewModel.onReceiveMessage()
         viewModel.connectAndJoin(chatId: chat.id)
         viewModel.loadLatestFirst(roomId: chat.id)
@@ -587,8 +603,8 @@ struct ChatBubble: View {
         } else {
             isTranslating = true
             if #available(iOS 18.0, *) {
-                let targetCode = Locale.current.language.languageCode?.identifier ?? "en"
-                translationConfigurationAny = TranslationSession.Configuration(source: nil, target: Locale.Language(identifier: targetCode))
+                let targetLang = SupportedLanguage.getCurrentLanguageCode()
+                translationConfigurationAny = TranslationSession.Configuration(source: nil, target: Locale.Language(identifier: targetLang))
             } else {
                 self.isTranslating = false
             }

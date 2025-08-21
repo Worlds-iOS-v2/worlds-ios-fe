@@ -88,12 +88,18 @@ struct QuestionDetailView: View {
                         HStack(spacing: 10) {
                             
                             // 학생이면 랜덤 이미지
-                            if let _ = question.user.role {
-                                Image("default")
-                                    .resizable()
-                                    .frame(width: 38, height: 38)
+                            if let isTeacher = question.user.role {
+                                if isTeacher {
+                                    Image("default")
+                                        .resizable()
+                                        .frame(width: 38, height: 38)
+                                } else {
+                                    Image("\(userProfileImage)")
+                                        .resizable()
+                                        .frame(width: 38, height: 38)
+                                }
                             } else {
-                                Image("\(userProfileImage)")
+                                Image("default")
                                     .resizable()
                                     .frame(width: 38, height: 38)
                             }

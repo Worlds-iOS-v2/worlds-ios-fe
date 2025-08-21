@@ -245,7 +245,7 @@ struct CommentRow: View {
     
     /// 번역 시작
     func startTranslation() {
-        let targetLang = Locale.current.language.languageCode?.identifier ?? "en"
+        let targetLang = SupportedLanguage.getCurrentLanguageCode()
         translationConfiguration = TranslationSession.Configuration(
             source: nil,
             target: Locale.Language(identifier: targetLang)
