@@ -39,14 +39,15 @@ struct ProfileImageSelectionView: View {
                 
                 VStack(spacing: 16) {
                     Text("캐릭터 선택")
-                        .font(.pretendard(.regular, size: 32))
+                        .font(.pretendard(.bold, size: 32))
                         .foregroundStyle(.mainfontws)
                     
                     Text("함께 공부할 캐릭터를 골라보세요!")
-                        .font(.pretendard(.regular, size: 18))
+                        .font(.pretendard(.medium, size: 18))
                         .foregroundStyle(.gray)
                 }
-                .padding(.top, 60)
+                .padding(.top, 30)
+                .padding(.bottom, 20)
                 
                 // 캐릭터 선택 그리드
                 LazyVGrid(columns: [
@@ -147,7 +148,7 @@ struct CharacterCardView: View {
                 }
                 
                 Text(character.name)
-                    .font(.pretendard(.regular, size: 20))
+                    .font(.pretendard(.semiBold, size: 20))
                     .foregroundStyle(.black)
             }
         }
