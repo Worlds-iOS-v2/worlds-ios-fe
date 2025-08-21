@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "cameraws.png",
+      "filename" : "‘camera0821’의 배경이 제거됨 2.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "cameraws@2x.png",
+      "filename" : "‘camera0821’의 배경이 제거됨 2@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "cameraws@3x.png",
+      "filename" : "‘camera0821’의 배경이 제거됨 2@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
