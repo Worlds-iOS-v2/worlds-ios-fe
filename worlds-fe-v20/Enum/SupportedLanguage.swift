@@ -11,7 +11,6 @@ enum SupportedLanguage: String, CaseIterable {
     case korean = "ko"
     case english = "en"
     case vietnamese = "vi"
-    case japanese = "ja"
     case chinese = "zh"
     case thai = "th"
     case russian = "ru"
@@ -30,8 +29,6 @@ enum SupportedLanguage: String, CaseIterable {
             return "태국어"
         case .russian:
             return "러시아어"
-        default:
-            return "영어"
         }
     }
     
