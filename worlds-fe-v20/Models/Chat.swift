@@ -8,14 +8,14 @@
 import Foundation
 
 // 실제 서버 채팅방 모델 (채팅 목록용)
-struct ChatRoom: Identifiable, Codable {
+struct ChatRoom: Identifiable, Codable, Hashable {
     let id: Int
     let userAId: Int
     let userBId: Int
     let createdAt: String
     let userA: ChatUser
     let userB: ChatUser
-    let messages: [Message]
+    var messages: [Message]
     var unreadCount: Int?
 
     var name: String {
@@ -29,14 +29,24 @@ struct ChatRoom: Identifiable, Codable {
     var dateString: String {
         return messages.last?.createdAt ?? ""
     }
+    
+    // 🔥 Hashable 구현
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    // 🔥 Equatable 구현
+    static func == (lhs: ChatRoom, rhs: ChatRoom) -> Bool {
+        return lhs.id == rhs.id
+    }
 }
 
-struct ChatUser: Codable {
+struct ChatUser: Codable, Hashable {
     let id: Int
     let userName: String
 }
 
-struct Message: Identifiable, Codable {
+struct Message: Identifiable, Codable, Hashable {
     let id: Int
     let roomId: Int
     let senderId: Int
@@ -51,4 +61,18 @@ struct Message: Identifiable, Codable {
         let currentUserId = UserDefaults.standard.integer(forKey: "userId")
         return senderId == currentUserId
     }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    static func == (lhs: Message, rhs: Message) -> Bool {
+        return lhs.id == rhs.id
+    }
+}
+
+struct UnhideResponse: Codable {
+    let roomId: Int
+    let unhiddenFor: String
+    let alreadyVisible: Bool
 }

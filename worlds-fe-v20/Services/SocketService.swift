@@ -29,7 +29,7 @@ class SocketService {
     }
     
     private var manager: SocketManager!
-    private var socket: SocketIOClient!
+    var socket: SocketIOClient!
     
     private init() {
         guard let baseUrl = Bundle.main.object(forInfoDictionaryKey: "APIBaseURL") as? String,
@@ -42,12 +42,24 @@ class SocketService {
     
     /// 소켓 서버에 연결
     func connect() {
+        if socket.status == .connected {
+            print("⚠️ 이미 연결되어 있음")
+            return
+        }
+        
         socket.on(clientEvent: .connect) { _, _ in
-            print("Socket connected")
+            print("✅ [SOCKET] 연결 성공!")
         }
+        
         socket.on(clientEvent: .disconnect) { _, _ in
-            print("Socket disconnected")
+            print("❌ [SOCKET] 연결 끊어짐")
         }
+        
+        socket.on(clientEvent: .error) { data, _ in
+            print("🚨 [SOCKET] 에러: \(data)")
+        }
+        
+        print("🔌 [SOCKET] 연결 시도 중...")
         socket.connect()
     }
     
@@ -61,10 +73,18 @@ class SocketService {
     ///   - roomId: 채팅방 ID
     func joinRoom(roomId: Int) {
         guard let userId = currentUserId else {
-            print("No CurrentUserId found in UserDefaults")
+            print("❌ currentUserId 없음")
             return
         }
-        socket.emit(Event.joinRoom, ["roomId": roomId, "userId": userId])
+        
+        let payload = ["roomId": roomId, "userId": userId]
+        print("🏠 [SOCKET] 방 참여 시도: \(payload)")
+        socket.emit(Event.joinRoom, payload)
+        
+        // 방 참여 응답 리스너 (선택사항)
+        socket.on("join_room_response") { data, _ in
+            print("✅ [SOCKET] 방 참여 응답: \(data)")
+        }
     }
 
     /// 채팅방 목록을 REST API로 요청 (JWT 기반) - 디버깅 버전
@@ -262,23 +282,35 @@ class SocketService {
     /// - Parameter completion: 수신한 메시지를 반환하는 클로저
     func onReceiveMessage(completion: @escaping (_ message: Message) -> Void) {
         socket.off(Event.receiveMessage)
+        
         socket.on(Event.receiveMessage) { data, _ in
-            print("Raw receive_message data:", data)
+            
             if let dict = data.first as? [String: Any] {
-                print("Parsed dictionary:", dict)
-                if let jsonData = try? JSONSerialization.data(withJSONObject: dict) {
-                    print("JSON data string:", String(data: jsonData, encoding: .utf8) ?? "nil")
-                    if let message = try? JSONDecoder().decode(Message.self, from: jsonData) {
-                        print("Decoded Message:", message)
-                        completion(message)
-                    } else {
-                        print("Failed to decode Message from jsonData")
+                do {
+                    let jsonData = try JSONSerialization.data(withJSONObject: dict)
+                    let message = try JSONDecoder().decode(Message.self, from: jsonData)
+                    
+                    completion(message)
+                    
+                    // 채팅 목록 업데이트를 위한 상세 알림 전송
+                    DispatchQueue.main.async {
+                        NotificationCenter.default.post(
+                            name: .init("NewMessageReceived"),
+                            object: nil,
+                            userInfo: [
+                                "roomId": message.roomId,
+                                "senderId": message.senderId,
+                                "messageId": message.id,
+                                "content": message.content,
+                                "createdAt": message.createdAt,
+                                "fileUrl": message.fileUrl ?? "",
+                                "fileType": message.fileType ?? ""
+                            ]
+                        )
                     }
-                } else {
-                    print("Failed to serialize dictionary to JSON")
+                } catch {
+                    print("❌ [SOCKET] 메시지 디코딩 실패: \(error)")
                 }
-            } else {
-                print("Failed to cast data[0] to dictionary")
             }
         }
     }
@@ -572,7 +604,6 @@ extension SocketService {
         let cleanedToken = rawToken.trimmingCharacters(in: .whitespacesAndNewlines)
         print("🔎 claim raw token:", rawToken)
         print("🔎 claim cleaned token:", cleanedToken)
-        print("🔎 raw == cleaned?", rawToken == cleanedToken)
         let body = ["token": cleanedToken]
         req.httpBody = try? JSONSerialization.data(withJSONObject: body)
         
@@ -594,11 +625,39 @@ extension SocketService {
                 completion(nil)
                 return
             }
+            
             do {
                 let room = try JSONDecoder().decode(ChatRoom.self, from: data)
+                print("🎯 [Socket] claimPairing 성공: roomId=\(room.id)")
+                
+                // 새로 연결된 방은 leftRoomIds에서 제거하고 숨김 해제
+                DispatchQueue.main.async {
+                    var leftRooms = Set(UserDefaults.standard.array(forKey: "leftRoomIds") as? [Int] ?? [])
+                    leftRooms.remove(room.id)
+                    UserDefaults.standard.set(Array(leftRooms), forKey: "leftRoomIds")
+                    print("🎯 [Socket] leftRoomIds에서 제거: \(room.id)")
+                    
+                    // 백엔드에서 방 숨김 해제 (APIService 사용)
+                    Task {
+                        do {
+                            let unhideResponse = try await APIService.shared.unhideRoom(roomId: room.id)
+                            print("✅ [Socket] 방 숨김 해제 성공: roomId=\(unhideResponse.roomId), unhiddenFor=\(unhideResponse.unhiddenFor), alreadyVisible=\(unhideResponse.alreadyVisible)")
+                            
+                            // 채팅방 목록 새로고침 알림
+                            DispatchQueue.main.async {
+                                NotificationCenter.default.post(name: .init("RefreshChatRooms"), object: nil)
+                            }
+                            
+                        } catch {
+                            print("[Socket] 방 숨김 해제 실패: \(error)")
+                            // 실패해도 계속 진행
+                        }
+                    }
+                }
+                
                 completion(room)
             } catch {
-                print("❌ 디코딩 실패 @ \(url.absoluteString):", error)
+                print("❌ [Socket] claimPairing 디코딩 실패: \(error)")
                 completion(nil)
             }
         }.resume()

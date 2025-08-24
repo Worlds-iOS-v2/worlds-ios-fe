@@ -11,6 +11,10 @@ import UIKit
 
 class ChatViewModel: ObservableObject {
     @Published var messages: [Message] = []
+    @Published var isSocketConnected = false
+    
+    private var currentRoomId: Int?
+    private var messageListener: (() -> Void)?
 
     // 임시 음수 ID 시드 (서버 ID와 충돌 방지)
     private var tempIdSeed: Int = -1
@@ -35,6 +39,9 @@ class ChatViewModel: ObservableObject {
     private let pageSize = 20
     private var latestPageSkip: Int = 0
     private var discoveredTotal: Int?
+    
+    @Published var errorMessage: String?
+    @Published var ocrList: [OCRList] = []
 
     private func parseISO8601(_ s: String) -> Date? {
         let formatter = ISO8601DateFormatter()
@@ -60,18 +67,59 @@ class ChatViewModel: ObservableObject {
     }
     
     func connectAndJoin(chatId: Int) {
+        print("🎬 [VM] connectAndJoin 시작 - roomId: \(chatId)")
+        currentRoomId = chatId
+        
         SocketService.shared.connect()
         SocketService.shared.joinRoom(roomId: chatId)
-        // 리스너 등록 (로그 포함)
-        onReceiveMessage()
+        
+        // 🔥 중요: 메시지 리스너 설정
+        setupMessageListener()
+    }
+    
+    private func setupMessageListener() {
+        print("🎧 [VM] 메시지 리스너 설정 중...")
+        
+        SocketService.shared.onReceiveMessage { [weak self] message in
+            print("📩 [VM] 메시지 수신됨!")
+            print("📩 [VM] 내용: \(message.content)")
+            print("📩 [VM] 발신자: \(message.senderId)")
+            print("📩 [VM] 방 ID: \(message.roomId)")
+            
+            guard let self = self else { return }
+            
+            // 🔥 중요: 메인 스레드에서 UI 업데이트
+            DispatchQueue.main.async {
+                print("🔄 [VM] UI 업데이트 시작...")
+                
+                // 중복 메시지 체크
+                let exists = self.messages.contains { $0.id == message.id }
+                if !exists {
+                    self.messages.append(message)
+                    print("✅ [VM] 메시지 추가 완료! 총 메시지 수: \(self.messages.count)")
+                    
+                    // 🔥 강제로 UI 업데이트 트리거
+                    self.objectWillChange.send()
+                } else {
+                    print("⚠️ [VM] 중복 메시지 무시")
+                }
+            }
+            
+            // 읽음 처리
+            if let roomId = self.currentRoomId {
+                self.markUnreadFromOthersAsRead(roomId: roomId)
+            }
+        }
     }
     
     func sendMessage(chatId: Int, userId: Int, content: String) {
+        print("📤 [VM] 메시지 전송 시작: \(content)")
+        
         let now = Date()
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         let nowString = formatter.string(from: now)
-
+        
         let message = Message(
             id: self.nextTempId(),
             roomId: chatId,
@@ -82,25 +130,28 @@ class ChatViewModel: ObservableObject {
             fileUrl: nil,
             fileType: nil
         )
-
-        // 서버로 전송
-        SocketService.shared.sendMessage(message)
-
-        // 즉시 로컬 반영
+        
+        // 즉시 로컬 UI 업데이트 (보낸 메시지)
         DispatchQueue.main.async {
             self.messages.append(message)
+            print("✅ [VM] 보낸 메시지 로컬 추가 완료")
         }
+        
+        // 서버로 전송
+        SocketService.shared.sendMessage(message)
+        print("📤 [VM] 서버로 메시지 전송 완료")
     }
 
     /// 이미지 전송 (낙관적 렌더링): 즉시 말풍선 추가 → 백그라운드 업로드 → URL 수신 후 소켓 전송
-    func sendImage(chatId: Int, userId: Int, image: UIImage) {
-        // 공통 타임스탬프
+    func sendImage(chatId: Int, userId: Int, imageData: Data, mimeType: String) {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         let createdAt = formatter.string(from: Date())
-
-        // 1) 즉시 임시 메시지 추가 (fileUrl 없음 → UI에서 업로드 중 표시)
+        
+        // 1) 🔥 즉시 Base64 이미지로 표시
         let tempId = self.nextTempId()
+        let base64String = "data:\(mimeType);base64,\(imageData.base64EncodedString())"
+        
         let tempMessage = Message(
             id: tempId,
             roomId: chatId,
@@ -108,72 +159,75 @@ class ChatViewModel: ObservableObject {
             content: "",
             isRead: false,
             createdAt: createdAt,
-            fileUrl: nil,
-            fileType: "image/jpeg"
+            fileUrl: base64String, // Base64 URL
+            fileType: mimeType
         )
+        
+        // 즉시 UI 업데이트
         DispatchQueue.main.async {
             self.messages.append(tempMessage)
+            self.objectWillChange.send()
         }
-
-        // 2) 백그라운드에서 압축 + 업로드 → URL 확보 후 소켓 전송
+        
+        // 2) 🔥 백그라운드에서 압축 + 업로드
         Task.detached { [weak self] in
             guard let self = self else { return }
-
-            // 압축 (품질: 0.75)
-            guard let data = image.jpegData(compressionQuality: 0.75) else {
-                print("❌ JPEG 변환 실패")
-                // 실패 시 임시 말풍선 제거
-                DispatchQueue.main.async {
-                    if let idx = self.messages.firstIndex(where: { $0.id == tempId }) {
-                        self.messages.remove(at: idx)
-                    }
+            
+            // 압축 (필요한 경우)
+            let finalData: Data
+            if mimeType == "image/jpeg", imageData.count > 1024 * 1024 { // 1MB 이상인 경우만 압축
+                if let image = UIImage(data: imageData),
+                   let compressedData = image.jpegData(compressionQuality: 0.7) {
+                    finalData = compressedData
+                } else {
+                    finalData = imageData
                 }
-                return
+            } else {
+                finalData = imageData
             }
-
+            
             SocketService.shared.uploadAttachment(
-                data: data,
+                data: finalData,
                 fileName: "photo_\(Int(Date().timeIntervalSince1970)).jpg",
-                mimeType: "image/jpeg"
+                mimeType: mimeType
             ) { [weak self] urlString in
                 guard let self = self else { return }
-                guard let fileUrl = urlString else {
-                    print("❌ 업로드 실패: fileUrl 없음")
-                    // 실패 시 임시 말풍선 제거
-                    DispatchQueue.main.async {
-                        if let idx = self.messages.firstIndex(where: { $0.id == tempId }) {
-                            self.messages.remove(at: idx)
-                        }
-                    }
-                    return
-                }
-
-                // 3) 임시 메시지 업데이트 (fileUrl 채우기)
+                
                 DispatchQueue.main.async {
-                    if let idx = self.messages.firstIndex(where: { $0.id == tempId }) {
-                        let old = self.messages[idx]
-                        let new = Message(
-                            id: old.id,
-                            roomId: old.roomId,
-                            senderId: old.senderId,
-                            content: old.content,
-                            isRead: old.isRead,
-                            createdAt: old.createdAt,
-                            fileUrl: fileUrl,                 // <- 업로드된 URL
-                            fileType: "image/jpeg"            // 필요하면 유지/세팅
-                        )
-                        self.messages[idx] = new
-                        // 이어서 실제 소켓 전송
-                        let outbound = new
-                        SocketService.shared.sendMessage(outbound)
+                    if let urlString = urlString {
+                        // 🔥 성공: Base64를 실제 URL로 교체
+                        if let index = self.messages.firstIndex(where: { $0.id == tempId }) {
+                            let updatedMessage = Message(
+                                id: tempId,
+                                roomId: chatId,
+                                senderId: userId,
+                                content: "",
+                                isRead: false,
+                                createdAt: createdAt,
+                                fileUrl: urlString, // 실제 서버 URL
+                                fileType: mimeType
+                            )
+                            self.messages[index] = updatedMessage
+                            
+                            // 서버로 전송
+                            SocketService.shared.sendMessage(updatedMessage)
+                        }
+                    } else {
+                        // 🔥 실패: 임시 메시지 제거
+                        if let index = self.messages.firstIndex(where: { $0.id == tempId }) {
+                            self.messages.remove(at: index)
+                        }
                     }
                 }
             }
         }
     }
+
     
     func disconnect() {
+        print("👋 [VM] 소켓 연결 해제")
         SocketService.shared.disconnect()
+        currentRoomId = nil
     }
     
     func listenForMessageRead() {
@@ -187,12 +241,18 @@ class ChatViewModel: ObservableObject {
     }
     
     func onReceiveMessage() {
+        print("🎧 [VM] 메시지 리스너 설정 중...")
+        
         SocketService.shared.onReceiveMessage { [weak self] message in
-            print("📩 onReceiveMessage 수신됨: \(message.content)")
+            print("🚨🚨🚨 [VM] 메시지 받았다!!! \(message.content)")
+            
             DispatchQueue.main.async {
                 self?.messages.append(message)
+                print("✅ [VM] 현재 메시지 개수: \(self?.messages.count ?? 0)")
+                
+                // 🔥 강제 UI 업데이트
+                self?.objectWillChange.send()
             }
-            self?.markUnreadFromOthersAsRead(roomId: message.roomId)
         }
     }
 
@@ -311,5 +371,23 @@ class ChatViewModel: ObservableObject {
         let unreadFromOthers = messages.filter { $0.roomId == roomId && $0.senderId != myId && $0.isRead == false }
         guard let lastId = unreadFromOthers.map({ $0.id }).max() else { return }
         SocketService.shared.emitMessageRead(roomId: roomId, messageId: lastId)
+    }
+    
+    @MainActor
+    func fetchOCRList(userID: Int) async {        
+        do {
+            let ocrList = try await UserAPIManager.shared.getOCRList(userID: userID)
+            self.ocrList = ocrList
+            print("\(ocrList)")
+            self.errorMessage = nil
+        } catch {
+            print("ocrList 에러 발생:", error)
+            self.errorMessage = "OCR 목록을 불러오는데 실패했습니다: \(error.localizedDescription)"
+        }
+    }
+    
+    func clearMessages() {
+        messages.removeAll()
+        objectWillChange.send()
     }
 }

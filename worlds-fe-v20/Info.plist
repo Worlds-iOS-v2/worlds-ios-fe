@@ -14,6 +14,8 @@
 	<string>$(API_CRAWL_URL)</string>
 	<key>APIDeleteAccountURL</key>
 	<string>$(API_DELETE_ACCOUNT_URL)</string>
+	<key>APIEmailCodeURL</key>
+	<string>$(API_EMAIL_CODE_URL)</string>
 	<key>APIFindEmailURL</key>
 	<string>$(API_FIND_EMAIL_URL)</string>
 	<key>APILoginURL</key>
@@ -26,8 +28,14 @@
 	<string>$(API_OCR_SOLUTION_URL)</string>
 	<key>APIOCRURL</key>
 	<string>$(API_OCR_URL)</string>
+	<key>APIProfileImageURL</key>
+	<string>$(API_PROFILE_IMAGE_URL)</string>
 	<key>APISignupURL</key>
 	<string>$(API_SIGNUP_URL)</string>
+	<key>APIUserAttendanceListURL</key>
+	<string>$(API_ATTENDANCE_LIST_URL)</string>
+	<key>APIUserAttendanceURL</key>
+	<string>$(API_USER_ATTENDANCE_URL)</string>
 	<key>APIUserInfoURL</key>
 	<string>$(API_USER_INFO_URL)</string>
 	<key>CFBundleIconName</key>
@@ -37,5 +45,12 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>BMJUA.otf</string>
+		<string>PretendardVariable.ttf</string>
+	</array>
+	<key>UIUserInterfaceStyle</key>
+	<string>Light</string>
 </dict>
 </plist>

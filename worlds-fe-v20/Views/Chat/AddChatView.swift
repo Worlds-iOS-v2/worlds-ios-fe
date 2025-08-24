@@ -18,120 +18,123 @@ struct AddChatView: View {
     @State private var errorMessage: String? = nil
     @State private var activeChatRoom: ChatRoom?
     @State private var pendingChatRoom: ChatRoom?
+    
+    let onChatRoomCreated: ((ChatRoom) -> Void)?
 
+    var textColor: Color = .mainfontws
+    
     var body: some View {
         NavigationStack {
             VStack(spacing: 24) {
-            // 상단 바
-            HStack {
-                Button(action: { dismiss() }) {
-                    Image(systemName: "xmark")
-                        .font(.title3)
-                        .foregroundColor(.black)
-                }
-                Spacer()
-                Text("대화상대추가")
-                    .font(.headline)
-                    .foregroundColor(.black)
-                Spacer()
-                // 오른쪽 공간 확보용
-                Spacer().frame(width: 20)
-            }
-            .padding(.horizontal, 24)
-            .padding(.top, 24)
-
-            VStack(spacing: 8) {
-                Text("QR로 채팅 상대를 추가하세요")
-                    .font(.title3)
-                    .fontWeight(.bold)
-                Text("상대방의 QR 코드를 스캔하면\n자동으로 채팅방이 생성돼요.")
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(.gray)
-            }
-
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white)
-                .frame(width: 280, height: 280)
-                .shadow(radius: 4)
-                .overlay(
-                    Group {
-                        if let token = pairingToken, let qrImage = generateQRCode(from: token) {
-                            Image(uiImage: qrImage)
-                                .interpolation(.none)
-                                .resizable()
-                                .scaledToFit()
-                                .padding(20)
-                        } else {
-                            Text("QR 생성 준비 중…")
-                                .foregroundColor(.gray)
-                        }
+                // 상단 바
+                HStack {
+                    Button(action: { dismiss() }) {
+                        Image(systemName: "xmark")
+                            .font(.title3)
+                            .foregroundColor(.black)
                     }
-                )
+                    Spacer()
+                    Text("대화상대추가")
+                        .font(.pretendard(.bold, size: 20))
+                        .foregroundColor(textColor)
+                    
+                    Spacer()
+                    // 오른쪽 공간 확보용
+                    Spacer().frame(width: 20)
+                }
+                .padding(.horizontal, 24)
                 .padding(.top, 24)
-
-            Button(action: {
-                isShowingScanner = true
-            }) {
-                Text("QR 스캔하기")
-                    .fontWeight(.semibold)
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.blue)
-                    .cornerRadius(14)
-                    .shadow(color: .gray.opacity(0.3), radius: 4, x: 0, y: 3)
-            }
-            .padding(.horizontal, 24)
-            .padding(.top, 40)
-            .sheet(isPresented: $isShowingScanner, onDismiss: {
-                // 시트(스캐너)가 완전히 내려간 뒤에 네비게이션 푸시 수행
-                if let room = pendingChatRoom {
-                    self.activeChatRoom = room
-                    self.pendingChatRoom = nil
+                
+                VStack(spacing: 8) {
+                    Text("QR로 채팅 상대를 추가하세요")
+                        .font(.pretendard(.semiBold, size: 22))
+                        .foregroundColor(textColor)
+                    
+                    Text("상대방의 QR 코드를 스캔하면\n자동으로 채팅방이 생성돼요.")
+                        .font(.pretendard(.medium, size: 18))
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.gray)
                 }
-            }) {
-                QRCodeScannerView { token in
-                    // 스캔 성공 → claim 호출, 결과는 pending으로 보관
-                    SocketService.shared.claimPairing(token: token) { chatRoom in
-                        DispatchQueue.main.async {
-                            if let chatRoom = chatRoom {
-                                self.pendingChatRoom = chatRoom
+                
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.white)
+                    .frame(width: 280, height: 280)
+                    .shadow(radius: 4)
+                    .overlay(
+                        Group {
+                            if let token = pairingToken, let qrImage = generateQRCode(from: token) {
+                                Image(uiImage: qrImage)
+                                    .interpolation(.none)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .padding(20)
                             } else {
-                                self.errorMessage = "채팅방 생성에 실패했어요. 다시 시도해주세요."
-                                self.showAlert = true
+                                Text("QR 생성 준비 중…")
+                                    .font(.pretendard(.medium, size: 18))
+                                    .foregroundColor(.gray)
                             }
-                            // 시트 닫기 (닫힌 뒤 onDismiss에서 push)
-                            self.isShowingScanner = false
+                        }
+                    )
+                    .padding(.top, 24)
+                
+                Button(action: {
+                    isShowingScanner = true
+                }) {
+                    Text("QR 스캔하기")
+                        .font(.pretendard(.bold, size: 20))
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(.mainws)
+                        .cornerRadius(12)
+                        .shadow(color: .gray.opacity(0.3), radius: 4, x: 0, y: 3)
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 40)
+                .sheet(isPresented: $isShowingScanner) {
+                    QRCodeScannerView { token in
+                        SocketService.shared.claimPairing(token: token) { chatRoom in
+                            DispatchQueue.main.async {
+                                if let chatRoom = chatRoom {
+                                    print("[AddChat] 채팅방 생성 성공: \(chatRoom.id)")
+                                    self.isShowingScanner = false
+                                    
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                        self.onChatRoomCreated?(chatRoom)
+                                        self.dismiss()
+                                    }
+                                } else {
+                                    self.errorMessage = "채팅방 생성에 실패했어요. 다시 시도해주세요."
+                                    self.showAlert = true
+                                    self.isShowingScanner = false
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                Spacer()
+            }
+            .background(Color(red: 0.94, green: 0.96, blue: 1.0))
+            .ignoresSafeArea()
+            .onAppear {
+                SocketService.shared.createPairingToken { token, expiresAt in
+                    DispatchQueue.main.async {
+                        if let token = token {
+                            self.pairingToken = token
+                            self.pairingExpiresAt = expiresAt
+                        } else {
+                            self.errorMessage = "QR 생성에 실패했어요. 다시 시도해주세요."
+                            self.showAlert = true
                         }
                     }
                 }
             }
-
-            Spacer()
-        }
-        .background(Color(red: 0.94, green: 0.96, blue: 1.0))
-        .ignoresSafeArea()
-        .onAppear {
-            SocketService.shared.createPairingToken { token, expiresAt in
-                DispatchQueue.main.async {
-                    if let token = token {
-                        self.pairingToken = token
-                        self.pairingExpiresAt = expiresAt
-                    } else {
-                        self.errorMessage = "QR 생성에 실패했어요. 다시 시도해주세요."
-                        self.showAlert = true
-                    }
-                }
+            .alert(isPresented: $showAlert) {
+                Alert(title: Text("알림"),
+                      message: Text(errorMessage ?? "알 수 없는 오류가 발생했습니다."),
+                      dismissButton: .default(Text("확인")))
             }
-        }
-        .alert(isPresented: $showAlert) {
-            Alert(title: Text("알림"),
-                  message: Text(errorMessage ?? "알 수 없는 오류가 발생했습니다."),
-                  dismissButton: .default(Text("확인")))
-        }
-        .fullScreenCover(item: $activeChatRoom) { room in
-            ChatDetailView(chat: room)
-        }
         }
     }
 
@@ -170,5 +173,5 @@ struct AddChatView: View {
 }
 
 #Preview {
-    AddChatView()
+   // AddChatView()
 }

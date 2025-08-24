@@ -11,34 +11,34 @@ struct CommonSignUpTextField: View {
     var title: String = ""
     var placeholder: String = ""
     var isSecure: Bool = false
+    var textColor: Color = .mainfontws
 
     @Binding var content: String
     
     var body: some View {
         VStack(alignment: .leading) {
             Text("\(title)")
-                .foregroundStyle(Color.gray)
-                .font(.system(size: 20))
-                .fontWeight(.semibold)
+                .foregroundStyle(textColor)
+                .font(.pretendard(.semiBold, size: 22))
             
             if isSecure {
                 SecureField("\(placeholder)", text: $content)
-                    .foregroundStyle(Color.gray)
-                    .font(.system(size: 20))
+                    .foregroundStyle(textColor)
+                    .font(.pretendard(.medium, size: 22))
                     .frame(height: 60)
                     .padding(.horizontal, 14)
                     .background(Color.white)
-                    .cornerRadius(16)
+                    .cornerRadius(12)
 
             } else {
                 TextField("\(placeholder)", text: $content)
                     .textInputAutocapitalization(.never) // 자동 대문자처리 해제
-                    .foregroundStyle(Color.gray)
-                    .font(.system(size: 20))
+                    .foregroundStyle(textColor)
+                    .font(.pretendard(.medium, size: 22))
                     .frame(height: 60)
                     .padding(.horizontal, 14)
                     .background(Color.white)
-                    .cornerRadius(16)
+                    .cornerRadius(12)
             }
         }
     }

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		9F25395A2E17C57600B526A5 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
+		B348B8BF2E537382005F91C3 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = B348B8BE2E537382005F91C3 /* Kingfisher */; };
 		B3A398032E308E9600FC2798 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = B3A398022E308E9600FC2798 /* Alamofire */; };
 		CCECCA652E49CA7F00E73684 /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = CCECCA642E49CA7F00E73684 /* SocketIO */; };
 /* End PBXBuildFile section */
@@ -42,6 +43,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B348B8BF2E537382005F91C3 /* Kingfisher in Frameworks */,
 				9F25395A2E17C57600B526A5 /* (null) in Frameworks */,
 				B3A398032E308E9600FC2798 /* Alamofire in Frameworks */,
 				CCECCA652E49CA7F00E73684 /* SocketIO in Frameworks */,
@@ -89,6 +91,7 @@
 			packageProductDependencies = (
 				B3A398022E308E9600FC2798 /* Alamofire */,
 				CCECCA642E49CA7F00E73684 /* SocketIO */,
+				B348B8BE2E537382005F91C3 /* Kingfisher */,
 			);
 			productName = "worlds-fe-v20";
 			productReference = 9F2539392E17C53900B526A5 /* worlds-fe-v20.app */;
@@ -121,6 +124,7 @@
 			packageReferences = (
 				B3A398012E308E9600FC2798 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				CCECCA632E49CA7F00E73684 /* XCRemoteSwiftPackageReference "socket.io-client-swift" */,
+				B348B8BD2E537382005F91C3 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9F25393A2E17C53900B526A5 /* Products */;
@@ -297,14 +301,14 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.0.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.kibwa.worlds-fe-v20";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -334,14 +338,14 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.0.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.kibwa.worlds-fe-v20";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -374,6 +378,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		B348B8BD2E537382005F91C3 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.5.0;
+			};
+		};
 		B3A398012E308E9600FC2798 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Alamofire/Alamofire";
@@ -393,6 +405,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		B348B8BE2E537382005F91C3 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B348B8BD2E537382005F91C3 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
 		B3A398022E308E9600FC2798 /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = B3A398012E308E9600FC2798 /* XCRemoteSwiftPackageReference "Alamofire" */;

@@ -11,7 +11,7 @@ protocol CultureDisplayable {
     var title: String { get }
     var applicationPeriod: String { get }
     var programPeriod: String { get }
-    var location: String { get }
+    var borough: String { get }
     var url: String { get }
 }
 
@@ -20,6 +20,8 @@ struct CultureSlideView<T: CultureDisplayable>: View {
     let isLoading: Bool
     /// 현재 인덱스 저장
     @State private var currentIndex = 0
+    
+    var textColor: Color = .mainfontws
 
     // MARK: - body
     var body: some View {
@@ -31,35 +33,35 @@ struct CultureSlideView<T: CultureDisplayable>: View {
                     VStack(alignment: .leading) {
                         HStack {
                             Text(isLoading ? "로딩 중..." : "데이터 없음")
-                                .font(.headline)
-                                .foregroundColor(.black)
+                                .font(.pretendard(.regular, size: 20))
+                                .foregroundColor(textColor)
 
                             Spacer()
 
                             Text("")
-                                .font(.caption)
-                                .foregroundColor(.black)
+                                .font(.pretendard(.regular, size: 14))
+                                .foregroundColor(textColor)
                         }
                         .padding(.bottom, 12)
 
                         Text("신청 기간: \(isLoading ? "로딩 중..." : "데이터 없음")")
-                            .font(.caption)
-                            .foregroundColor(.gray)
+                            .font(.pretendard(.regular, size: 14))
+                            .foregroundColor(textColor)
                             .padding(.bottom, 4)
 
                         Text("활동 기간: \(isLoading ? "로딩 중..." : "데이터 없음")")
-                            .font(.caption)
-                            .foregroundColor(.gray)
+                            .font(.pretendard(.regular, size: 14))
+                            .foregroundColor(textColor)
                     }
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background {
                     Rectangle()
-                        .fill(Color.backgroundws)
+                        .fill(Color.white)
                 }
                 .ignoresSafeArea()
-                .cornerRadius(16)
+                .cornerRadius(12)
                 .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
             } else {
                 InfinitePageBaseView(
@@ -69,26 +71,26 @@ struct CultureSlideView<T: CultureDisplayable>: View {
                     view: { index in
                         Link(destination: URL(string: datas[index].url)!) {
                             VStack(alignment: .leading) {
-                                HStack {
-                                    Text(datas[index].title)
-                                        .font(.headline)
-                                        .foregroundColor(.black)
-
-                                    Spacer()
-
-                                    Text(datas[index].location)
-                                        .font(.caption)
-                                        .foregroundColor(.black)
-                                }
-                                .padding(.bottom, 12)
-
+                                Text(datas[index].borough)
+                                    .font(.pretendard(.bold, size: 16))
+                                    .foregroundColor(.subfontws)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.bottom, 8)
+                                
+                                Text(datas[index].title)
+                                    .font(.pretendard(.semiBold, size: 20))
+                                    .foregroundColor(textColor)
+                                    .lineLimit(1)
+                                    .padding(.bottom, 8)
+                                
+                                
                                 Text("신청 기간: \(datas[index].applicationPeriod)")
-                                    .font(.caption)
+                                    .font(.pretendard(.medium, size: 14))
                                     .foregroundColor(.gray)
                                     .padding(.bottom, 4)
-
+                                
                                 Text("활동 기간: \(datas[index].programPeriod)")
-                                    .font(.caption)
+                                    .font(.pretendard(.medium, size: 14))
                                     .foregroundColor(.gray)
                             }
                         }
@@ -96,11 +98,11 @@ struct CultureSlideView<T: CultureDisplayable>: View {
                         .padding()
                         .background {
                             Rectangle()
-                                .fill(Color.backgroundws)
+                                .fill(Color.white)
                                 .tag(index)
                         }
                         .ignoresSafeArea()
-                        .cornerRadius(16)
+                        .cornerRadius(12)
                     }
                 )
                 // 인덱스 변화
@@ -132,21 +134,20 @@ extension CultureSlideView {
     private func imageCustomIndicator() -> some View {
         ZStack {
             if datas.count > 1 {
-                HStack(spacing: 4) {
+                HStack(spacing: 6) {
                     ForEach(datas.indices, id: \.self) { index in
                         Capsule()
-                            .stroke(.sub1Ws, lineWidth: 1)
-                            .frame(
-                                width: currentIndex == index ? 16 : 6, height: 6
+                            .fill(currentIndex == index ? Color.mainws : Color.mainfontws)
+                            .frame(width: currentIndex == index ? 16 : 6, height: 6)
+                            .overlay(
+                                Capsule()
+                                    .stroke(Color.sub1Ws, lineWidth: 1)
                             )
                             .opacity(currentIndex == index ? 1 : 0.5)
-                            .background(
-                                currentIndex == index ? .sub1Ws : .backgroundws)
                     }
                 }  // H
                 .padding(.bottom, 24)
             }  // if
         }  // Z
     }
-
 }

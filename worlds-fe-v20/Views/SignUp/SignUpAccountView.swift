@@ -15,35 +15,101 @@ struct SignUpAccountView: View {
     @State var email: String = ""
     @State var password: String = ""
     @State var passwordCheck: String = ""
+    @State var verifyCode: String = "" // 인증번호
+    
+    @State var showEmailCheckAlert = false
+    @State var emailCheckAlertMessage = ""
+    
+    @State var showEmailVerifyCodeAlert = false
+    @State var emailVerifyCodeAlertMessage = ""
+    
+    @State var isSuceed: Bool = false
+    @State var verifyCodeSent: Bool = false // 인증번호 전송 여부
+    @State var verifyCodeConfirmed: Bool = false // 인증번호 인증 여부
     
     var isFilled: Bool {
         !email.isEmpty &&
         isValidEmail(email) &&
         !password.isEmpty &&
         !passwordCheck.isEmpty &&
-        password == passwordCheck
+        password == passwordCheck &&
+        verifyCodeConfirmed == true
     }
-    // var isFilled = true
-    @State var isSuceed: Bool = false
+    
+    var textColor: Color = .mainfontws
     
     @EnvironmentObject var viewModel: SignUpViewModel
     
     var body: some View {
-        VStack {
+        ScrollView {
             VStack(alignment: .leading) {
                 Text("로그인 정보를 입력해주세요.")
-                    .font(.system(size: 27, weight: .bold))
+                    .font(.pretendard(.bold, size: 27))
+                    .foregroundColor(textColor)
                     .padding(.top, 40)
                 
                 CommonSignUpTextField(title: "이메일", placeholder: "이메일을 입력해주세요", content: $email)
                     .keyboardType(.emailAddress)
                     .padding(.top, 40)
                 
-                if !email.isEmpty && !isValidEmail(email) {
-                    Text("올바른 이메일 형식이 아닙니다.")
-                        .foregroundColor(.red)
-                        .font(.caption)
+                HStack {
+                    if !email.isEmpty && !isValidEmail(email) {
+                        Text("올바른 이메일 형식이 아닙니다.")
+                            .foregroundColor(.red)
+                            .font(.pretendard(.medium, size: 16))
+                    }
+                    
+                    Spacer()
+                    
+                    Button {
+                        Task {
+                            viewModel.email = email
+                            
+                            let succeed = await viewModel.checkEmail()
+                            
+                            if succeed {
+                                verifyCodeSent = true
+                                emailCheckAlertMessage = "인증번호를 전송했습니다."
+                            } else {
+                                emailCheckAlertMessage = viewModel.errorMessage ?? "알 수 없는 오류가 발생했습니다."
+                            }
+                            
+                            showEmailCheckAlert = true
+                        }
+                    } label: {
+                        Text("인증번호 전송")
+                            .foregroundColor(.mainws)
+                            .font(.pretendard(.semiBold, size: 16))
+                    }
+                    .alert(emailCheckAlertMessage, isPresented: $showEmailCheckAlert) {
+                        Button("확인", role: .cancel) { }
+                    }
                 }
+                
+                HStack(alignment: .bottom) {
+                    CommonSignUpTextField(title: "이메일 인증", placeholder: "인증번호", content: $verifyCode)
+                        .keyboardType(.numberPad)
+                    
+                    CommonSignUpButton(text: "인증", isFilled: verifyCodeSent) {
+                        Task {
+                            let succeed = await viewModel.verifyEmailCode(email: email, code: verifyCode)
+                            
+                            if succeed {
+                                verifyCodeConfirmed = true
+                                emailVerifyCodeAlertMessage = "인증 성공했습니다."
+                            } else {
+                                emailVerifyCodeAlertMessage = viewModel.errorMessage ?? "알 수 없는 오류가 발생했습니다."
+                            }
+                            
+                            showEmailVerifyCodeAlert = true
+                        }
+                    }
+                    .frame(width: 120)
+                    .alert(emailVerifyCodeAlertMessage, isPresented: $showEmailVerifyCodeAlert) {
+                        Button("확인", role: .cancel) { }
+                    }
+                }
+                .padding(.top, 40)
                 
                 CommonSignUpTextField(title: "비밀번호", placeholder: "비밀번호를 입력해주세요", isSecure: true, content: $password)
                     .padding(.top, 40)
@@ -51,7 +117,7 @@ struct SignUpAccountView: View {
                 if !password.isEmpty && !isValidPassword(password) {
                     Text("비밀번호는 영문, 숫자, 특수문자 중 2가지 이상 조합으로 8~16자여야 합니다.")
                         .foregroundColor(.red)
-                        .font(.caption)
+                        .font(.pretendard(.medium, size: 16))
                 }
                 
                 CommonSignUpTextField(title: "비밀번호 확인", placeholder: "비밀번호를 한 번 더 입력해주세요.", isSecure: true, content: $passwordCheck)
@@ -60,7 +126,7 @@ struct SignUpAccountView: View {
                 if !passwordCheck.isEmpty && password != passwordCheck {
                     Text("비밀번호가 일치하지 않습니다.")
                         .foregroundColor(.red)
-                        .font(.caption)
+                        .font(.pretendard(.medium, size: 16))
                 }
                 
                 Spacer()
@@ -84,12 +150,13 @@ struct SignUpAccountView: View {
                 appState.flow = .login
             } label: {
                 Text("로그인 하기")
-                    .foregroundStyle(Color.gray)
-                    .font(.system(size: 14))
+                    .foregroundStyle(.subfontws)
+                    .font(.pretendard(.semiBold, size: 16))
             }
         }
+        .scrollIndicators(.hidden)
         .padding()
-        .background(.backgroundws)
+        .background(.background1Ws)
         .navigationTitle("회원가입")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)

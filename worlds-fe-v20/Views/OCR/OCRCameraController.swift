@@ -30,7 +30,7 @@ class OCRCameraController: UIViewController, AVCapturePhotoCaptureDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .backgroundws
+        view.backgroundColor = .background2Ws
         setupPreviewLayer()
         configureCaptureSession(position: cameraPosition)
 
@@ -240,15 +240,13 @@ class OCRCameraController: UIViewController, AVCapturePhotoCaptureDelegate {
 // SwiftUI에서 카메라 컨트롤러를 사용할 수 있게 하는 래퍼
 struct CameraPreview: UIViewControllerRepresentable {
     @Binding var cameraPosition: AVCaptureDevice.Position
-    @Binding var cameraController: OCRCameraController?
+    @Binding var cameraController: OCRCameraController
     var onPhotoCaptured: (UIImage?) -> Void
     
     func makeUIViewController(context: Context) -> OCRCameraController {
-        let controller = OCRCameraController()
-        controller.delegate = context.coordinator
-        controller.configureCaptureSession(position: cameraPosition)
-        cameraController = controller
-        return controller
+        cameraController.delegate = context.coordinator
+        cameraController.configureCaptureSession(position: cameraPosition)
+        return cameraController
     }
     
     func updateUIViewController(_ uiViewController: OCRCameraController, context: Context) {

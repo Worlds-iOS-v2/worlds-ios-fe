@@ -88,14 +88,15 @@ struct OCRImageResizingView: View {
                 }
             } label: {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 10)
+                    RoundedRectangle(cornerRadius: 12)
                         .fill(Color.mainws)
                         .frame(height: 60)
                         .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
                     
                     HStack {
                         Image(systemName: "text.viewfinder")
-                        Text("OCR 실행")
+                        Text("번역하기")
+                            .font(.pretendard(.bold, size: 24))
                     }
                     .font(.system(size: 20, weight: .bold))
                     .foregroundStyle(.white)

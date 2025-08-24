@@ -12,16 +12,18 @@ struct DeleteAccountView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) var dismiss
     
+    var textColor: Color = .mainfontws
+    
     var body: some View {
         VStack {
             Text("탈퇴 하시겠습니까?")
-                .font(.system(size: 32, weight: .bold))
-                .foregroundStyle(.black)
+                .font(.pretendard(.bold, size: 30))
+                .foregroundStyle(textColor)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
             
             Text("탈퇴할 경우, 모든 데이터는 삭제되며 다시 복구되지 않습니다.")
-                .font(.system(size: 20))
+                .font(.pretendard(.medium, size: 22))
                 .foregroundStyle(.gray)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
@@ -35,7 +37,7 @@ struct DeleteAccountView: View {
                 }
             } label: {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 10)
+                    RoundedRectangle(cornerRadius: 12)
                         .fill(Color.red)
                         .frame(height: 60)
                         .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
@@ -43,7 +45,7 @@ struct DeleteAccountView: View {
                     HStack {
                         Text("회원탈퇴")
                     }
-                    .font(.system(size: 20, weight: .bold))
+                    .font(.pretendard(.bold, size: 24))
                     .foregroundStyle(.white)
                 }
             }

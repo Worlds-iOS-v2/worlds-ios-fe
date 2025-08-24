@@ -13,32 +13,34 @@ struct AttendanceRowView: View {
     let isToday: Bool
     
     var body: some View {
-        VStack(spacing: 16) {
-            if isToday {
-                ZStack {
-                    Circle()
-                        .fill(Color.gray.opacity(0.3))
-                        .frame(width: 40, height: 40)
-                    
+            VStack(spacing: 16) {
+                if isToday {
+                    ZStack {
+                        Circle()
+                            .fill(.mainws.opacity(0.2))
+                            .frame(width: 40, height: 40)
+                        
+                        Text(getWeekdayString(for: weekday))
+                            .font(.pretendard(.bold, size: 16))
+                            .foregroundColor(.mainfontws)
+                    }
+                } else {
                     Text(getWeekdayString(for: weekday))
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(.black)
+                        .font(.pretendard(.medium, size: 16))
+                        .foregroundColor(.mainfontws)
+                        .frame(width: 40, height: 40)
                 }
-            } else {
-                Text(getWeekdayString(for: weekday))
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(.black)
-                    .frame(width: 40, height: 40)
+                
+                if isAttended {
+                    Image("bookws")
+                        .font(.system(size: 20))
+                        .frame(width: 20, height: 20)
+                } else {
+                    Rectangle()
+                        .fill(.clear)
+                        .frame(width: 20, height: 20)
+                }
             }
-            
-            if isAttended {
-                Text("📚")
-                    .font(.system(size: 20))
-            }
-        }
-        .onAppear {
-          //  print("Weekday: \(weekday), isToday: \(isToday), Current weekday: \(Calendar.current.component(.weekday, from: Date()))")
-        }
     }
     
     // 사용자 언어 설정에 따라 요일 문자열 반환

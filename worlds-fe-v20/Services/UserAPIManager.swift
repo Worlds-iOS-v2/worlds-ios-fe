@@ -6,9 +6,23 @@
 //
 
 // User CRUD 관련 API 코드 => 충돌 날까봐 따로 코드 작성 / 추후 APIService에 합칠 것임
+
 import Foundation
 import Alamofire
 import UIKit
+
+struct ProfileImageRequest: Encodable {
+    let image: Int   // 1~4
+}
+
+struct ProfileImageResponse: Decodable {
+    let message: String?
+    let error: String?
+    let statusCode: Int?
+    let profileImage: String?
+    let profileImageUrl: String?
+    let path: String?
+}
 
 enum UserAPIError: Error, LocalizedError {
     case missingToken
@@ -59,7 +73,7 @@ class UserAPIManager {
     }
     
     // 회원가입
-    func signUp(name: String, email: String, password: String, birth: String, isMentor: Bool, mentorCode: String?) async throws -> APIResponse {
+    func signUp(name: String, email: String, password: String, birth: String, isMentor: Bool) async throws -> APIResponse {
         guard let endPoint = Bundle.main.object(forInfoDictionaryKey: "APISignupURL") as? String else {
             print("URL이 존재하지 않습니다.")
             throw UserAPIError.invalidEndPoint
@@ -77,7 +91,6 @@ class UserAPIManager {
             "userName": name,
             "userBirth": birth,
             "isMentor": isMentor,
-            "mentorCode": mentorCode,
             "targetLanguage": targetLanguage
         ]
         
@@ -190,6 +203,132 @@ class UserAPIManager {
         }
     }
     
+    // 프로필 이미지 설정
+    func updateProfileImage(imageNumber: Int) async throws -> APIResponse {
+        guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
+            print("토큰 값이 유효하지 않습니다.")
+            throw UserAPIError.invalidToken
+        }
+        
+        guard let endPoint = Bundle.main.object(forInfoDictionaryKey: "APIProfileImageURL") as? String else {
+            throw UserAPIError.invalidEndPoint
+        }
+                                
+        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
+        
+        let parameters: [String: Any] = [
+            "image": imageNumber
+        ]
+              
+        let response = try await AF.request(endPoint, method: .post, parameters: parameters, headers: headers)
+            .serializingDecodable(APIResponse.self)
+            .value
+        
+        return response
+    }
+
+    func attendanceCheck() async throws -> APIResponse {
+        guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
+            print("토큰 값이 유효하지 않습니다.")
+            throw UserAPIError.invalidToken
+        }
+                
+        guard let endPoint = Bundle.main.object(forInfoDictionaryKey: "APIUserAttendanceURL") as? String else {
+            throw UserAPIError.invalidEndPoint
+        }
+                
+        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
+        
+        let dataResponse = await AF.request(endPoint, method: .post, encoding: JSONEncoding.default, headers: headers)
+            .validate()
+            .serializingData()
+            .response
+                
+        switch dataResponse.result {
+        case .success(let data):
+            do {
+                let response = try JSONDecoder().decode(APIResponse.self, from: data)
+                print("출석체크 정보: \(response)")
+
+                return response
+            } catch {
+                print("디코딩 에러: \(error.localizedDescription)")
+                
+                if let rawJSON = String(data: data, encoding: .utf8) {
+                     print("출석체크 원본 JSON 응답:\n\(rawJSON)")
+                }
+                
+                throw UserAPIError.decodingError(description: "디코딩 실패: \(error)")
+            }
+            
+        case .failure:
+            if let rawData = dataResponse.data,
+               let rawString = String(data: rawData, encoding: .utf8) {
+                print("출석체크 서버 원본 응답: \(rawString)")
+                
+                // 서버 에러 응답 파싱 시도
+                let errorResponse = try JSONDecoder().decode(APIErrorResponse.self, from: rawData)
+                print("출석체크 파싱된 에러 응답: \(errorResponse)")
+                
+                let errorMessage = errorResponse.message[0]
+                throw UserAPIError.serverError(message: errorMessage)
+            } else {
+                throw UserAPIError.serverError(message: "출석체크 서버 응답 파싱 실패")
+            }
+        }
+    }
+    
+    func getAttendanceList() async throws -> APIResponse {
+        guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
+            print("토큰 값이 유효하지 않습니다.")
+            throw UserAPIError.invalidToken
+        }
+                
+        guard let endPoint = Bundle.main.object(forInfoDictionaryKey: "APIUserAttendanceListURL") as? String else {
+            throw UserAPIError.invalidEndPoint
+        }
+                
+        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
+        
+        let dataResponse = await AF.request(endPoint, method: .get, encoding: JSONEncoding.default, headers: headers)
+            .validate()
+            .serializingData()
+            .response
+                
+        switch dataResponse.result {
+        case .success(let data):
+            do {
+                let response = try JSONDecoder().decode(APIResponse.self, from: data)
+                // print("출석체크 정보: \(response)")
+
+                return response
+            } catch {
+                print("디코딩 에러: \(error.localizedDescription)")
+                
+                if let rawJSON = String(data: data, encoding: .utf8) {
+                     print("출석체크 원본 JSON 응답:\n\(rawJSON)")
+                }
+                
+                throw UserAPIError.decodingError(description: "디코딩 실패: \(error)")
+            }
+            
+        case .failure:
+            if let rawData = dataResponse.data,
+               let rawString = String(data: rawData, encoding: .utf8) {
+                print("출석체크 서버 원본 응답: \(rawString)")
+                
+                // 서버 에러 응답 파싱 시도
+                let errorResponse = try JSONDecoder().decode(APIErrorResponse.self, from: rawData)
+                print("출석체크 파싱된 에러 응답: \(errorResponse)")
+                
+                let errorMessage = errorResponse.message[0]
+                throw UserAPIError.serverError(message: errorMessage)
+            } else {
+                throw UserAPIError.serverError(message: "출석체크 서버 응답 파싱 실패")
+            }
+        }
+    }
+    
     // 이메일 중복 체크
     func emailCheck(email: String) async throws -> APIResponse {
         guard let endPoint = Bundle.main.object(forInfoDictionaryKey: "APICheckEmailURL") as? String else {
@@ -220,21 +359,57 @@ class UserAPIManager {
         case .failure:
             if let rawData = dataResponse.data,
                let rawString = String(data: rawData, encoding: .utf8) {
-                print("이메일 체크 서버 원본 응답: \(rawString)")
+                // 서버 에러 응답 파싱 시도
+                let errorResponse = try JSONDecoder().decode(APIErrorResponse.self, from: rawData)
+                print("이메일 중복 파싱된 에러 응답: \(errorResponse)")
                 
-                do {
-                    let errorResponse = try JSONDecoder().decode(APIErrorResponse.self, from: rawData)
-                    print("이메일 체크 파싱된 에러 응답: \(errorResponse)")
-                    
-                    var errorMessage = errorResponse.error
-                    
-                    throw UserAPIError.serverError(message: errorMessage)
-                } catch {
-                    print("이메일 체크 에러 응답 파싱 실패: \(error)")
-                    throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
-                }
+                let errorMessage = errorResponse.message[0]
+                throw UserAPIError.serverError(message: errorMessage)
             } else {
-                throw UserAPIError.serverError(message: "서버 응답 파싱 실패")
+                throw UserAPIError.serverError(message: "이메일 중복 서버 응답 파싱 실패")
+            }
+        }
+    }
+    
+    // 이메일 코드 체크
+    func emailVerifyCode(email: String, verifyCode: String) async throws -> APIResponse {
+        guard let endPoint = Bundle.main.object(forInfoDictionaryKey: "APIEmailCodeURL") as? String else {
+            throw UserAPIError.invalidEndPoint
+        }
+        
+        let parameters: [String: Any] = [
+            "email": email,
+            "verificationCode": verifyCode
+        ]
+        
+        let dataResponse = await AF.request(endPoint, method: .post, parameters: parameters)
+            .validate()
+            .serializingData()
+            .response
+        
+        switch dataResponse.result {
+        case .success(let data):
+            do {
+                let response = try JSONDecoder().decode(APIResponse.self, from: data)
+                
+                print("이메일 코드 정보: \(response)")
+                
+                return response
+            } catch {
+                throw UserAPIError.decodingError(description: "User 디코딩 실패: \(error)")
+            }
+            
+        case .failure:
+            if let rawData = dataResponse.data,
+               let rawString = String(data: rawData, encoding: .utf8) {
+                // 서버 에러 응답 파싱 시도
+                let errorResponse = try JSONDecoder().decode(APIErrorResponse.self, from: rawData)
+                print("이메일 중복 파싱된 에러 응답: \(errorResponse)")
+                
+                let errorMessage = errorResponse.message[0]
+                throw UserAPIError.serverError(message: errorMessage)
+            } else {
+                throw UserAPIError.serverError(message: "이메일 중복 서버 응답 파싱 실패")
             }
         }
     }
@@ -292,7 +467,7 @@ class UserAPIManager {
         
         let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
         
-        let dataResponse = await AF.request(endPoint, method: .get, headers: headers)
+        let dataResponse = await AF.request(endPoint, method: .post, headers: headers)
             .validate()
             .serializingData()
             .response
@@ -620,6 +795,27 @@ class UserAPIManager {
         return response
     }
     
+    func getOCRList(userID: Int) async throws -> [OCRList] {
+        guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
+            print("토큰 값이 유효하지 않습니다.")
+            throw UserAPIError.invalidToken
+        }
+        
+        guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "APIOCRURL") as? String else {
+            throw UserAPIError.invalidEndPoint
+        }
+        
+        let endPoint = "\(baseURL)/\(userID)"
+                
+        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
+              
+        let response = try await AF.request(endPoint, method: .get, headers: headers)
+            .serializingDecodable([OCRList].self)
+            .value
+        
+        return response
+    }
+    
     func getCultureInfo() async throws -> CultureInfo {
         guard let token = UserDefaults.standard.string(forKey: "accessToken") else {
             print("토큰 값이 유효하지 않습니다.")
@@ -667,32 +863,13 @@ class UserAPIManager {
     }
 }
 
+// MARK: - UserAPIManager Extension 수정
 extension UserAPIManager {
     func getTargetLanguage() -> String {
-        let preferredLanguage = Locale.preferredLanguages.first ?? "en" //ko-KR
-        let languageCode = preferredLanguage.components(separatedBy: "-").first ?? "en" //ko만 출력
-        
-        // 서버에서 요구하는 형태로 매핑
-        // ko로 바꿔서 주게 해주기 . . . . !!!!
-//        switch languageCode.lowercased() {
-//        case "ko":
-//            return "Korean"
-//        case "en":
-//            return "English"
-//        case "vi":
-//            return "Vietnam"
-//        case "ja":
-//            return "Japanese"
-//        case "zh":
-//            return "Chinese"
-//        case "es":
-//            return "Spanish"
-//        case "fr":
-//            return "French"
-//        default:
-//            return "English" // 기본값
-//        }
-        
-        return languageCode.lowercased()
+        return SupportedLanguage.getCurrentLanguageCode()
+    }
+    
+    func getTargetLanguageName() -> String {
+        return SupportedLanguage.getCurrentLanguageName()
     }
 }

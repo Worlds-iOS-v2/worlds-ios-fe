@@ -1,0 +1,206 @@
+//
+//  CreateQuestionView.swift
+//  worlds-fe-v20
+//
+//  Created by 이서하 on 7/8/25.
+//
+
+import SwiftUI
+
+struct CreateQuestionView: View {
+    @Binding var title: String
+    @Binding var content: String
+    @Binding var isPresented: Bool
+    @Binding var isCreating: Bool
+    @Binding var errorMessage: String?
+    @Environment(\.presentationMode) var presentationMode
+    @State private var isShowingImagePicker = false
+    @State private var selectedImages: [UIImage] = []
+    @State private var imagePickerSourceType: UIImagePickerController.SourceType = .photoLibrary
+
+    @State private var selectedCategory: Category? = nil
+    
+    // 초기값 설정을 위한 파라미터
+    var initialImages: [UIImage] = []
+    var initialCategory: Category? = nil
+
+    var onSubmit: (_ images: [UIImage], _ category: String) -> Void
+
+    var body: some View {
+        NavigationView {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 14) {
+                Spacer().frame(height: 15)
+
+                // 카테고리 선택
+                Menu {
+                    ForEach([Category.study, Category.free], id: \.self) { category in
+                        Button(category.displayName) {
+                            selectedCategory = category
+                        }
+                    }
+                } label: {
+                    HStack {
+                        Text(selectedCategory?.displayName ?? "게시판 선택")
+                            .font(.pretendard(.semiBold, size: 16))
+                            .foregroundColor(.gray)
+                        
+                        Image(systemName: "chevron.down")
+                            .foregroundColor(.gray)
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 6)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color(.systemGray4), lineWidth: 1)
+                    )
+                }
+                .padding(.horizontal, 4)
+
+                // 제목 입력
+                TextField("제목", text: $title)
+                    .padding(13)
+                    .background(Color.white)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.mainws, lineWidth: 1)
+                    )
+                    .font(.pretendard(.semiBold, size: 20))
+                    .padding(.horizontal, 4)
+
+                // 내용 입력
+                ZStack(alignment: .topLeading) {
+                    if content.isEmpty {
+                        Text("내용")
+                            .font(.pretendard(.medium, size: 18))
+                            .foregroundColor(Color(.systemGray3))
+                            .padding(.top, 13)
+                            .padding(.leading, 17)
+                    }
+                    
+                    TextEditor(text: $content)
+                        .padding(8)
+                        .background(Color.white)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.mainws, lineWidth: 1)
+                        )
+                        .font(.pretendard(.medium, size: 18))
+                        .frame(height: 370)
+                }
+                .padding(.horizontal, 4)
+
+                // 이미지 선택 영역
+                HStack {
+                    Button {
+                        imagePickerSourceType = .photoLibrary
+                        isShowingImagePicker = true
+                    } label: {
+                        VStack(spacing: 2) {
+                            Image(systemName: "photo.on.rectangle.angled")
+                                .resizable()
+                                .frame(width: 32, height: 28)
+                                .foregroundColor(Color(.systemGray))
+                            Text("\(selectedImages.count)/3")
+                                .font(.pretendard(.medium, size: 12))
+                                .foregroundColor(.gray)
+                        }
+                        .frame(width: 60, height: 48)
+                        .background(Color.white)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color.mainws, lineWidth: 1.2)
+                        )
+                    }
+
+                    if !selectedImages.isEmpty {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack {
+                                ForEach(selectedImages, id: \.self) { image in
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 100, height: 100)
+                                        .clipped()
+                                        .cornerRadius(8)
+                                }
+                            }
+                            .padding(.leading, 30)
+                        }
+                    }
+
+                    Spacer()
+                }
+                .padding(.top, 4)
+                .padding(.horizontal, 4)
+
+                Spacer()
+                   
+                // 등록 버튼
+                Button {
+                    guard let selected = selectedCategory else {
+                        errorMessage = "카테고리 선택은 필수입니다."
+                        return
+                    }
+                    for (index, image) in selectedImages.enumerated() {
+                    }
+                    
+                    onSubmit(selectedImages, selected.rawValue)
+                } label: {
+                    Text("등록")
+                        .font(.pretendard(.bold, size: 24))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity, minHeight: 60)
+                        .background(Color.mainws)
+                        .cornerRadius(12)
+                }
+                .padding(.bottom, 18)
+                .padding(.horizontal, 4)
+                }
+            } // ScrollView 끗
+            .scrollIndicators(.hidden)
+            .onTapGesture {
+                UIApplication.shared.endEditing()
+            }
+            
+            .padding(.horizontal, 20)
+            .navigationTitle("질문하기")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+
+                    Button {
+                        presentationMode.wrappedValue.dismiss()
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(.black)
+                            .font(.system(size: 20, weight: .medium))
+                    }
+                }
+            }
+            .sheet(isPresented: $isShowingImagePicker) {
+                if imagePickerSourceType == .camera {
+                    CameraPickerView(selectedImages: $selectedImages)
+                } else {
+                    ImagePickerView(selectedImages: $selectedImages)
+                }
+            }
+            .onAppear {
+                if !initialImages.isEmpty {
+                    selectedImages = initialImages
+                }
+                if let initialCategory = initialCategory {
+                    selectedCategory = initialCategory
+                }
+            }
+            .onDisappear {
+                title = ""
+                content = ""
+                selectedImages = []
+                selectedCategory = nil
+            }
+        }
+    }
+}

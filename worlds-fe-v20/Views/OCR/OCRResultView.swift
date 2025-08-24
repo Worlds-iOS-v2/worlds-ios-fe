@@ -12,9 +12,9 @@ import UIKit
 struct OCRResultView: View {
     // 선택된(크롭된) 이미지
     let selectedImage: UIImage
-    @State private var showingSummaryView = false
+    @State private var showingSummaryModalView = false
     @State private var showingCreateQuestionView = false
-    
+        
     @State private var newQuestionTitle = ""
     @State private var newQuestionContent = ""
     @State private var isCreatingQuestion = false
@@ -27,13 +27,16 @@ struct OCRResultView: View {
     // 공유 OCRViewModel 사용
     @EnvironmentObject private var viewModel: OCRViewModel
     
+    var textColor: Color = .mainfontws
+    let translatedLanguage: String = SupportedLanguage.getCurrentLanguageName()
+    
     var body: some View {
         ZStack {
             VStack(spacing: 20) {
                 HStack(spacing: 15) {
                     Text("한국어")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.black)
+                        .font(.pretendard(.bold, size: 18))
+                        .foregroundColor(textColor)
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(.sub2Ws)
@@ -46,9 +49,9 @@ struct OCRResultView: View {
                         .foregroundColor(.sub2Ws)
                         .padding()
                     
-                    Text("영어")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.black)
+                    Text("\(translatedLanguage)")
+                        .font(.pretendard(.bold, size: 18))
+                        .foregroundColor(textColor)
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(.sub2Ws)
@@ -62,7 +65,7 @@ struct OCRResultView: View {
                     .frame(maxHeight: 300)
                     .cornerRadius(12)
                     .shadow(radius: 5)
-
+                
                 if viewModel.isOCRLoading {
                     // 로딩 중일 때 프로그레스 뷰 표시
                     VStack(spacing: 16) {
@@ -71,12 +74,12 @@ struct OCRResultView: View {
                             .progressViewStyle(CircularProgressViewStyle(tint: .mainws))
                         
                         Text("텍스트를 분석하고 있습니다...")
-                            .font(.system(size: 16, weight: .medium))
+                            .font(.pretendard(.semiBold, size: 18))
                             .foregroundColor(.gray)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 40)
-                    .background(.backgroundws)
+                    .background(.background2Ws)
                     .cornerRadius(12)
                 } else {
                     // OCR 결과 표시
@@ -85,11 +88,11 @@ struct OCRResultView: View {
                             ForEach(0..<viewModel.originalText.count, id: \.self) { index in
                                 VStack(alignment: .leading, spacing: 8) {
                                     Text(viewModel.originalText[index])
-                                        .font(.body)
+                                        .font(.pretendard(.medium, size: 16))
                                         .foregroundColor(.black)
                                     
                                     Text(viewModel.translatedText[index])
-                                        .font(.body)
+                                        .font(.pretendard(.medium, size: 16))
                                         .foregroundColor(.mainws)
                                     
                                     Divider()
@@ -99,24 +102,24 @@ struct OCRResultView: View {
                         }
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(.backgroundws)
+                        .background(.background1Ws)
                     }
                     .cornerRadius(8)
                 }
-                            
+                
                 // 버튼들
                 HStack(spacing: 15) {
                     Button {
                         // performOCR()
-                        showingSummaryView = true
+                        showingSummaryModalView = true
                     } label: {
                             Text("개념 보기")
-                            .font(.system(size: 16, weight: .semibold))
+                            .font(.pretendard(.bold, size: 16))
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
                             .padding()
                             .background(.mainws)
-                            .cornerRadius(16)
+                            .cornerRadius(12)
                     }
                     .disabled(viewModel.isOCRLoading)
                     
@@ -124,12 +127,12 @@ struct OCRResultView: View {
                         showingCreateQuestionView = true
                     } label: {
                         Text("질문하기")
-                            .font(.system(size: 16, weight: .semibold))
+                            .font(.pretendard(.bold, size: 16))
                             .foregroundColor(.gray)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(.backgroundws)
-                            .cornerRadius(16)
+                            .background(.background1Ws)
+                            .cornerRadius(12)
                     }
                     .disabled(viewModel.isOCRLoading)
                     
@@ -137,12 +140,12 @@ struct OCRResultView: View {
                         dismiss()
                     } label: {
                         Text("재촬영")
-                            .font(.system(size: 16, weight: .semibold))
+                            .font(.pretendard(.bold, size: 16))
                             .foregroundColor(.gray)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(.backgroundws)
-                            .cornerRadius(16)
+                            .background(.background1Ws)
+                            .cornerRadius(12)
                     }
                     .disabled(viewModel.isOCRLoading)
                 }
@@ -172,8 +175,8 @@ struct OCRResultView: View {
                     }
                 }
             }
-            .sheet(isPresented: $showingSummaryView) {
-                OCRSummaryView()
+            .sheet(isPresented: $showingSummaryModalView) {
+                OCRSummaryModalView()
                     .environmentObject(viewModel)
             }
             .fullScreenCover(isPresented: $showingCreateQuestionView) {
@@ -196,6 +199,7 @@ struct OCRResultView: View {
             .onAppear {
                 Task {
                     try await viewModel.fetchOCR(selectedImage: selectedImage)
+                    try await viewModel.fetchOCRSolution()
                 }
             }
         }
