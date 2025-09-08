@@ -57,10 +57,10 @@ struct LoginView: View {
                     
                     Button {
                         if email.isEmpty || password.isEmpty {
-                            alertMessage = "이메일과 비밀번호를 모두 입력해주세요."
+                            alertMessage = "이메일과 비밀번호를 모두 입력해주세요.".localized
                             showAlert = true
                         } else if !isValidEmail(email) {
-                            alertMessage = "이메일 형식이 올바르지 않습니다."
+                            alertMessage = "이메일 형식이 올바르지 않습니다.".localized
                             showAlert = true
                         } else {
                             viewModel.email = email
@@ -80,7 +80,7 @@ struct LoginView: View {
                                     // APIErrorResponse(message: Optional(["비밀번호는 영문, 숫자, 특수문자 중 2가지 이상 조합으로 8~16자여야 합니다."]), error: "Bad Request", statusCode: 400)
                                     // 그 외 이메일 형식 검사 및 빈 필드는 프론트에서 처리
                                     showAlert = true
-                                    alertMessage = viewModel.errorMessage ?? "알 수 없는 에러가 발생했습니다."
+                                    alertMessage = viewModel.errorMessage ?? "알 수 없는 오류가 발생했습니다.".localized
                                 }
                             }
                         }

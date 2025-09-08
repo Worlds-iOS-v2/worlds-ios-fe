@@ -42,9 +42,9 @@ struct QuestionDetailView: View {
     ]
 
     let badgeColorMap: [String: Color] = [
-        "학습": .mainws,
-        "자유": .purple,
-        "전체": .gray
+        "학습".localized: .mainws,
+        "자유".localized: .purple,
+        "전체".localized: .gray
     ]
     
     let profileImages: [String] = ["himchan", "doran", "malgeum", "saengak"]

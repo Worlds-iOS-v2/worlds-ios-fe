@@ -67,17 +67,17 @@ final class SignUpViewModel: ObservableObject {
             
             return true
         } catch UserAPIError.serverError(let message) {
-            if message == "이미 인증이 완료된 이메일입니다." {
+            if message == "이미 인증이 완료된 이메일입니다.".localized {
                 return true
             }
             
-            self.errorMessage = message
+            self.errorMessage = message.localized
             print(message)
             
             return false
         } catch {
             if error.localizedDescription == "The data couldn’t be read because it isn’t in the correct format." {
-                self.errorMessage = "접근이 제한되었습니다. 관리자에게 문의하세요."
+                self.errorMessage = "접근이 제한되었습니다. 관리자에게 문의하세요.".localized
             }
             
             return false

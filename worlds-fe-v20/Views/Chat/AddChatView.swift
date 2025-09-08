@@ -132,7 +132,7 @@ struct AddChatView: View {
             }
             .alert(isPresented: $showAlert) {
                 Alert(title: Text("알림"),
-                      message: Text(errorMessage ?? "알 수 없는 오류가 발생했습니다."),
+                      message: Text(errorMessage ?? "알 수 없는 오류가 발생했습니다.".localized),
                       dismissButton: .default(Text("확인")))
             }
         }

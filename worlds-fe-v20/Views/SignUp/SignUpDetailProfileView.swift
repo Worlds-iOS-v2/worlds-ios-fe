@@ -134,7 +134,7 @@ struct SignUpDetailProfileView: View {
                         appState.flow = .login
                     } else {
                         showAlert = true
-                        alertMessage = viewModel.errorMessage ?? "알 수 없는 에러 발생"
+                        alertMessage = viewModel.errorMessage ?? "알 수 없는 오류가 발생했습니다.".localized
                     }
                 }
             }

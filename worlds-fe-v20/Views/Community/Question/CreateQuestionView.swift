@@ -41,7 +41,7 @@ struct CreateQuestionView: View {
                     }
                 } label: {
                     HStack {
-                        Text(selectedCategory?.displayName ?? "게시판 선택")
+                        Text(selectedCategory?.displayName ?? "게시판 선택".localized)
                             .font(.pretendard(.semiBold, size: 16))
                             .foregroundColor(.gray)
                         

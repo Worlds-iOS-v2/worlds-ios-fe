@@ -51,7 +51,7 @@ struct ResetPasswordView: View {
                     .padding(.top, 20)
                 
                 if isLoginView {
-                    CommonSignUpTextField(title: "이메일", placeholder: "이메일을 입력해주세요.", isSecure: false, content: $email)
+                    CommonSignUpTextField(title: "이메일", placeholder: "이메일을 입력해주세요", isSecure: false, content: $email)
                         .textInputAutocapitalization(.never) // 자동 대문자처리 해제
                         .keyboardType(.emailAddress)
                         .padding(.top, 20)
@@ -81,7 +81,7 @@ struct ResetPasswordView: View {
                         .font(.pretendard(.medium, size: 14))
                 }
                 
-                CommonSignUpTextField(title: "비밀번호 확인", placeholder: "비밀번호를 한 번 더 입력해주세요.", isSecure: true, content: $passwordCheck)
+                CommonSignUpTextField(title: "비밀번호 확인", placeholder: "비밀번호를 한 번 더 입력해주세요", isSecure: true, content: $passwordCheck)
                     .padding(.top, 20)
                 
                 if !passwordCheck.isEmpty && newPassword != passwordCheck {
@@ -98,7 +98,7 @@ struct ResetPasswordView: View {
                             if isLoginView {
                                 let loginSuccess = await viewModel.login(email: email, password: oldPassword)
                                 guard loginSuccess else {
-                                    self.alertMessage = viewModel.errorMessage ?? "알 수 없는 에러가 발생했습니다."
+                                    self.alertMessage = viewModel.errorMessage ?? "알 수 없는 오류가 발생했습니다.".localized
                                     showAlert = true
                                     return
                                 }

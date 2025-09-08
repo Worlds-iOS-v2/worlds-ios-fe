@@ -17,12 +17,12 @@ struct CommonSignUpTextField: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text("\(title)")
+            Text("\(title)".localized)
                 .foregroundStyle(textColor)
                 .font(.pretendard(.semiBold, size: 22))
             
             if isSecure {
-                SecureField("\(placeholder)", text: $content)
+                SecureField("\(placeholder)".localized, text: $content)
                     .foregroundStyle(textColor)
                     .font(.pretendard(.medium, size: 22))
                     .frame(height: 60)
@@ -31,7 +31,7 @@ struct CommonSignUpTextField: View {
                     .cornerRadius(12)
 
             } else {
-                TextField("\(placeholder)", text: $content)
+                TextField("\(placeholder)".localized, text: $content)
                     .textInputAutocapitalization(.never) // 자동 대문자처리 해제
                     .foregroundStyle(textColor)
                     .font(.pretendard(.medium, size: 22))

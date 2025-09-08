@@ -20,7 +20,7 @@ struct CommonSignUpButton: View {
                     .frame(height: 60)
                     // .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
                 
-                Text("\(text)")
+                Text("\(text)".localized)
                     .font(.pretendard(.bold, size: 24))
                     .foregroundStyle(.white)
             }
