@@ -9,12 +9,14 @@
 /* Begin PBXBuildFile section */
 		9F25395A2E17C57600B526A5 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 		B348B8BF2E537382005F91C3 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = B348B8BE2E537382005F91C3 /* Kingfisher */; };
+		B3613B3C2E6EC62600151414 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B3613B3B2E6EC62600151414 /* Localizable.xcstrings */; };
 		B3A398032E308E9600FC2798 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = B3A398022E308E9600FC2798 /* Alamofire */; };
 		CCECCA652E49CA7F00E73684 /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = CCECCA642E49CA7F00E73684 /* SocketIO */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		9F2539392E17C53900B526A5 /* worlds-fe-v20.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "worlds-fe-v20.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B3613B3B2E6EC62600151414 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -56,6 +58,7 @@
 		9F2539302E17C53900B526A5 = {
 			isa = PBXGroup;
 			children = (
+				B3613B3B2E6EC62600151414 /* Localizable.xcstrings */,
 				9F25393B2E17C53900B526A5 /* worlds-fe-v20 */,
 				9F25393A2E17C53900B526A5 /* Products */,
 			);
@@ -118,6 +121,11 @@
 			knownRegions = (
 				en,
 				Base,
+				"zh-Hans",
+				ko,
+				vi,
+				th,
+				ru,
 			);
 			mainGroup = 9F2539302E17C53900B526A5;
 			minimizedProjectReferenceProxies = 1;
@@ -141,6 +149,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B3613B3C2E6EC62600151414 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -218,6 +227,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -276,6 +286,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
