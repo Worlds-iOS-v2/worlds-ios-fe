@@ -282,9 +282,9 @@ struct QuestionCard: View {
 extension Category {
     var displayName: String {
         switch self {
-        case .all: return "전체"
-        case .study: return "학습"
-        case .free: return "자유"
+        case .all: return "전체".localized
+        case .study: return "학습".localized
+        case .free: return "자유".localized
         }
     }
 }

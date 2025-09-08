@@ -69,9 +69,9 @@ struct SignUpAccountView: View {
                             
                             if succeed {
                                 verifyCodeSent = true
-                                emailCheckAlertMessage = "인증번호를 전송했습니다."
+                                emailCheckAlertMessage = "인증번호를 전송했습니다.".localized
                             } else {
-                                emailCheckAlertMessage = viewModel.errorMessage ?? "알 수 없는 오류가 발생했습니다."
+                                emailCheckAlertMessage = viewModel.errorMessage ?? "알 수 없는 오류가 발생했습니다.".localized
                             }
                             
                             showEmailCheckAlert = true
@@ -98,7 +98,7 @@ struct SignUpAccountView: View {
                                 verifyCodeConfirmed = true
                                 emailVerifyCodeAlertMessage = "인증 성공했습니다."
                             } else {
-                                emailVerifyCodeAlertMessage = viewModel.errorMessage ?? "알 수 없는 오류가 발생했습니다."
+                                emailVerifyCodeAlertMessage = viewModel.errorMessage ?? "알 수 없는 오류가 발생했습니다.".localized
                             }
                             
                             showEmailVerifyCodeAlert = true
@@ -120,7 +120,7 @@ struct SignUpAccountView: View {
                         .font(.pretendard(.medium, size: 16))
                 }
                 
-                CommonSignUpTextField(title: "비밀번호 확인", placeholder: "비밀번호를 한 번 더 입력해주세요.", isSecure: true, content: $passwordCheck)
+                CommonSignUpTextField(title: "비밀번호 확인", placeholder: "비밀번호를 한 번 더 입력해주세요", isSecure: true, content: $passwordCheck)
                     .padding(.top, 40)
                 
                 if !passwordCheck.isEmpty && password != passwordCheck {
