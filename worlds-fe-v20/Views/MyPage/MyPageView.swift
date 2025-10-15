@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct MyPageView: View {
+    @Environment(\.dismiss) var dismiss
     @Environment(\.openURL) var openURL
     @StateObject var viewModel: MyPageViewModel = MyPageViewModel()
     
@@ -19,25 +20,23 @@ struct MyPageView: View {
     var textColor: Color = .mainfontws
     
     var body: some View {
-        ScrollView {
-            ZStack {
-                Color.background2Ws
-                    .ignoresSafeArea()
-                
+        ZStack {
+            Color.background2Ws
+                .ignoresSafeArea()
+            ScrollView {
                 VStack {
-                    VStack {
-                        Text("마이페이지")
-                            .font(.pretendard(.bold, size: 27))
-                            .foregroundStyle(textColor)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.horizontal, 24)
-                        
-                        UserInfoCardView(userInfo: viewModel.userInfo)
-                            .cornerRadius(12)
-                            .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
-                            .padding(.horizontal, 16)
-                    }
-                    .padding(.vertical, 40)
+                    
+                    Text("마이페이지")
+                        .font(.pretendard(.bold, size: 27))
+                        .foregroundStyle(textColor)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 24)
+                    
+                    UserInfoCardView(userInfo: viewModel.userInfo)
+                        .cornerRadius(12)
+                        .shadow(color: .black.opacity(0.25), radius: 4, x: 4, y: 4)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 40)
                     
                     VStack(spacing: 16) {
                         NavigationLink(destination: MyQuestionView(questions: viewModel.questions)) {
@@ -56,21 +55,21 @@ struct MyPageView: View {
                         Divider()
                             .padding(.horizontal, 32)
                         
-                        NavigationLink(destination: OCRListView(ocrList: viewModel.ocrList)) {
-                            Text("나의 OCR")
-                                .font(.pretendard(.medium, size: textSize))
-                                .foregroundStyle(textColor)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        .padding(.horizontal, 32)
-                        .onAppear{
-                            Task {
-                                await viewModel.fetchMyOCRList()
-                            }
-                        }
-                        
-                        Divider()
-                            .padding(.horizontal, 32)
+                        //                        NavigationLink(destination: OCRListView(ocrList: viewModel.ocrList)) {
+                        //                            Text("나의 OCR")
+                        //                                .font(.pretendard(.medium, size: textSize))
+                        //                                .foregroundStyle(textColor)
+                        //                                .frame(maxWidth: .infinity, alignment: .leading)
+                        //                        }
+                        //                        .padding(.horizontal, 32)
+                        //                        .onAppear{
+                        //                            Task {
+                        //                                await viewModel.fetchMyOCRList()
+                        //                            }
+                        //                        }
+                        //
+                        //                        Divider()
+                        //                            .padding(.horizontal, 32)
                         
                         Button {
                             alertMessage = "로그아웃 하시겠습니까?"
@@ -140,12 +139,24 @@ struct MyPageView: View {
                 }
                 .padding(.bottom, 150)
             }
-        }
-        .scrollIndicators(.hidden)
-        .onAppear {
-            // 정보 불러오기
-            Task {
-                await viewModel.fetchMyInformation()
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(.mainws)
+                            .font(.system(size: 18, weight: .semibold))
+                    }
+                }
+            }
+            .scrollIndicators(.hidden)
+            .onAppear {
+                // 정보 불러오기
+                Task {
+                    await viewModel.fetchMyInformation()
+                }
             }
         }
     }
