@@ -155,6 +155,9 @@
         }
       }
     },
+    "00고등학교" : {
+
+    },
     "Chat" : {
       "localizations" : {
         "en" : {
@@ -768,6 +771,9 @@
         }
       }
     },
+    "급식 정보" : {
+
+    },
     "기존 비밀번호" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1315,6 +1321,9 @@
         }
       }
     },
+    "대외활동" : {
+
+    },
     "대화상대추가" : {
       "localizations" : {
         "en" : {
@@ -1348,6 +1357,9 @@
           }
         }
       }
+    },
+    "대화하기" : {
+
     },
     "댓글 %lld개" : {
       "localizations" : {
@@ -1418,6 +1430,7 @@
       }
     },
     "더보기 >" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1893,6 +1906,9 @@
           }
         }
       }
+    },
+    "문제분석하기" : {
+
     },
     "문화행사정보" : {
       "localizations" : {
@@ -2953,6 +2969,7 @@
       }
     },
     "안녕하세요! %@님" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3090,6 +3107,7 @@
       }
     },
     "오늘 하루는 어떤가요?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3465,75 +3483,6 @@
         }
       }
     },
-    "이메일과 비밀번호를 모두 입력해주세요." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Please enter both email and password."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Пожалуйста, введите электронную почту и пароль."
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "กรุณากรอกอีเมลและรหัสผ่าน"
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vui lòng nhập cả email và mật khẩu."
-          }
-        },
-        "zh" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "请输入邮箱和密码。"
-          }
-        }
-      }
-    },
-    "일" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Day"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "День"
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "วัน"
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ngày"
-          }
-        },
-        "zh" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "日"
-          }
-        }
-      }
-    },
     "이메일 인증" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3600,6 +3549,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "邮箱格式不正确。"
+          }
+        }
+      }
+    },
+    "이메일과 비밀번호를 모두 입력해주세요." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please enter both email and password."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пожалуйста, введите электронную почту и пароль."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "กรุณากรอกอีเมลและรหัสผ่าน"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vui lòng nhập cả email và mật khẩu."
+          }
+        },
+        "zh" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请输入邮箱和密码。"
           }
         }
       }
@@ -3808,6 +3792,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "加载图片中..."
+          }
+        }
+      }
+    },
+    "일" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Day"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "День"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "วัน"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ngày"
+          }
+        },
+        "zh" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日"
           }
         }
       }
@@ -4973,6 +4991,9 @@
           }
         }
       }
+    },
+    "학사 일정" : {
+
     },
     "학습" : {
       "extractionState" : "manual",
