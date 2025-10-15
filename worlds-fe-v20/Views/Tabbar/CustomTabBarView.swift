@@ -133,7 +133,7 @@ struct CustomTabBar: View {
             RoundedRectangle(cornerRadius: 20)
                 .fill(Color.white)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 12)
+                    RoundedRectangle(cornerRadius: 20)
                         .stroke(.mainws, lineWidth: 1)
                 )
         )
