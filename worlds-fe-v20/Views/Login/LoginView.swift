@@ -144,24 +144,24 @@ struct LoginView: View {
                         }
                         .padding(.trailing, 16)
                         
-                        Button {
-                            // 구글 로그인
-                        } label: {
-                            ZStack {
-                                Circle()
-                                    .fill(.google)
-                                    .frame(width: 50, height: 50)
-                                    .overlay(
-                                        Circle().stroke(Color.gray, lineWidth: 1)
-                                    )
-                                
-                                Image("google")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 20)
-                            }
-                        }
-                        .padding(.trailing, 16)
+//                        Button {
+//                            // 구글 로그인
+//                        } label: {
+//                            ZStack {
+//                                Circle()
+//                                    .fill(.google)
+//                                    .frame(width: 50, height: 50)
+//                                    .overlay(
+//                                        Circle().stroke(Color.gray, lineWidth: 1)
+//                                    )
+//                                
+//                                Image("google")
+//                                    .resizable()
+//                                    .scaledToFit()
+//                                    .frame(width: 20)
+//                            }
+//                        }
+//                        .padding(.trailing, 16)
                         
                         Button {
                             // 애플 로그인
