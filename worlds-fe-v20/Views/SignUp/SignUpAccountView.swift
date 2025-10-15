@@ -10,7 +10,7 @@ import SwiftUI
 /// 회원가입 2번째 화면 - 이메일, 비밀번호 입력
 struct SignUpAccountView: View {
     @EnvironmentObject var appState: AppState
-    @Environment(\.dismiss) var dismiss
+    // @Environment(\.dismiss) var dismiss
 
     @State var email: String = ""
     @State var password: String = ""
@@ -41,140 +41,143 @@ struct SignUpAccountView: View {
     @EnvironmentObject var viewModel: SignUpViewModel
     
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading) {
-                Text("로그인 정보를 입력해주세요.")
-                    .font(.pretendard(.bold, size: 27))
-                    .foregroundColor(textColor)
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading) {
+                    Text("로그인 정보를 입력해주세요.")
+                        .font(.pretendard(.bold, size: 27))
+                        .foregroundColor(textColor)
+                        .padding(.top, 40)
+                    
+                    CommonSignUpTextField(title: "이메일", placeholder: "이메일을 입력해주세요", content: $email)
+                        .keyboardType(.emailAddress)
+                        .padding(.top, 40)
+                    
+                    HStack {
+                        if !email.isEmpty && !isValidEmail(email) {
+                            Text("올바른 이메일 형식이 아닙니다.")
+                                .foregroundColor(.red)
+                                .font(.pretendard(.medium, size: 16))
+                        }
+                        
+                        Spacer()
+                        
+                        Button {
+                            Task {
+                                viewModel.email = email
+                                
+                                let succeed = await viewModel.checkEmail()
+                                
+                                if succeed {
+                                    verifyCodeSent = true
+                                    emailCheckAlertMessage = "인증번호를 전송했습니다.".localized
+                                } else {
+                                    emailCheckAlertMessage = viewModel.errorMessage ?? "알 수 없는 오류가 발생했습니다.".localized
+                                }
+                                
+                                showEmailCheckAlert = true
+                            }
+                        } label: {
+                            Text("인증번호 전송")
+                                .foregroundColor(.mainws)
+                                .font(.pretendard(.semiBold, size: 16))
+                        }
+                        .alert(emailCheckAlertMessage, isPresented: $showEmailCheckAlert) {
+                            Button("확인", role: .cancel) { }
+                        }
+                    }
+                    
+                    HStack(alignment: .bottom) {
+                        CommonSignUpTextField(title: "이메일 인증", placeholder: "인증번호", content: $verifyCode)
+                            .keyboardType(.numberPad)
+                        
+                        CommonSignUpButton(text: "인증", isFilled: verifyCodeSent) {
+                            Task {
+                                let succeed = await viewModel.verifyEmailCode(email: email, code: verifyCode)
+                                
+                                if succeed {
+                                    verifyCodeConfirmed = true
+                                    emailVerifyCodeAlertMessage = "인증 성공했습니다."
+                                } else {
+                                    emailVerifyCodeAlertMessage = viewModel.errorMessage ?? "알 수 없는 오류가 발생했습니다.".localized
+                                }
+                                
+                                showEmailVerifyCodeAlert = true
+                            }
+                        }
+                        .frame(width: 120)
+                        .alert(emailVerifyCodeAlertMessage, isPresented: $showEmailVerifyCodeAlert) {
+                            Button("확인", role: .cancel) { }
+                        }
+                    }
                     .padding(.top, 40)
-                
-                CommonSignUpTextField(title: "이메일", placeholder: "이메일을 입력해주세요", content: $email)
-                    .keyboardType(.emailAddress)
-                    .padding(.top, 40)
-                
-                HStack {
-                    if !email.isEmpty && !isValidEmail(email) {
-                        Text("올바른 이메일 형식이 아닙니다.")
+                    
+                    CommonSignUpTextField(title: "비밀번호", placeholder: "비밀번호를 입력해주세요", isSecure: true, content: $password)
+                        .padding(.top, 40)
+                    
+                    if !password.isEmpty && !isValidPassword(password) {
+                        Text("비밀번호는 영문, 숫자, 특수문자 중 2가지 이상 조합으로 8~16자여야 합니다.")
+                            .foregroundColor(.red)
+                            .font(.pretendard(.medium, size: 16))
+                    }
+                    
+                    CommonSignUpTextField(title: "비밀번호 확인", placeholder: "비밀번호를 한 번 더 입력해주세요", isSecure: true, content: $passwordCheck)
+                        .padding(.top, 40)
+                    
+                    if !passwordCheck.isEmpty && password != passwordCheck {
+                        Text("비밀번호가 일치하지 않습니다.")
                             .foregroundColor(.red)
                             .font(.pretendard(.medium, size: 16))
                     }
                     
                     Spacer()
                     
+                    CommonSignUpButton(text: "다음", isFilled: isFilled) {
+                        // viewmodel에 데이터 전송
+                        viewModel.email = email
+                        viewModel.password = password
+                        
+                        print("signup Account View: \(viewModel.email)")
+                        print("signup Account View: \(viewModel.password)")
+                        
+                        // viewModel 호출 후 화면 전환 (어떤 방식이 더 효율적인지는 아직 모르겠음)
+                        isSuceed = true
+                    }
+                    .padding(.top, 40)
+                    .padding(.bottom, 12)
+                }
+                
+//                Button {
+//                    appState.flow = .login
+//                } label: {
+//                    Text("로그인 하기")
+//                        .foregroundStyle(.subfontws)
+//                        .font(.pretendard(.semiBold, size: 16))
+//                }
+            }
+            .scrollIndicators(.hidden)
+            .padding()
+            .background(.background1Ws)
+            .navigationTitle("회원가입")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
                     Button {
-                        Task {
-                            viewModel.email = email
-                            
-                            let succeed = await viewModel.checkEmail()
-                            
-                            if succeed {
-                                verifyCodeSent = true
-                                emailCheckAlertMessage = "인증번호를 전송했습니다.".localized
-                            } else {
-                                emailCheckAlertMessage = viewModel.errorMessage ?? "알 수 없는 오류가 발생했습니다.".localized
-                            }
-                            
-                            showEmailCheckAlert = true
-                        }
+                        appState.flow = .login
                     } label: {
-                        Text("인증번호 전송")
-                            .foregroundColor(.mainws)
-                            .font(.pretendard(.semiBold, size: 16))
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(.black)
+                            .font(.system(size: 18, weight: .semibold))
                     }
-                    .alert(emailCheckAlertMessage, isPresented: $showEmailCheckAlert) {
-                        Button("확인", role: .cancel) { }
-                    }
-                }
-                
-                HStack(alignment: .bottom) {
-                    CommonSignUpTextField(title: "이메일 인증", placeholder: "인증번호", content: $verifyCode)
-                        .keyboardType(.numberPad)
-                    
-                    CommonSignUpButton(text: "인증", isFilled: verifyCodeSent) {
-                        Task {
-                            let succeed = await viewModel.verifyEmailCode(email: email, code: verifyCode)
-                            
-                            if succeed {
-                                verifyCodeConfirmed = true
-                                emailVerifyCodeAlertMessage = "인증 성공했습니다."
-                            } else {
-                                emailVerifyCodeAlertMessage = viewModel.errorMessage ?? "알 수 없는 오류가 발생했습니다.".localized
-                            }
-                            
-                            showEmailVerifyCodeAlert = true
-                        }
-                    }
-                    .frame(width: 120)
-                    .alert(emailVerifyCodeAlertMessage, isPresented: $showEmailVerifyCodeAlert) {
-                        Button("확인", role: .cancel) { }
-                    }
-                }
-                .padding(.top, 40)
-                
-                CommonSignUpTextField(title: "비밀번호", placeholder: "비밀번호를 입력해주세요", isSecure: true, content: $password)
-                    .padding(.top, 40)
-                
-                if !password.isEmpty && !isValidPassword(password) {
-                    Text("비밀번호는 영문, 숫자, 특수문자 중 2가지 이상 조합으로 8~16자여야 합니다.")
-                        .foregroundColor(.red)
-                        .font(.pretendard(.medium, size: 16))
-                }
-                
-                CommonSignUpTextField(title: "비밀번호 확인", placeholder: "비밀번호를 한 번 더 입력해주세요", isSecure: true, content: $passwordCheck)
-                    .padding(.top, 40)
-                
-                if !passwordCheck.isEmpty && password != passwordCheck {
-                    Text("비밀번호가 일치하지 않습니다.")
-                        .foregroundColor(.red)
-                        .font(.pretendard(.medium, size: 16))
-                }
-                
-                Spacer()
-                
-                CommonSignUpButton(text: "다음", isFilled: isFilled) {
-                    // viewmodel에 데이터 전송                    
-                    viewModel.email = email
-                    viewModel.password = password
-                    
-                    print("signup Account View: \(viewModel.email)")
-                    print("signup Account View: \(viewModel.password)")
-                    
-                    // viewModel 호출 후 화면 전환 (어떤 방식이 더 효율적인지는 아직 모르겠음)
-                    isSuceed = true
-                }
-                .padding(.top, 40)
-                .padding(.bottom, 12)
-            }
-            
-            Button {
-                appState.flow = .login
-            } label: {
-                Text("로그인 하기")
-                    .foregroundStyle(.subfontws)
-                    .font(.pretendard(.semiBold, size: 16))
-            }
-        }
-        .scrollIndicators(.hidden)
-        .padding()
-        .background(.background1Ws)
-        .navigationTitle("회원가입")
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(.black)
-                        .font(.system(size: 18, weight: .semibold))
                 }
             }
+            .navigationDestination(isPresented: $isSuceed) {
+                SignUpDetailProfileView()
+            }
+            .hideKeyboardOnTap()
         }
-        .navigationDestination(isPresented: $isSuceed) {
-            SignUpDetailProfileView()
-        }
-        .hideKeyboardOnTap()
+        .environmentObject(viewModel)
     }
 }
 
