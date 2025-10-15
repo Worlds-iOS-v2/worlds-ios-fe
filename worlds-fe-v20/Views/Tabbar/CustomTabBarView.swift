@@ -10,11 +10,13 @@ import SwiftUI
 // MARK: - 커스텀 탭바 뷰
 struct CustomTabBarView: View {
     @State private var selectedTab = 0
-    @State private var showCameraView = false
+    @State private var showFloatingMenu = false
+    @State private var navigateToChat = false
+    @State private var navigateToOCR = false
     
     var body: some View {
         NavigationStack {
-            ZStack(alignment: .bottom) {
+            ZStack {
                 Color.background2Ws
                     .ignoresSafeArea(.all)
                 
@@ -25,20 +27,69 @@ struct CustomTabBarView: View {
                     QuestionView(viewModel: QuestionViewModel())
                         .tag(1)
                     
-                    ChatListView()
+                    OCRListView()
                         .tag(2)
-                    
-                    MyPageView()
-                        .tag(3)
                 }
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                 
-                CustomTabBar(
-                    selectedTab: $selectedTab,
-                    onCameraTapped: { showCameraView = true }
-                )
+                // 플로팅 메뉴가 열렸을 때 배경 딤처리
+                if showFloatingMenu {
+                    Color.black.opacity(0.3)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation(.spring(response: 0.3)) {
+                                showFloatingMenu = false
+                            }
+                        }
+                }
+                
+                VStack {
+                    Spacer()
+                    
+                    // 플로팅 메뉴
+                    if showFloatingMenu {
+                        HStack {
+                            Spacer()
+                            FloatingMenuView(
+                                onChatTapped: {
+                                    withAnimation(.spring(response: 0.3)) {
+                                        showFloatingMenu = false
+                                    }
+                                    navigateToChat = true
+                                },
+                                onOCRTapped: {
+                                    withAnimation(.spring(response: 0.3)) {
+                                        showFloatingMenu = false
+                                    }
+                                    navigateToOCR = true
+                                }
+                            )
+                            .padding(.trailing, 30)
+                        }
+                        .padding(.bottom, 8)
+                        .transition(.scale.combined(with: .opacity))
+                    }
+                    
+                    // 탭바와 플로팅 버튼을 한 줄에 배치
+                    HStack(spacing: 16) {
+                        // 탭바
+                        CustomTabBar(selectedTab: $selectedTab)
+                        
+                        // 플로팅 버튼
+                        ChatFloatingButton(action: {
+                            withAnimation(.spring(response: 0.3)) {
+                                showFloatingMenu.toggle()
+                            }
+                        })
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 10)
+                }
             }
-            .navigationDestination(isPresented: $showCameraView) {
+            .navigationDestination(isPresented: $navigateToChat) {
+                ChatListView()
+            }
+            .navigationDestination(isPresented: $navigateToOCR) {
                 OCRCameraView()
             }
         }
@@ -50,106 +101,120 @@ struct CustomTabBarView: View {
 // MARK: - 커스텀 탭바 컴포넌트
 struct CustomTabBar: View {
     @Binding var selectedTab: Int
-    var onCameraTapped: () -> Void
     
     var body: some View {
         HStack(spacing: 0) {
             // 홈
             TabBarButton(
                 icon: "house",
+                title: "홈",
                 isSelected: selectedTab == 0,
                 action: { selectedTab = 0 }
             )
             
             // 게시판
             TabBarButton(
-                icon: "text.page",
+                icon: "square.text.square",
+                title: "게시판",
                 isSelected: selectedTab == 1,
                 action: { selectedTab = 1 }
             )
             
-            // 카메라 (중앙)
-            CenterTabButton(isSelected: false, action: { onCameraTapped() })
-            
-            // 채팅
-            TabBarButton(
-                icon: "message",
-                isSelected: selectedTab == 2,
-                action: { selectedTab = 2 }
-            )
-            
             // 프로필
             TabBarButton(
-                icon: "person",
-                isSelected: selectedTab == 3,
-                action: { selectedTab = 3 }
+                icon: "folder",
+                title: "OCR목록",
+                isSelected: selectedTab == 2,
+                action: { selectedTab = 2 }
             )
         }
         .frame(height: 80)
         .background(
-            RoundedRectangle(cornerRadius: 24)
+            RoundedRectangle(cornerRadius: 20)
                 .fill(Color.white)
-                .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: -5)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(.mainws, lineWidth: 1)
+                )
         )
-        .padding(.horizontal, 10)
-        .padding(.bottom, -4)
     }
 }
 
 // MARK: - 일반 탭 버튼
 struct TabBarButton: View {
     let icon: String
+    let title: String
     let isSelected: Bool
     let action: () -> Void
     
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 4) {
+            VStack(spacing: 6) {
                 Image(systemName: icon)
-                    .font(.system(size: 24))
+                    .font(.system(size: 26))
                     .foregroundColor(isSelected ? .mainws : .gray)
-                
-                // 선택된 탭 인디케이터
-                Circle()
-                    .fill(isSelected ? Color.mainws : Color.clear)
-                    .frame(width: 6, height: 6)
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 50)
+            .frame(height: 60)
         }
         .animation(.easeInOut(duration: 0.2), value: isSelected)
     }
 }
 
-// MARK: - 중앙 특별 탭 버튼 (카메라)
-struct CenterTabButton: View {
-    let isSelected: Bool
+// MARK: - 채팅 플로팅 버튼
+struct ChatFloatingButton: View {
     let action: () -> Void
     
     var body: some View {
         Button(action: action) {
             ZStack {
-                Circle()
-                    .fill(.white)
-                    .overlay(
-                        Circle()
-                        
-                            .stroke(Color.mainws, lineWidth: 4) // 테두리
-                            .frame(width: 80, height: 80)
-                    )
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(.sub1Ws)
                     .frame(width: 80, height: 80)
-                    .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 20)
+                            .stroke(.mainws, lineWidth: 1)
+                    )
                 
-                // 카메라 아이콘
-                Image(.cameraws)
+                Image(.chatbotws)
                     .font(.system(size: 28))
-                    .foregroundColor(.white)
             }
-            .scaleEffect(isSelected ? 1.1 : 1.0)
-            .offset(y: -25) // 위로 살짝 올리기
         }
-        .frame(maxWidth: .infinity)
-        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
+    }
+}
+
+// MARK: - 플로팅 메뉴
+struct FloatingMenuView: View {
+    let onChatTapped: () -> Void
+    let onOCRTapped: () -> Void
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            Button(action: onChatTapped) {
+                Text("대화하기")
+                    .font(.pretendard(.medium, size: 18))
+                    .foregroundColor(.black)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 60)
+            }
+            
+            Divider()
+                .padding(.horizontal, 20)
+            
+            Button(action: onOCRTapped) {
+                Text("문제분석하기")
+                    .font(.pretendard(.medium, size: 18))
+                    .foregroundColor(.black)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 60)
+            }
+        }
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.white)
+                .shadow(color: .black.opacity(0.15), radius: 15, x: 0, y: 5)
+        )
+        .frame(width: 220)
     }
 }
 
