@@ -9,7 +9,7 @@ import SwiftUI
 
 struct OCRListView: View {
     
-    @Environment(\.dismiss) var dismiss
+    // @Environment(\.dismiss) var dismiss
     
     var ocrList: [OCRList] = []
     
@@ -36,17 +36,17 @@ struct OCRListView: View {
             .navigationTitle("OCR 목록")
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "chevron.left")
-                            .foregroundColor(.mainws)
-                            .font(.system(size: 18, weight: .semibold))
-                    }
-                }
-            }
+//            .toolbar {
+//                ToolbarItem(placement: .navigationBarLeading) {
+//                    Button {
+//                        dismiss()
+//                    } label: {
+//                        Image(systemName: "chevron.left")
+//                            .foregroundColor(.mainws)
+//                            .font(.system(size: 18, weight: .semibold))
+//                    }
+//                }
+//            }
         }
     }
 }
