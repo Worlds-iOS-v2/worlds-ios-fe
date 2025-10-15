@@ -30,7 +30,7 @@ struct worlds_fe_v20App: App {
                 
                 // 회원가입 화면
             case .signUp:
-                SignUpRoleSelectionView()
+                SignUpAccountView()
                     .environmentObject(appState)
                     .environmentObject(signUpViewModel)
                 
