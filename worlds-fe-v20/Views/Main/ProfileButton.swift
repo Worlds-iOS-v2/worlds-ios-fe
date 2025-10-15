@@ -21,6 +21,6 @@ struct ProfileButton: View {
                     .foregroundColor(.gray)
             }
         }
-        .buttonStyle(PlainButtonStyle()) // 기본 버튼 스타일 제거
+        .buttonStyle(PlainButtonStyle())
     }
 }
