@@ -11,7 +11,7 @@ struct User: Codable, Hashable, Identifiable {
     let id: Int
     let userEmail: String
     let userName: String
-    let birthday: String
+    let birthday: String?
     let isMentor: Bool
     let reportCount: Int
     // let menteeTranslations: [MenteeTranslation]
