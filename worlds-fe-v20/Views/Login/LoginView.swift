@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct LoginView: View {
+    @StateObject private var kakaoLoginManager = KakaoLoginManager()
+    @StateObject private var appleLoginManager = AppleLoginManager()
+    
     @EnvironmentObject var appState: AppState
     
     @State var email: String = ""
@@ -129,7 +132,16 @@ struct LoginView: View {
                     
                     HStack {
                         Button {
-                            // 카카오 로그인
+                            kakaoLoginManager.loginWithKakao { result in
+                                DispatchQueue.main.async {
+                                    switch result {
+                                    case .success(_):
+                                        appState.flow = .main
+                                    case .failure(let error):
+                                        print("카카오 로그인 실패: \(error)")
+                                    }
+                                }
+                            }
                         } label: {
                             ZStack {
                                 Circle()
@@ -164,7 +176,16 @@ struct LoginView: View {
 //                        .padding(.trailing, 16)
                         
                         Button {
-                            // 애플 로그인
+                            appleLoginManager.loginWithApple { result in
+                                DispatchQueue.main.async {
+                                    switch result {
+                                    case .success(_):
+                                        appState.flow = .main
+                                    case .failure(let error):
+                                        print("애플 로그인 실패: \(error)")
+                                    }
+                                }
+                            }
                         } label: {
                             ZStack {
                                 Circle()

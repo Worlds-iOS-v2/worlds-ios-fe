@@ -4,6 +4,8 @@
 <dict>
 	<key>APIAccessTokenURL</key>
 	<string>$(API_ACCESS_TOKEN_URL)</string>
+	<key>APIAppleLoginURL</key>
+	<string>$(API_APPLE_LOGIN_URL)</string>
 	<key>APIBaseURL</key>
 	<string>$(API_BASE_URL)</string>
 	<key>APIChangePasswordURL</key>
@@ -18,6 +20,8 @@
 	<string>$(API_EMAIL_CODE_URL)</string>
 	<key>APIFindEmailURL</key>
 	<string>$(API_FIND_EMAIL_URL)</string>
+	<key>APIKakaoLoginURL</key>
+	<string>$(API_KAKAO_LOGIN_URL)</string>
 	<key>APILoginURL</key>
 	<string>$(API_LOGIN_URL)</string>
 	<key>APILogoutURL</key>
@@ -40,6 +44,8 @@
 	<string>$(API_USER_INFO_URL)</string>
 	<key>CFBundleIconName</key>
 	<string>AppIcon</string>
+	<key>KakaoNativeAppKey</key>
+	<string>$(KAKAO_NATIVE_APP_KEY)</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -50,7 +56,5 @@
 		<string>BMJUA.otf</string>
 		<string>PretendardVariable.ttf</string>
 	</array>
-	<key>UIUserInterfaceStyle</key>
-	<string>Light</string>
 </dict>
 </plist>
