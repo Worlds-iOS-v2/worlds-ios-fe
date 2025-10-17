@@ -10,6 +10,7 @@ import SwiftUI
 struct OCRListView: View {
     
     // @Environment(\.dismiss) var dismiss
+    @StateObject var viewModel = OCRListViewModel()
     
     var ocrList: [OCRList] = []
     
@@ -23,7 +24,7 @@ struct OCRListView: View {
             
             ScrollView {
                 VStack(spacing: 18) {
-                    ForEach(ocrList) { ocr in
+                    ForEach(viewModel.ocrList) { ocr in
                         NavigationLink(destination: OCRListDetailView(ocrContent: ocr)) {
                             OCRCardView(OCRContent: ocr)
                         }
@@ -36,17 +37,22 @@ struct OCRListView: View {
             .navigationTitle("OCR 목록")
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
-//            .toolbar {
-//                ToolbarItem(placement: .navigationBarLeading) {
-//                    Button {
-//                        dismiss()
-//                    } label: {
-//                        Image(systemName: "chevron.left")
-//                            .foregroundColor(.mainws)
-//                            .font(.system(size: 18, weight: .semibold))
-//                    }
-//                }
-//            }
+            .onAppear{
+                Task {
+                    await viewModel.fetchMyOCRList()
+                }
+            }
+            //            .toolbar {
+            //                ToolbarItem(placement: .navigationBarLeading) {
+            //                    Button {
+            //                        dismiss()
+            //                    } label: {
+            //                        Image(systemName: "chevron.left")
+            //                            .foregroundColor(.mainws)
+            //                            .font(.system(size: 18, weight: .semibold))
+            //                    }
+            //                }
+            //            }
         }
     }
 }
