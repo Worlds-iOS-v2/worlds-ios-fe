@@ -91,9 +91,15 @@ struct OCRResultView: View {
                                         .font(.pretendard(.medium, size: 16))
                                         .foregroundColor(.black)
                                     
-                                    Text(viewModel.translatedText[index])
-                                        .font(.pretendard(.medium, size: 16))
-                                        .foregroundColor(.mainws)
+                                    if index < viewModel.translatedText.count {
+                                        Text(viewModel.translatedText[index])
+                                            .font(.pretendard(.medium, size: 16))
+                                            .foregroundColor(.mainws)
+                                    } else {
+                                        Text(viewModel.originalText[index])
+                                            .font(.pretendard(.medium, size: 16))
+                                            .foregroundColor(.gray)
+                                    }
                                     
                                     Divider()
                                 }
