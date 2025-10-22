@@ -9,6 +9,8 @@ import SwiftUI
 
 struct LoginView: View {
     @EnvironmentObject var appState: AppState
+    @StateObject private var kakaoLoginManager = KakaoLoginManager()
+    @StateObject private var appleLoginManager = AppleLoginManager()
     
     @State var email: String = ""
     @State var password: String = ""
@@ -129,7 +131,16 @@ struct LoginView: View {
                     
                     HStack {
                         Button {
-                            // 카카오 로그인
+                            kakaoLoginManager.loginWithKakao { result in
+                                DispatchQueue.main.async {
+                                    switch result {
+                                    case .success(_):
+                                        appState.flow = .main
+                                    case .failure(let error):
+                                        print("카카오 로그인 실패: \(error)")
+                                    }
+                                }
+                            }
                         } label: {
                             ZStack {
                                 Circle()
@@ -145,26 +156,16 @@ struct LoginView: View {
                         .padding(.trailing, 16)
                         
                         Button {
-                            // 구글 로그인
-                        } label: {
-                            ZStack {
-                                Circle()
-                                    .fill(.google)
-                                    .frame(width: 50, height: 50)
-                                    .overlay(
-                                        Circle().stroke(Color.gray, lineWidth: 1)
-                                    )
-                                
-                                Image("google")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 20)
+                            appleLoginManager.loginWithApple { result in
+                                DispatchQueue.main.async {
+                                    switch result {
+                                    case .success(_):
+                                        appState.flow = .main
+                                    case .failure(let error):
+                                        print("애플 로그인 실패: \(error)")
+                                    }
+                                }
                             }
-                        }
-                        .padding(.trailing, 16)
-                        
-                        Button {
-                            // 애플 로그인
                         } label: {
                             ZStack {
                                 Circle()

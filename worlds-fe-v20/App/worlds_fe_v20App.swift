@@ -6,11 +6,22 @@
 //
 
 import SwiftUI
+import KakaoSDKCommon
 
 @main
 struct worlds_fe_v20App: App {
     @StateObject private var appState = AppState()
     @StateObject private var signUpViewModel = SignUpViewModel()
+    
+    init() {
+        guard let appKey = Bundle.main.object(forInfoDictionaryKey: "KakaoNativeAppKey") as? String else {
+            print("appKey가 존재하지 않습니다.")
+            return
+        }
+        print("Info.plist에서 읽은 카카오 앱 키: \(Bundle.main.object(forInfoDictionaryKey: "KakaoNativeAppKey") ?? "없음")")
+        
+        KakaoSDK.initSDK(appKey: appKey)
+    }
     
     var body: some Scene {
         WindowGroup {

@@ -52,5 +52,11 @@
 	</array>
 	<key>UIUserInterfaceStyle</key>
 	<string>Light</string>
+	<key>APIAppleLoginURL</key>
+	<string>$(API_APPLE_LOGIN_URL)</string>
+	<key>APIKakaoLoginURL</key>
+	<string>$(API_KAKAO_LOGIN_URL)</string>
+	<key>KakaoNativeAppKey</key>
+	<string>$(KAKAO_NATIVE_APP_KEY)</string>
 </dict>
 </plist>
