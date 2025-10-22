@@ -581,9 +581,10 @@ class UserAPIManager {
         case .success(let data):
             do {
                 let response = try JSONDecoder().decode(APIResponse.self, from: data)
-                                
-                UserDefaults.standard.set(response.userInfo?.userName, forKey: "username")
                 
+                UserDefaults.standard.set(response.userInfo?.userName, forKey: "username")
+                UserDefaults.standard.set(response.userInfo?.id, forKey: "userId")
+
                 return response
             } catch {
                 throw UserAPIError.decodingError(description: "디코딩 실패: \(error)")
