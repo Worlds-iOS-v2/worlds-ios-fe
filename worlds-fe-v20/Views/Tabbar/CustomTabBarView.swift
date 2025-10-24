@@ -87,7 +87,7 @@ struct CustomTabBarView: View {
                 }
             }
             .navigationDestination(isPresented: $navigateToChat) {
-                ChatListView()
+                ChatbotView()
             }
             .navigationDestination(isPresented: $navigateToOCR) {
                 OCRCameraView()

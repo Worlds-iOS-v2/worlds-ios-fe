@@ -10,6 +10,8 @@
 	<string>$(API_BASE_URL)</string>
 	<key>APIChangePasswordURL</key>
 	<string>$(API_CHANGE_PASSWORD_URL)</string>
+	<key>APIChatbotURL</key>
+	<string>$(API_CHATBOT_URL)</string>
 	<key>APICheckEmailURL</key>
 	<string>$(API_CHECK_EMAIL_URL)</string>
 	<key>APICrawlURL</key>
