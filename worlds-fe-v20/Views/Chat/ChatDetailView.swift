@@ -388,7 +388,6 @@ struct ChatDetailView: View {
     private func setupChatConnection() {
         print("[ChatDetail] 소켓 연결 시작")
 
-        viewModel.onReceiveMessage()
         viewModel.connectAndJoin(chatId: chat.id)
         viewModel.loadLatestFirst(roomId: chat.id)
         viewModel.listenForMessageRead()
