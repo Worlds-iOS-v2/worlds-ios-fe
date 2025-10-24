@@ -239,22 +239,6 @@ class ChatViewModel: ObservableObject {
             }
         }
     }
-    
-    func onReceiveMessage() {
-        print("🎧 [VM] 메시지 리스너 설정 중...")
-        
-        SocketService.shared.onReceiveMessage { [weak self] message in
-            print("🚨🚨🚨 [VM] 메시지 받았다!!! \(message.content)")
-            
-            DispatchQueue.main.async {
-                self?.messages.append(message)
-                print("✅ [VM] 현재 메시지 개수: \(self?.messages.count ?? 0)")
-                
-                // 🔥 강제 UI 업데이트
-                self?.objectWillChange.send()
-            }
-        }
-    }
 
     func seed(initialMessages: [Message]) {
         DispatchQueue.main.async {

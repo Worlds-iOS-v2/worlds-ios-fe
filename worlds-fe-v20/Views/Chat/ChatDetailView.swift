@@ -133,6 +133,9 @@ struct ChatDetailView: View {
             }
         }
         .background(Color.sub2Ws)
+        .onDisappear {
+            NotificationCenter.default.post(name: .init("RefreshChatRooms"), object: nil)
+        }
         .onAppear {
             // 나간 방인지 체크
             let leftRooms = Set(UserDefaults.standard.array(forKey: "leftRoomIds") as? [Int] ?? [])
@@ -388,7 +391,6 @@ struct ChatDetailView: View {
     private func setupChatConnection() {
         print("[ChatDetail] 소켓 연결 시작")
 
-        viewModel.onReceiveMessage()
         viewModel.connectAndJoin(chatId: chat.id)
         viewModel.loadLatestFirst(roomId: chat.id)
         viewModel.listenForMessageRead()
