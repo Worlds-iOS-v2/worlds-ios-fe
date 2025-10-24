@@ -84,7 +84,7 @@ final class MainViewModel: ObservableObject {
             let info = try await UserAPIManager.shared.getCultureInfo()
             self.eventPrograms = info.eventData
             self.govermentPrograms = info.governmentData
-            self.koreanPrograms = info.koreanData
+            // self.koreanPrograms = info.koreanData
             self.hasLoadedCulture = true
             self.errorMessage = nil
         } catch {
