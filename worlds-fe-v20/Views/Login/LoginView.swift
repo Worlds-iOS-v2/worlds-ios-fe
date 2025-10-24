@@ -9,8 +9,6 @@ import SwiftUI
 
 struct LoginView: View {
     @EnvironmentObject var appState: AppState
-    @StateObject private var kakaoLoginManager = KakaoLoginManager()
-    @StateObject private var appleLoginManager = AppleLoginManager()
     
     @State var email: String = ""
     @State var password: String = ""
@@ -131,14 +129,15 @@ struct LoginView: View {
                     
                     HStack {
                         Button {
-                            kakaoLoginManager.loginWithKakao { result in
-                                DispatchQueue.main.async {
-                                    switch result {
-                                    case .success(_):
-                                        appState.flow = .main
-                                    case .failure(let error):
-                                        print("카카오 로그인 실패: \(error)")
+                            viewModel.kakaoLogin { success in
+                                if success {
+                                    Task {
+                                        await viewModel.attendanceCheck()
+                                        await appState.checkProfileAfterLogin()
                                     }
+                                } else {
+                                    alertMessage = viewModel.errorMessage ?? "카카오 로그인에 실패했습니다."
+                                    showAlert = true
                                 }
                             }
                         } label: {
@@ -156,14 +155,15 @@ struct LoginView: View {
                         .padding(.trailing, 16)
                         
                         Button {
-                            appleLoginManager.loginWithApple { result in
-                                DispatchQueue.main.async {
-                                    switch result {
-                                    case .success(_):
-                                        appState.flow = .main
-                                    case .failure(let error):
-                                        print("애플 로그인 실패: \(error)")
+                            viewModel.appleLogin { success in
+                                if success {
+                                    Task {
+                                        await viewModel.attendanceCheck()
+                                        await appState.checkProfileAfterLogin()
                                     }
+                                } else {
+                                    alertMessage = viewModel.errorMessage ?? "애플 로그인에 실패했습니다."
+                                    showAlert = true
                                 }
                             }
                         } label: {
