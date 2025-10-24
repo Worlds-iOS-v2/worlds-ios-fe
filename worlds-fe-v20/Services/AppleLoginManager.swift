@@ -46,12 +46,39 @@ class AppleLoginManager: NSObject, ObservableObject, ASAuthorizationControllerDe
                 deviceLanguage = locale.languageCode ?? "en"
             }
 
+            // 이메일과 이름 처리 (최초에만 제공되므로 저장)
+            var email = appleIDCredential.email
+            var givenName = appleIDCredential.fullName?.givenName
+            var familyName = appleIDCredential.fullName?.familyName
+            
+            // 최초 로그인인 경우 (값이 있으면) 저장
+            if let userEmail = email {
+                UserDefaults.standard.set(userEmail, forKey: "appleUserEmail")
+            }
+            if let name = givenName {
+                UserDefaults.standard.set(name, forKey: "appleGivenName")
+            }
+            if let family = familyName {
+                UserDefaults.standard.set(family, forKey: "appleFamilyName")
+            }
+            
+            // nil이면 저장된 값 사용 (두 번째 로그인부터)
+            if email == nil {
+                email = UserDefaults.standard.string(forKey: "appleUserEmail")
+            }
+            if givenName == nil {
+                givenName = UserDefaults.standard.string(forKey: "appleGivenName")
+            }
+            if familyName == nil {
+                familyName = UserDefaults.standard.string(forKey: "appleFamilyName")
+            }
+
             print("=== Apple Login - 백엔드 전송 데이터 ===")
             print("User Identifier (oauthId): \(appleIDCredential.user)")
             print("ID Token: \(idTokenString)")
-            print("Email: \(appleIDCredential.email ?? "nil")")
-            print("Given Name: \(appleIDCredential.fullName?.givenName ?? "nil")")
-            print("Family Name: \(appleIDCredential.fullName?.familyName ?? "nil")")
+            print("Email: \(email ?? "nil")")
+            print("Given Name: \(givenName ?? "nil")")
+            print("Family Name: \(familyName ?? "nil")")
             print("Device Language: \(deviceLanguage)")
             print("=======================================")
 
@@ -61,9 +88,9 @@ class AppleLoginManager: NSObject, ObservableObject, ASAuthorizationControllerDe
                     let success = try await self.sendAppleDataToServer(
                         oauthId: appleIDCredential.user,
                         idToken: idTokenString,
-                        email: appleIDCredential.email ?? "sample@sample.com",
-                        givenName: appleIDCredential.fullName?.givenName ?? "sampleName",
-                        familyName: appleIDCredential.fullName?.familyName ?? "sampleName",
+                        email: email ?? "sample@sample.com",
+                        givenName: givenName ?? "givenName",
+                        familyName: familyName ?? "familyName",
                         targetLanguage: deviceLanguage
                     )
 
