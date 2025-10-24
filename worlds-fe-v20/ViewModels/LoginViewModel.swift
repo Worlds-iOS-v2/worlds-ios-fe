@@ -12,6 +12,9 @@ final class LoginViewModel: ObservableObject {
     @Published var password: String = ""
     @Published var errorMessage: String?
     
+    private let kakaoLoginManager = KakaoLoginManager()
+    private let appleLoginManager = AppleLoginManager()
+    
     // 로그인 함수
     @MainActor
     func login() async -> Bool {
@@ -33,6 +36,50 @@ final class LoginViewModel: ObservableObject {
             print("기타 에러: \(errorMessage)")
             
             return false
+        }
+    }
+    
+    // 카카오 로그인
+    @MainActor
+    func kakaoLogin(completion: @escaping (Bool) -> Void) {
+        kakaoLoginManager.loginWithKakao { [weak self] result in
+            guard let self = self else { return }
+            
+            Task { @MainActor in
+                switch result {
+                case .success(_):
+                    print("카카오 로그인 성공")
+                    self.errorMessage = nil
+                    completion(true)
+                    
+                case .failure(let error):
+                    print("카카오 로그인 실패: \(error)")
+                    self.errorMessage = "카카오 로그인에 실패했습니다."
+                    completion(false)
+                }
+            }
+        }
+    }
+    
+    // 애플 로그인
+    @MainActor
+    func appleLogin(completion: @escaping (Bool) -> Void) {
+        appleLoginManager.loginWithApple { [weak self] result in
+            guard let self = self else { return }
+            
+            Task { @MainActor in
+                switch result {
+                case .success(_):
+                    print("애플 로그인 성공")
+                    self.errorMessage = nil
+                    completion(true)
+                    
+                case .failure(let error):
+                    print("애플 로그인 실패: \(error)")
+                    self.errorMessage = "애플 로그인에 실패했습니다."
+                    completion(false)
+                }
+            }
         }
     }
     
