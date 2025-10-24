@@ -12,7 +12,7 @@ struct CultureDetailView: View {
     
     let eventPrograms: [EventProgram]
     let govermentPrograms: [GovernmentProgram]
-    let koreanPrograms: [KoreanProgram]
+   // let koreanPrograms: [KoreanProgram]
     
     var textColor: Color = .mainfontws
     
@@ -42,13 +42,13 @@ struct CultureDetailView: View {
                         .padding(.horizontal, 24)
                         .padding(.bottom, 20)
                     
-                    Text("한국어 교육 프로그램")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 24)
-                    
-                    CultureSlideView<KoreanProgram>(datas: koreanPrograms, isLoading: false)
-                        .frame(height: 190)
-                        .padding(.horizontal, 24)
+//                    Text("한국어 교육 프로그램")
+//                        .frame(maxWidth: .infinity, alignment: .leading)
+//                        .padding(.horizontal, 24)
+//                    
+//                    CultureSlideView<KoreanProgram>(datas: koreanPrograms, isLoading: false)
+//                        .frame(height: 190)
+//                        .padding(.horizontal, 24)
                 }
                 .font(.pretendard(.bold, size: 24))
                 .foregroundStyle(textColor)

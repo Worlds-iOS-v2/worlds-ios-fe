@@ -11,7 +11,7 @@ struct CultureInfo: Codable {
     let message: String
     let statusCode: Int
     let governmentData: [GovernmentProgram]
-    let koreanData: [KoreanProgram]
+    // let koreanData: [KoreanProgram]
     let eventData: [EventProgram]
 }
 
