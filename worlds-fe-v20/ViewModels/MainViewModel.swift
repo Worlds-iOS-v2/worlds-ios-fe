@@ -14,7 +14,7 @@ final class MainViewModel: ObservableObject {
     
     @Published var eventPrograms: [EventProgram] = []
     @Published var govermentPrograms: [GovernmentProgram] = []
-    @Published var koreanPrograms: [KoreanProgram] = []
+    // @Published var koreanPrograms: [KoreanProgram] = []
     @Published var isLoading: Bool = false
     
     // 데이터 로드 상태 (한 번만 로드하기 위한 플래그)
@@ -84,7 +84,7 @@ final class MainViewModel: ObservableObject {
             let info = try await UserAPIManager.shared.getCultureInfo()
             self.eventPrograms = info.eventData
             self.govermentPrograms = info.governmentData
-            self.koreanPrograms = info.koreanData
+            // self.koreanPrograms = info.koreanData
             self.hasLoadedCulture = true
             self.errorMessage = nil
         } catch {
@@ -100,7 +100,7 @@ final class MainViewModel: ObservableObject {
         attendanceList = []
         eventPrograms = []
         govermentPrograms = []
-        koreanPrograms = []
+        // koreanPrograms = []
         hasLoadedPosts = false
         hasLoadedAttendance = false
         hasLoadedCulture = false
