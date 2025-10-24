@@ -3390,88 +3390,87 @@
         }
       }
     },
-    "이메일 형식이 올바르지 않습니다." : {
-      "extractionState" : "manual",
+    "이메일" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Email format is incorrect."
+            "value" : "Email"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Неверный формат электронной почты."
+            "value" : "Электронная почта"
           }
         },
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "รูปแบบอีเมลไม่ถูกต้อง"
+            "value" : "อีเมล"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Định dạng email không đúng."
+            "value" : "Email"
           }
         },
         "zh" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "邮箱格式不正确。"
+            "value" : "邮箱"
           }
         }
       }
     },
-    "이미 인증이 완료된 이메일입니다." : {
+    "이메일 인증" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This email is already verified."
+            "value" : "Email Verification"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Этот адрес электронной почты уже подтвержден."
+            "value" : "Подтверждение электронной почты"
           }
         },
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "อีเมลนี้ได้รับการยืนยันแล้ว"
+            "value" : "ยืนยันอีเมล"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Email này đã được xác thực."
+            "value" : "Xác thực email"
           }
         },
         "zh" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "此邮箱已完成验证。"
+            "value" : "邮箱验证"
           }
         }
       }
     },
-    "이미지를 불러올 수 없습니다" : {
+    "이미지를 불러오지 못했습니다" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cannot load image"
+            "value" : "Failed to load image"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Не удается загрузить изображение"
+            "value" : "Не удалось загрузить изображение"
           }
         },
         "th" : {
@@ -3525,40 +3524,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "验证码"
-          }
-        }
-      }
-    },
-    "인증번호 전송" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Send Verification Code"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Отправить код подтверждения"
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ส่งรหัสยืนยัน"
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gửi mã xác thực"
-          }
-        },
-        "zh" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "发送验证码"
           }
         }
       }
@@ -3631,40 +3596,6 @@
         }
       }
     },
-    "이메일" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Email"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Электронная почта"
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "อีเมล"
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Email"
-          }
-        },
-        "zh" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "邮箱"
-          }
-        }
-      }
-    },
     "이메일 또는 비밀번호가 일치하지 않습니다." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3700,37 +3631,37 @@
         }
       }
     },
-    "이메일 인증" : {
+    "이메일 형식이 올바르지 않습니다." : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Email Verification"
+            "value" : "Email format is incorrect."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Подтверждение электронной почты"
+            "value" : "Неверный формат электронной почты."
           }
         },
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ยืนยันอีเมล"
+            "value" : "รูปแบบอีเมลไม่ถูกต้อง"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Xác thực email"
+            "value" : "Định dạng email không đúng."
           }
         },
         "zh" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "邮箱验证"
+            "value" : "邮箱格式不正确。"
           }
         }
       }
@@ -3836,6 +3767,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "请输入邮箱"
+          }
+        }
+      }
+    },
+    "이미 인증이 완료된 이메일입니다." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This email is already verified."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Этот адрес электронной почты уже подтвержден."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "อีเมลนี้ได้รับการยืนยันแล้ว"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email này đã được xác thực."
+          }
+        },
+        "zh" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此邮箱已完成验证。"
           }
         }
       }
@@ -4011,18 +3977,18 @@
         }
       }
     },
-    "이미지를 불러오지 못했습니다" : {
+    "이미지를 불러올 수 없습니다" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Failed to load image"
+            "value" : "Cannot load image"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Не удалось загрузить изображение"
+            "value" : "Не удается загрузить изображение"
           }
         },
         "th" : {
@@ -4144,6 +4110,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "验证"
+          }
+        }
+      }
+    },
+    "인증번호 전송" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send Verification Code"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отправить код подтверждения"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ส่งรหัสยืนยัน"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gửi mã xác thực"
+          }
+        },
+        "zh" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "发送验证码"
           }
         }
       }
@@ -5075,6 +5075,7 @@
       }
     },
     "한국어 교육 프로그램" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
