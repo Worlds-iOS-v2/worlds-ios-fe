@@ -78,10 +78,20 @@ class SocketService {
         }
         
         let payload = ["roomId": roomId, "userId": userId]
-        print("🏠 [SOCKET] 방 참여 시도: \(payload)")
-        socket.emit(Event.joinRoom, payload)
         
-        // 방 참여 응답 리스너 (선택사항)
+        // 🔥 연결되어 있으면 바로 emit
+        if socket.status == .connected {
+            print("🏠 [SOCKET] 방 참여 시도: \(payload)")
+            socket.emit(Event.joinRoom, payload)
+        } else {
+            print("⏳ [SOCKET] 연결 대기 후 방 참여 예약")
+            socket.once(clientEvent: .connect) { [weak self] _, _ in
+                print("🏠 [SOCKET] 연결 완료 - 방 참여 시도: \(payload)")
+                self?.socket.emit(Event.joinRoom, payload)
+            }
+        }
+        
+        // 방 참여 응답 리스너
         socket.on("join_room_response") { data, _ in
             print("✅ [SOCKET] 방 참여 응답: \(data)")
         }
