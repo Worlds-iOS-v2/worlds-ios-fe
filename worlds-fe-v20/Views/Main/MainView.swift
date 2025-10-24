@@ -89,8 +89,8 @@ struct MainView: View {
                     
                     NavigationLink(destination: CultureDetailView(
                         eventPrograms: viewModel.eventPrograms,
-                        govermentPrograms: viewModel.govermentPrograms,
-                        koreanPrograms: viewModel.koreanPrograms
+                        govermentPrograms: viewModel.govermentPrograms
+                        // koreanPrograms: viewModel.koreanPrograms
                     )) {
                         Text("더보기 >")
                             .font(.pretendard(.semiBold, size: 16))
